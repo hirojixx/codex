@@ -425,3 +425,118 @@ Angular 18では `signal + computed + 明示load/reload` で「resource風」を
 ### 注意点
 - v19+ `resource` の完全同等ではない（API/挙動差分あり）
 - Angular 18では「明示イベント駆動」で管理するほうがデバッグしやすい
+
+---
+
+## 15) 追加収集した実装パターン（lacolaco + Angular18系GitHubハック）
+
+以下は、lacolaco氏の記事群とAngular 18系の公開リポジトリ/周辺エコシステムで
+実際に使われることの多い「現場ハック」を整理したもの。
+
+### 15-1. lacolaco由来の実装パターン
+
+1. **Signal of Signals（computed内でsignalを返す）**
+   - 目的: `linkedSignal` がない環境で「source変更時リセット + 編集可能値」を実現。
+   - 出典: `Angular v19: linkedSignal() の解説`。
+   - URL: https://zenn.dev/lacolaco/articles/angular-v19-linked-signal
+
+```ts
+const selectedFood = computed(() => {
+  options();
+  return signal<string | null>(null);
+});
+
+function selectFood(food: string) {
+  selectedFood().set(food);
+}
+```
+
+2. **effect内の同期writeを避ける（v18設計思想）**
+   - 目的: ループ/競合を避け、導出状態は `computed` に寄せる。
+   - 出典: `Angular v19: effect() の変更点`（v18の挙動差分解説）。
+   - URL: https://zenn.dev/lacolaco/articles/angular-v19-effect-changes
+
+3. **コンポーネント間通信で「input/output + Signal」を混ぜる**
+   - 目的: 全部Signalに寄せるより、境界で責務を明確化。
+   - 出典: `Angular Signalsとコンポーネント間通信`。
+   - URL: https://zenn.dev/lacolaco/articles/angular-signals-and-component-communication
+
+### 15-2. Angular18系GitHubで多いハック
+
+4. **fetch + signal の軽量ローダー（HttpClientを使わない最小構成）**
+   - 目的: 小規模画面で RxJS 配管を最小化。
+   - 参考: `nicetomytyuk/angular-18-fetch-signals-example`。
+   - URL: https://github.com/nicetomytyuk/angular-18-fetch-signals-example
+
+```ts
+const loading = signal(false);
+const error = signal<string | null>(null);
+const data = signal<Item[]>([]);
+
+async function load() {
+  loading.set(true);
+  error.set(null);
+  try {
+    data.set(await fetch('/api/items').then(r => r.json()));
+  } catch (e) {
+    error.set(String(e));
+  } finally {
+    loading.set(false);
+  }
+}
+```
+
+5. **Signal Storeを“service内signal”から段階導入**
+   - 目的: 既存RxJS/NgRxから一気に置換しない。
+   - 参考: `zuriscript/signalstory`, `ngrx-signal-store-playground`。
+   - URL: https://github.com/zuriscript/signalstory
+   - URL: https://github.com/markostanimirovic/ngrx-signal-store-playground
+
+6. **immutable強制ハック（mutation事故防止）**
+   - 目的: `set/update` しても再描画されない事故を削減。
+   - 参考: `@angular-architects/ngrx-toolkit` の `withImmutableState`。
+   - URL: https://github.com/angular-architects/ngrx-toolkit
+
+7. **状態同期は explicitEffect で依存を明示**
+   - 目的: effect乱用を避け、依存シグナル集合を明示化。
+   - 参考: `ngxtension explicitEffect`。
+   - URL: https://ngxtension.dev/utilities/effects-side-effects/explicit-effect
+
+8. **Signal + Observable 混在の最小橋渡し**
+   - 目的: 全面RxJS化せず、必要箇所のみ合成。
+   - 参考: `ngxtension derivedFrom`。
+   - URL: https://ngxtension.dev/utilities/signal-async/derived-from
+
+```ts
+const page = signal(1);
+const filters$ = new BehaviorSubject({ q: '' });
+const query = derivedFrom({ page, filters: filters$ }, undefined, { initialValue: { page: 1, filters: { q: '' } } });
+```
+
+9. **「画面ローカルはsignal、ドメイン横断はstore」分離**
+   - 目的: store肥大化防止。
+   - 実務では `selectedId` や `isOpen` はコンポーネントsignal、
+     認証/権限/共通キャッシュはstoreに置く。
+
+10. **ステータスを文字列unionで固定（boolean乱立を避ける）**
+```ts
+type Status = 'idle' | 'loading' | 'reloading' | 'resolved' | 'error';
+const status = signal<Status>('idle');
+```
+
+11. **latest-wins + abort の二重防御**
+```ts
+let controller: AbortController | null = null;
+const seq = signal(0);
+```
+- 連打UI（検索、タブ切替）で特に有効。
+
+12. **テンプレート側は `@if/@for` と signal読み取りを直結**
+- Angular 18 control flowと組み合わせ、
+  `@if (vm().loading) { ... } @else { ... }` を基本形にする。
+
+### 15-3. 追加収集からの推奨
+- lacolacoパターン（Signal of Signals）は Angular 18 で linkedSignal代替として有効。
+- ただしチーム規約として「どの場面で使うか」を固定しないと可読性が落ちる。
+- まずは **イベント駆動load + 3状態管理 + draft分離 + latest-wins** の4点を標準化し、
+  次段階で store/utility（ngxtension, signalstory, ngrx-toolkit）を限定導入するのが安全。
