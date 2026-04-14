@@ -540,3 +540,115 @@ const seq = signal(0);
 - ただしチーム規約として「どの場面で使うか」を固定しないと可読性が落ちる。
 - まずは **イベント駆動load + 3状態管理 + draft分離 + latest-wins** の4点を標準化し、
   次段階で store/utility（ngxtension, signalstory, ngrx-toolkit）を限定導入するのが安全。
+
+---
+
+## 16) さらに使われる「ハック寄り」実装（上級者向け）
+
+> ここは可読性とのトレードオフが強い。チーム規約を決めて限定採用すること。
+
+1. **TTL付きメモ化ローダー（key + ttlで再利用）**
+```ts
+const cache = signal<Record<string, { at: number; data: unknown }>>({});
+
+async function loadWithTtl<T>(key: string, ttlMs: number, fetcher: () => Promise<T>) {
+  const hit = cache()[key];
+  if (hit && Date.now() - hit.at < ttlMs) return hit.data as T;
+  const data = await fetcher();
+  cache.update(prev => ({ ...prev, [key]: { at: Date.now(), data } }));
+  return data;
+}
+```
+
+2. **SWR（先にキャッシュ表示→裏で再取得）**
+```ts
+async function loadSWR<T>(key: string, fetcher: () => Promise<T>) {
+  const stale = cache()[key]?.data as T | undefined;
+  if (stale !== undefined) view.set(stale); // 先に表示
+  const fresh = await fetcher();
+  cache.update(prev => ({ ...prev, [key]: { at: Date.now(), data: fresh } }));
+  view.set(fresh);
+}
+```
+
+3. **single-flight（同一キーの重複リクエストを一本化）**
+```ts
+const inflight = new Map<string, Promise<unknown>>();
+
+function singleFlight<T>(key: string, run: () => Promise<T>): Promise<T> {
+  const p = inflight.get(key);
+  if (p) return p as Promise<T>;
+  const next = run().finally(() => inflight.delete(key));
+  inflight.set(key, next);
+  return next;
+}
+```
+
+4. **Debounce付き手動検索（RxJSなし）**
+```ts
+let timer: ReturnType<typeof setTimeout> | null = null;
+function scheduleSearch(ms = 300) {
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(() => void onClickSearch(), ms);
+}
+```
+
+5. **Undo/Redo（履歴stackをsignalで保持）**
+```ts
+const history = signal<ProjectDraft[]>([]);
+const cursor = signal(-1);
+```
+
+6. **Patch Queue（保存APIを直列化）**
+```ts
+let queue = Promise.resolve();
+function enqueueSave(task: () => Promise<void>) {
+  queue = queue.then(task, task);
+  return queue;
+}
+```
+
+7. **Cross-tab同期（storageイベント + signal）**
+```ts
+window.addEventListener('storage', e => {
+  if (e.key === 'draft') draft.set(JSON.parse(e.newValue ?? 'null'));
+});
+```
+
+8. **Persisted Signal（localStorage backed）**
+```ts
+const theme = signal(localStorage.getItem('theme') ?? 'light');
+function setTheme(v: string) {
+  theme.set(v);
+  localStorage.setItem('theme', v);
+}
+```
+
+9. **Selector結果の弱参照キャッシュ（高コスト導出向け）**
+```ts
+const selectorCache = new WeakMap<object, unknown>();
+```
+
+10. **Lazy chunk state（画面表示時にだけsignalを生成）**
+```ts
+let advancedState: ReturnType<typeof signal<number>> | null = null;
+function getAdvancedState() {
+  return (advancedState ??= signal(0));
+}
+```
+
+11. **Feature FlagでSignal/RxJS実装を切替**
+```ts
+const useSignalsPath = signal(true);
+```
+
+12. **エラー正規化レイヤー（UI側error型を統一）**
+```ts
+type UiError = { code: string; message: string };
+function normalizeError(e: unknown): UiError { return { code: 'UNKNOWN', message: String(e) }; }
+```
+
+### 採用優先順位（推奨）
+1. まずは section 9 の標準パターン。
+2. 次に section 15 のlacolaco/GitHub由来パターン。
+3. それでも不足する場合のみ本 section のハックを限定採用。
