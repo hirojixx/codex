@@ -1,12 +1,12 @@
 # Research Index
 
-Generated: 2026-04-14 03:09:35 UTC
+Generated: 2026-04-14 03:25:07 UTC
 
 ## 00_inbox
 - (empty)
 
 ## 01_active
-- (empty)
+- research/01_active/2026-04-14__homelab-proxmox-k8s-build-runbook.md
 
 ## 02_reference
 - (empty)
