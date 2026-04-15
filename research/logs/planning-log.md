@@ -36,3 +36,63 @@
   3. 自己レビュー実行
 - status: planned (2026-04-14)
 
+## 2026-04-14 04:24:39 UTC
+- task: db-design-patterns-ja
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - DB設計 考慮項目 正規化 制約
+  - DDD イベントソーシング テーブル設計
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-04-14)
+
+## 2026-04-14 04:37:15 UTC
+- task: expand-db-design-note-with-explanations
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - DB設計 制約 ない場合 問題 深刻度
+  - ER図 サンプル DDD イベントソーシング
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-04-14)
+
+## 2026-04-14 05:03:14 UTC
+- task: db-note-all-items-risk-severity
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - 各項目 前提 解説 サンプル 問題 深刻度
+  - DB設計 チェックリスト 66項目
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-04-14)
+
+## 2026-04-14 08:52:51 UTC
+- task: bike-manufacturing-db-design-flow-education
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - バイク製造管理 BOM 概念設計 ER
+  - 部品番号改版 追従設計
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-04-14)
+
+## 2026-04-14 08:58:45 UTC
+- task: split-bike-bom-case-study-into-separate-file
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - 教育用 ケーススタディ ファイル分割
+  - BOM バイク 詳細ドキュメント
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-04-14)
+
