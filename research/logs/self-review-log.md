@@ -67,3 +67,57 @@
  research/logs/self-review-log.md                   |   5 +
  4 files changed, 149 insertions(+), 1 deletion(-)
 
+## 2026-04-14 04:25:36 UTC
+- reindex: passed
+- required-files: passed
+- planning-log-check: passed (2026-04-14)
+- git-diff-summary:
+ research/_meta/index.md          |  3 ++-
+ research/logs/planning-log.md    | 12 ++++++++++++
+ research/logs/self-review-log.md |  5 +++++
+ 3 files changed, 19 insertions(+), 1 deletion(-)
+
+## 2026-04-14 04:38:27 UTC
+- reindex: passed
+- required-files: passed
+- planning-log-check: passed (2026-04-14)
+- git-diff-summary:
+ ...14__db-design-patterns-ddd-event-sourcing-ja.md | 207 +++++++++++++++++++--
+ research/_meta/index.md                            |   2 +-
+ research/logs/planning-log.md                      |  12 ++
+ research/logs/self-review-log.md                   |   5 +
+ 4 files changed, 213 insertions(+), 13 deletions(-)
+
+## 2026-04-14 05:05:25 UTC
+- reindex: passed
+- required-files: passed
+- planning-log-check: passed (2026-04-14)
+- git-diff-summary:
+ ...14__db-design-patterns-ddd-event-sourcing-ja.md | 595 +++++++++++++++------
+ research/_meta/index.md                            |   2 +-
+ research/logs/planning-log.md                      |  12 +
+ research/logs/self-review-log.md                   |   5 +
+ 4 files changed, 453 insertions(+), 161 deletions(-)
+
+## 2026-04-14 08:53:46 UTC
+- reindex: passed
+- required-files: passed
+- planning-log-check: passed (2026-04-14)
+- git-diff-summary:
+ ...14__db-design-patterns-ddd-event-sourcing-ja.md | 161 +++++++++++++++++++++
+ research/_meta/index.md                            |   2 +-
+ research/logs/planning-log.md                      |  12 ++
+ research/logs/self-review-log.md                   |   5 +
+ 4 files changed, 179 insertions(+), 1 deletion(-)
+
+## 2026-04-14 08:59:43 UTC
+- reindex: passed
+- required-files: passed
+- planning-log-check: passed (2026-04-14)
+- git-diff-summary:
+ ...14__db-design-patterns-ddd-event-sourcing-ja.md | 164 +--------------------
+ research/_meta/index.md                            |   3 +-
+ research/logs/planning-log.md                      |  12 ++
+ research/logs/self-review-log.md                   |   5 +
+ 4 files changed, 24 insertions(+), 160 deletions(-)
+
