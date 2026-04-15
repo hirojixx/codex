@@ -157,38 +157,175 @@ const isDirty = computed(() => JSON.stringify(base()) !== JSON.stringify(draft()
 
 ## 7. ハック寄りパターン（必要時のみ）
 
-### 7-1. lacolaco由来
+> 以下は「標準で困った時にだけ」採用する。全項目に最小サンプルを示す。
 
-1. Signal of Signals（`computed(() => signal(...))`）
-2. effect内同期write回避
-3. input/output + Signal 境界運用
+### 7-1. lacolaco由来（3）
 
-### 7-2. GitHub / Ecosystem由来
+1) Signal of Signals（`computed(() => signal(...))`）
+```ts
+const selectedFood = computed(() => {
+  options();
+  return signal<string | null>(null);
+});
 
-4. fetch + signal軽量ローダー
-5. Signal Store段階導入
-6. immutable強制（withImmutableState 等）
-7. `explicitEffect` で依存明示
-8. `derivedFrom` で Signal+Observable 橋渡し
-9. 画面ローカルsignal / 横断store分離
-10. status を union で固定
-11. latest-wins + abort 二重防御
-12. `@if/@for` と signal読取直結
+function selectFood(food: string) {
+  selectedFood().set(food);
+}
+```
 
-### 7-3. さらに上級ハック
+2) effect内同期write回避（導出はcomputedへ）
+```ts
+const fullName = computed(() => `${firstName()} ${lastName()}`);
+// effectの中で別signalへ set しない
+```
 
-13. TTLメモ化ローダー
-14. SWR（stale即表示 + 背景更新）
-15. single-flight（同キー重複排除）
-16. RxJSなし debounce
-17. Undo/Redo 履歴stack
-18. patch queue（保存直列化）
-19. cross-tab 同期
-20. persisted signal
-21. selector弱参照キャッシュ
-22. lazy state 初期化
-23. feature flag で Signal/RxJS 切替
-24. error正規化レイヤー
+3) input/output + Signal 境界運用
+```ts
+// parent
+<child [userId]="selectedId()" (saved)="reload()" />
+
+// child
+userId = input.required<string>();
+saved = output<void>();
+```
+
+### 7-2. GitHub / Ecosystem由来（9）
+
+4) fetch + signal軽量ローダー
+```ts
+const loading = signal(false);
+const data = signal<Item[]>([]);
+async function load() {
+  loading.set(true);
+  data.set(await fetch('/api/items').then(r => r.json()));
+  loading.set(false);
+}
+```
+
+5) Signal Store段階導入（service内signalから移行）
+```ts
+@Injectable()
+export class ProjectState {
+  readonly projects = signal<Project[]>([]);
+  readonly selectedId = signal<string | null>(null);
+}
+```
+
+6) immutable強制（mutation防止）
+```ts
+function addItem(next: Item) {
+  items.update(prev => [...prev, next]); // push禁止
+}
+```
+
+7) `explicitEffect` で依存明示
+```ts
+explicitEffect([selectedId, filters], ([id, f]) => {
+  console.log('track only explicit deps', id, f);
+});
+```
+
+8) `derivedFrom` で Signal+Observable 橋渡し
+```ts
+const query = derivedFrom({ page, filters: filters$ }, undefined, {
+  initialValue: { page: 1, filters: { q: '' } },
+});
+```
+
+9) 画面ローカルsignal / 横断store分離
+```ts
+// component local
+const isOpen = signal(false);
+// app-wide store
+authStore.user();
+```
+
+10) status を union で固定
+```ts
+type Status = 'idle' | 'loading' | 'reloading' | 'resolved' | 'error';
+const status = signal<Status>('idle');
+```
+
+11) latest-wins + abort 二重防御
+```ts
+const seq = signal(0);
+let controller: AbortController | null = null;
+```
+
+12) `@if/@for` と signal読取直結
+```html
+@if (vm().loading) { <spinner /> }
+@else { @for (item of vm().items; track item.id) { <li>{{item.name}}</li> } }
+```
+
+### 7-3. さらに上級ハック（12）
+
+13) TTLメモ化ローダー
+```ts
+const cache = signal<Record<string, { at: number; data: unknown }>>({});
+```
+
+14) SWR（stale即表示 + 背景更新）
+```ts
+if (cache()[key]) view.set(cache()[key].data as T);
+view.set(await fetcher());
+```
+
+15) single-flight（同キー重複排除）
+```ts
+const inflight = new Map<string, Promise<unknown>>();
+```
+
+16) RxJSなし debounce
+```ts
+let timer: ReturnType<typeof setTimeout> | null = null;
+```
+
+17) Undo/Redo 履歴stack
+```ts
+const history = signal<ProjectDraft[]>([]);
+const cursor = signal(-1);
+```
+
+18) patch queue（保存直列化）
+```ts
+let queue = Promise.resolve();
+queue = queue.then(() => saveApi(draft()));
+```
+
+19) cross-tab 同期
+```ts
+window.addEventListener('storage', e => {
+  if (e.key === 'draft') draft.set(JSON.parse(e.newValue ?? 'null'));
+});
+```
+
+20) persisted signal
+```ts
+const theme = signal(localStorage.getItem('theme') ?? 'light');
+```
+
+21) selector弱参照キャッシュ
+```ts
+const selectorCache = new WeakMap<object, unknown>();
+```
+
+22) lazy state 初期化
+```ts
+let advanced: WritableSignal<number> | null = null;
+const getAdvanced = () => (advanced ??= signal(0));
+```
+
+23) feature flag で Signal/RxJS 切替
+```ts
+const useSignalsPath = signal(true);
+```
+
+24) error正規化レイヤー
+```ts
+type UiError = { code: string; message: string };
+const normalizeError = (e: unknown): UiError => ({ code: 'UNKNOWN', message: String(e) });
+```
 
 ---
 
