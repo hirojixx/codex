@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Note Maintainer"
+  short_description: "Keep note metadata and logs consistent"
+  default_prompt: "既存のresearchノートを品質ゲートに沿って更新してください。"
