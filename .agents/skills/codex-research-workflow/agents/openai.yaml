@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Research Workflow"
+  short_description: "Run planning and self-review gates"
+  default_prompt: "このリポジトリの調査ノート更新を標準手順で進めてください。"

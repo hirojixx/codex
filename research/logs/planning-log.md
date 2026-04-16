@@ -96,3 +96,15 @@
   3. 自己レビュー実行
 - status: planned (2026-04-14)
 
+## 2026-04-16 10:31:54 UTC
+- task: create-skills-from-commit-history
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - OpenAI Codex skills best practices
+  - repo commit log recurring workflows
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-04-16)
+
