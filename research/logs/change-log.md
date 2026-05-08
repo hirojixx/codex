@@ -8,3 +8,8 @@
 - `scripts/self_review.sh` と自己レビュー用テンプレートを追加。
 - 作業前プランニングを必須化し、`scripts/preplan.sh` と planning ログ運用を追加。
 - self-review で当日 planning-log の存在確認を行うゲートを追加。
+
+## 2026-05-08
+- planning/self-review の記録先を単一ログからタスク別ログディレクトリへ変更。
+- 旧 `planning-log.md` / `self-review-log.md` を `research/logs/archive/` に移動して過去ログとして保持。
+- `codex.md` と関連テンプレート/README のログ運用説明をタスク別ログに更新。

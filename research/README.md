@@ -4,12 +4,12 @@
 このディレクトリは、プログラミング調査を「収集 → 正規化 → 検証 → 参照資産化」するための中核です。
 
 ## 使い方（最短）
-1. 作業前に `./scripts/preplan.sh` を実行し、計画を記録。
+1. 作業前に `./scripts/preplan.sh` を実行し、`research/logs/planning/YYYY-MM-DD__<task-slug>.md` へ計画を記録。
 2. 調査メモを `00_inbox` に追加。
 3. テンプレートを用いて `01_active` に昇格。
 4. 検証済みになったら `02_reference` へ移動。
 5. 旧版は `03_archive` で履歴保持。
-6. ファイル編集後は `./scripts/self_review.sh` を実行し、自己レビュー記録を残す。
+6. ファイル編集後は `./scripts/self_review.sh [task_title]` を実行し、`research/logs/self-review/YYYY-MM-DD__<task-slug>.md` へ自己レビュー記録を残す。
 
 ## KPI 例
 - Inbox滞留日数: 2日以内

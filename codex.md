@@ -3,8 +3,8 @@
 ## 0. 作業前プランニング（必須）
 1. **Prompt定義**: 「目的・成功条件・制約」を1行ずつ明文化する。
 2. **事前検索**: 最低2件の検索語を作成し、既存ノート/外部ソースの確認対象を決める。
-3. **計画記録**: `./scripts/preplan.sh <task_title> <query1> <query2> ...` を実行して `research/logs/planning-log.md` に記録する。
-4. **実装開始条件**: planning-log への記録完了後にのみ編集を開始する。
+3. **計画記録**: `./scripts/preplan.sh <task_title> <query1> <query2> ...` を実行して、タスク別ログ `research/logs/planning/YYYY-MM-DD__<task-slug>.md` に記録する。
+4. **実装開始条件**: 当日のタスク別 planning ログへの記録完了後にのみ編集を開始する。
 
 ## 1. 目的
 - 主にプログラミング関連の調査を、**再利用可能な知識資産**として蓄積する。
@@ -25,6 +25,9 @@
 - `research/_meta`: タクソノミー・運用ルール・レビュー設定。
 - `research/_templates`: 調査ノートのテンプレート。
 - `research/logs`: 更新履歴・再整理記録・プランニング記録・自己レビュー記録。
+- `research/logs/planning`: タスク別の作業前プランニングログ（`YYYY-MM-DD__<task-slug>.md`）。
+- `research/logs/self-review`: タスク別の自己レビューログ（`YYYY-MM-DD__<task-slug>.md`）。
+- `research/logs/archive`: 旧形式の単一ログなど、履歴保持用の過去ログ。
 
 ## 4. 命名規則
 - ノート名: `YYYY-MM-DD__topic-slug.md`
@@ -56,8 +59,8 @@
 2. `research/_meta/taxonomy.md` のカテゴリに沿って分類。
 3. `research/logs/change-log.md` に更新履歴を記録。
 4. 週1回 `scripts/reindex.sh` でインデックスを再生成。
-5. 作業前に `scripts/preplan.sh` を実行。
-6. ファイル編集後は必ず `scripts/self_review.sh` を実行。
+5. 作業前に `scripts/preplan.sh` を実行し、タスク別 planning ログを作成。
+6. ファイル編集後は必ず `scripts/self_review.sh [task_title]` を実行し、対応するタスク別 self-review ログを作成。
 
 ## 8. 品質ゲート
 - 根拠のない断定をしない（必ず source を明記）。
@@ -68,5 +71,5 @@
 1. **構成レビュー**: 追加/変更ファイルが規約ディレクトリに配置されているか確認。
 2. **内容レビュー**: テンプレートの必須項目（結論・根拠・制約・次アクション）が欠落していないか確認。
 3. **整合レビュー**: `taxonomy.md` / `update-policy.md` と矛盾がないか確認。
-4. **自動チェック実行**: `scripts/self_review.sh` を実行し、`research/logs/self-review-log.md` に結果を追記。
+4. **自動チェック実行**: `scripts/self_review.sh [task_title]` を実行し、`research/logs/self-review/YYYY-MM-DD__<task-slug>.md` に結果を追記する（`task_title` 省略時は当日の最新 planning ログに対応）。
 5. **最終判定**: 問題が1つでも残る場合はコミットしない。
