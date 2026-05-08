@@ -132,3 +132,26 @@
   3. 自己レビュー実行
 - status: planned (2026-05-08)
 
+## 2026-05-08 01:12:13 UTC
+- task: add research lifecycle stage directories
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - research lifecycle inbox reference archive directories
+  - git track empty directories gitkeep README examples
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-05-08)
+
+## 2026-05-08 01:58:14 UTC
+- task: resolve research index merge conflicts
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - GitHub resolve merge conflicts command line
+  - generated files reduce merge conflicts stable headers
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-05-08)
