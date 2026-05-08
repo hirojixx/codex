@@ -108,6 +108,30 @@
   3. 自己レビュー実行
 - status: planned (2026-04-16)
 
+## 2026-05-08 01:12:22 UTC
+- task: research index sharding
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - repository generated aggregate index shard files
+  - documentation workflow avoid merge conflicts generated index
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-05-08)
+
+## 2026-05-08 01:41:22 UTC
+- task: resolve-index-conflicts
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - git merge conflict deterministic generated index
+  - research generated index timestamp merge conflict
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-05-08)
+
 ## 2026-05-08 01:12:13 UTC
 - task: add research lifecycle stage directories
 - planning_prompt: この作業の目的・成功条件・制約は何か？
@@ -120,3 +144,14 @@
   3. 自己レビュー実行
 - status: planned (2026-05-08)
 
+## 2026-05-08 01:58:14 UTC
+- task: resolve research index merge conflicts
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - GitHub resolve merge conflicts command line
+  - generated files reduce merge conflicts stable headers
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-05-08)

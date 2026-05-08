@@ -23,6 +23,7 @@
 - `research/02_reference`: 検証済みの定常知識。
 - `research/03_archive`: 廃止・旧版・履歴保持。
 - `research/_meta`: タクソノミー・運用ルール・レビュー設定。
+- `research/_meta/index/`: ステージ別インデックスのシャード。担当ステージのファイルだけを更新する。
 - `research/_templates`: 調査ノートのテンプレート。
 - `research/logs`: 更新履歴・再整理記録・プランニング記録・自己レビュー記録。
 
@@ -55,16 +56,22 @@
 1. `research/_templates/research-note.md` を使って最初の3ノートを作成。
 2. `research/_meta/taxonomy.md` のカテゴリに沿って分類。
 3. `research/logs/change-log.md` に更新履歴を記録。
-4. 週1回 `scripts/reindex.sh` でインデックスを再生成。
-5. 作業前に `scripts/preplan.sh` を実行。
-6. ファイル編集後は必ず `scripts/self_review.sh` を実行。
+4. 通常作業では `scripts/reindex.sh <stage>` で担当ステージのインデックスシャードだけを再生成。
+5. CIや最終統合時のみ `scripts/reindex_all.sh` で集約インデックス `research/_meta/index.md` を再生成。
+6. 作業前に `scripts/preplan.sh` を実行。
+7. ファイル編集後は必ず `scripts/self_review.sh` を実行。
 
-## 8. 品質ゲート
+## 8. インデックス運用
+- `research/_meta/index.md` は手編集・頻繁更新対象から外し、CIや最終統合で再生成する集約インデックスとして扱う。
+- 日常の調査・整理では `research/_meta/index/00_inbox.md`、`01_active.md`、`02_reference.md`、`03_archive.md` のうち担当ステージのシャードだけを更新する。
+- 複数人または4並列作業では、担当ステージまたは担当テーマのシャードに変更範囲を限定し、集約インデックスの更新競合を避ける。
+
+## 9. 品質ゲート
 - 根拠のない断定をしない（必ず source を明記）。
 - 「結論」「制約」「次アクション」が空欄のノートは `active` 扱いに戻す。
 - `review_due` が過去日のノートを0件に維持する。
 
-## 9. 自己レビュープロセス（必須）
+## 10. 自己レビュープロセス（必須）
 1. **構成レビュー**: 追加/変更ファイルが規約ディレクトリに配置されているか確認。
 2. **内容レビュー**: テンプレートの必須項目（結論・根拠・制約・次アクション）が欠落していないか確認。
 3. **整合レビュー**: `taxonomy.md` / `update-policy.md` と矛盾がないか確認。
