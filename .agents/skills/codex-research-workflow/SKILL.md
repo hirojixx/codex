@@ -14,7 +14,7 @@ Follow this workflow exactly for repository research work.
 ## 2) Run pre-planning gate (required)
 - Run `./scripts/preplan.sh <task_title> <query1> <query2> ...` before any content edit.
 - Use at least two concrete search queries.
-- Verify that `research/logs/planning-log.md` is updated.
+- Verify that `research/logs/planning/YYYY-MM-DD__<task-slug>.md` is created or updated for the current task.
 
 ## 3) Perform web-grounded collection
 - Check primary sources first (official docs/specs/vendor docs).
