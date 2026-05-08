@@ -10,7 +10,11 @@ TODAY="$(date -u +'%Y-%m-%d')"
 cd "$ROOT_DIR"
 
 ./scripts/reindex.sh >/dev/null
-review_due_output="$(./scripts/check_review_due.sh)"
+review_due_output=""
+if ! review_due_output="$(./scripts/check_review_due.sh)"; then
+  printf '%s\n' "$review_due_output"
+  exit 1
+fi
 
 missing=0
 for required in \
