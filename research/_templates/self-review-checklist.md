@@ -26,7 +26,7 @@
 
 ## 4. Verification
 - [ ] `./scripts/reindex.sh <stage>` または必要に応じて `./scripts/reindex_all.sh` 実行
-- [ ] `./scripts/self_review.sh [task_title]` 実行
+- [ ] `./scripts/self_review.sh <task_title>` 実行
 - [ ] 差分を目視確認し、不要ファイルが含まれていない
 
 ## 5. Decision

@@ -16,12 +16,15 @@ shift || true
 slugify() {
   local input="$1"
   local slug
+  local hash
+
   slug="$(printf '%s' "$input" \
     | tr '[:upper:]' '[:lower:]' \
     | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')"
 
   if [[ -z "$slug" ]]; then
-    slug="task"
+    hash="$(printf '%s' "$input" | cksum | awk '{print $1}')"
+    slug="task-${hash}"
   fi
 
   printf '%s' "$slug"

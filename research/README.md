@@ -14,7 +14,7 @@
 5. 旧版は `03_archive` で履歴保持。
    - 例: 置き換え済みの旧調査、対象バージョンが終了した検証ログ、参照頻度が下がった過去資料。
 6. 担当ステージのインデックスだけを `./scripts/reindex.sh <stage>` で更新する。
-7. ファイル編集後は `./scripts/self_review.sh [task_title]` を実行し、`research/logs/self-review/YYYY-MM-DD__<task-slug>.md` へ自己レビュー記録を残す。
+7. ファイル編集後は `./scripts/self_review.sh <task_title>` を実行し、`research/logs/self-review/YYYY-MM-DD__<task-slug>.md` へ自己レビュー記録を残す。
 
 ## KPI 例
 - Inbox滞留日数: 2日以内

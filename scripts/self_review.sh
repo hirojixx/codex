@@ -6,29 +6,30 @@ PLAN_DIR="$ROOT_DIR/research/logs/planning"
 REVIEW_DIR="$ROOT_DIR/research/logs/self-review"
 DATE_UTC="$(date -u +'%Y-%m-%d %H:%M:%S UTC')"
 TODAY="$(date -u +'%Y-%m-%d')"
-TASK_TITLE="${1:-}"
+if [[ "$#" -ne 1 ]]; then
+  echo "Usage: $0 <task_title>"
+  exit 1
+fi
+
+TASK_TITLE="$1"
 STAGES=(00_inbox 01_active 02_reference 03_archive)
 REINDEX_TARGETS="${REINDEX_TARGETS:-}"
 
 slugify() {
   local input="$1"
   local slug
+  local hash
+
   slug="$(printf '%s' "$input" \
     | tr '[:upper:]' '[:lower:]' \
     | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')"
 
   if [[ -z "$slug" ]]; then
-    slug="task"
+    hash="$(printf '%s' "$input" | cksum | awk '{print $1}')"
+    slug="task-${hash}"
   fi
 
   printf '%s' "$slug"
-}
-
-latest_today_plan() {
-  find "$PLAN_DIR" -maxdepth 1 -type f -name "${TODAY}__*.md" -print0 2>/dev/null \
-    | xargs -0 -r stat -c '%Y %n' \
-    | sort -nr \
-    | sed -n '1s/^[0-9]\+ //p'
 }
 
 cd "$ROOT_DIR"
@@ -78,22 +79,11 @@ if [[ "$missing" -ne 0 ]]; then
   exit 1
 fi
 
-if [[ -n "$TASK_TITLE" ]]; then
-  TASK_SLUG="$(slugify "$TASK_TITLE")"
-  PLAN_LOG="$PLAN_DIR/${TODAY}__${TASK_SLUG}.md"
-else
-  PLAN_LOG="$(latest_today_plan)"
-  if [[ -n "$PLAN_LOG" ]]; then
-    task_filename="$(basename "$PLAN_LOG")"
-    TASK_SLUG="${task_filename#${TODAY}__}"
-    TASK_SLUG="${TASK_SLUG%.md}"
-  else
-    TASK_SLUG=""
-  fi
-fi
+TASK_SLUG="$(slugify "$TASK_TITLE")"
+PLAN_LOG="$PLAN_DIR/${TODAY}__${TASK_SLUG}.md"
 
-if [[ -z "${PLAN_LOG:-}" ]] || [[ ! -f "$PLAN_LOG" ]] || ! grep -q "$TODAY" "$PLAN_LOG"; then
-  echo "[ERROR] No task-specific planning log entry found for $TODAY. Run ./scripts/preplan.sh first."
+if [[ ! -f "$PLAN_LOG" ]] || ! grep -q "$TODAY" "$PLAN_LOG"; then
+  echo "[ERROR] No task-specific planning log entry found for '$TASK_TITLE' on $TODAY. Run ./scripts/preplan.sh '$TASK_TITLE' first."
   exit 1
 fi
 

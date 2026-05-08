@@ -62,7 +62,7 @@
 4. 通常作業では `scripts/reindex.sh <stage>` で担当ステージのインデックスシャードだけを再生成。
 5. CIや最終統合時のみ `scripts/reindex_all.sh` で集約インデックス `research/_meta/index.md` を再生成。
 6. 作業前に `scripts/preplan.sh` を実行し、タスク別 planning ログを作成。
-7. ファイル編集後は必ず `scripts/self_review.sh [task_title]` を実行し、対応するタスク別 self-review ログを作成。
+7. ファイル編集後は必ず `scripts/self_review.sh <task_title>` を実行し、対応するタスク別 self-review ログを作成。
 
 ## 8. インデックス運用
 - `research/_meta/index.md` は手編集・頻繁更新対象から外し、CIや最終統合で再生成する集約インデックスとして扱う。
@@ -78,5 +78,5 @@
 1. **構成レビュー**: 追加/変更ファイルが規約ディレクトリに配置されているか確認。
 2. **内容レビュー**: テンプレートの必須項目（結論・根拠・制約・次アクション）が欠落していないか確認。
 3. **整合レビュー**: `taxonomy.md` / `update-policy.md` と矛盾がないか確認。
-4. **自動チェック実行**: `scripts/self_review.sh [task_title]` を実行し、`research/logs/self-review/YYYY-MM-DD__<task-slug>.md` に結果を追記する（`task_title` 省略時は当日の最新 planning ログに対応）。
+4. **自動チェック実行**: `scripts/self_review.sh <task_title>` を実行し、対応する当日の planning ログだけを確認して `research/logs/self-review/YYYY-MM-DD__<task-slug>.md` に結果を追記する。
 5. **最終判定**: 問題が1つでも残る場合はコミットしない。

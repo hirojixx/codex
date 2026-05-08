@@ -30,7 +30,7 @@ For skill design rules, read:
 - Update supporting logs when scope changes materially.
 
 ## 5) Run self-review gate (required)
-- Run `./scripts/self_review.sh` after edits.
+- Run `./scripts/self_review.sh <task_title>` after edits, using the same task title passed to `./scripts/preplan.sh`.
 - Resolve any reported issues before commit.
 - Confirm taxonomy and update policy consistency when touching research notes.
 
