@@ -130,4 +130,21 @@
  research/logs/planning-log.md    | 12 ++++++++++++
  research/logs/self-review-log.md |  5 +++++
  3 files changed, 19 insertions(+), 1 deletion(-)
+## 2026-05-08 01:15:27 UTC
+- reindex: passed
+- review-due-check: passed
+  - [WARN] review_due is within 7 days in research/01_active/2026-04-14__bike-bom-db-design-case-study-ja.md: 2026-05-14 (6 days remaining)
+  - [WARN] review_due is within 7 days in research/01_active/2026-04-14__db-design-patterns-ddd-event-sourcing-ja.md: 2026-05-14 (6 days remaining)
+  - [WARN] review_due is within 7 days in research/01_active/2026-04-14__homelab-proxmox-k8s-build-runbook.md: 2026-05-14 (6 days remaining)
+  - [WARN] review_due is within 7 days in research/01_active/2026-04-14__vscode-architecture-patterns.md: 2026-05-14 (6 days remaining)
+- required-files: passed
+- planning-log-check: passed (2026-05-08)
+- git-diff-summary:
+ .../01_active/2026-04-14__vscode-architecture-patterns.md    |  7 ++++++-
+ research/_meta/index.md                                      |  2 +-
+ research/logs/change-log.md                                  |  5 +++++
+ research/logs/planning-log.md                                | 12 ++++++++++++
+ research/logs/self-review-log.md                             | 11 ++++++++++-
+ scripts/self_review.sh                                       | 10 +++++++++-
+ 6 files changed, 43 insertions(+), 4 deletions(-)
 
