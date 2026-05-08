@@ -2,7 +2,7 @@
 
 ## 2026-05-08 02:15:05 UTC
 - task: resolve task log merge conflicts
-- task_slug: resolve-task-log-merge-conflicts
+- task_slug: resolve-task-log-merge-conflicts-4190816125
 - planning_prompt: この作業の目的・成功条件・制約は何か？
 - pre_search:
   - Git merge conflict resolution shell scripts

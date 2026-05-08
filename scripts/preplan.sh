@@ -18,13 +18,15 @@ slugify() {
   local slug
   local hash
 
+  hash="$(printf '%s' "$input" | cksum | awk '{print $1}')"
   slug="$(printf '%s' "$input" \
     | tr '[:upper:]' '[:lower:]' \
     | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')"
 
   if [[ -z "$slug" ]]; then
-    hash="$(printf '%s' "$input" | cksum | awk '{print $1}')"
     slug="task-${hash}"
+  else
+    slug="${slug}-${hash}"
   fi
 
   printf '%s' "$slug"

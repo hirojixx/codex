@@ -2,7 +2,7 @@
 
 ## 2026-05-08 01:14:30 UTC
 - task: task-specific research logs
-- task_slug: task-specific-research-logs
+- task_slug: task-specific-research-logs-2666663195
 - planning_prompt: この作業の目的・成功条件・制約は何か？
 - pre_search:
   - repository research planning log per task

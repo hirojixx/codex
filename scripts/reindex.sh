@@ -36,6 +36,8 @@ write_stage_index() {
   local stage_dir="$ROOT_DIR/research/$stage"
   local title
   local found=0
+  local file
+  local rel
 
   title="$(stage_title "$stage")"
 

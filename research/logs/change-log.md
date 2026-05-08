@@ -20,9 +20,11 @@
 - 旧 `planning-log.md` / `self-review-log.md` を `research/logs/archive/` に移動して過去ログとして保持。
 - `codex.md` と関連テンプレート/README のログ運用説明をタスク別ログに更新。
 - conflict resolution として、ステージ別インデックス運用とタスク別ログ運用を同時に維持する形へ統合。
+- master 取り込み時の衝突を、ステージ別インデックス運用とハッシュ付きタスク別ログ運用を両立する形で解消。
 
 ## 2026-05-08 - task log review fixes
 - `preplan.sh` / `self_review.sh` の slug 生成で ASCII 化後に空になるタスク名へ安定ハッシュ付き fallback を追加し、日本語タスク名同士の同日衝突を防止。
+- `preplan.sh` / `self_review.sh` の slug 生成で全タスク名に安定ハッシュ suffix を追加し、`foo/bar` と `foo bar` のような非空 slug 衝突を防止。
 - `self_review.sh` は `<task_title>` を必須化し、当日最新 planning ログへの暗黙 fallback を廃止して誤ったタスクへのレビュー紐付きを防止。
 - `reindex.sh` から Bash 4 専用の associative array を除去し、macOS 標準 Bash 3.2 互換の `case` に変更。
-- ドキュメントと mandatory skill の self-review 手順を `<task_title>` 必須の運用へ更新。
+- ドキュメント、テンプレート、mandatory skill、maintainer skill の self-review 手順を `<task_title>` 必須の運用へ更新。

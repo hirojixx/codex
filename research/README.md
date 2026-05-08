@@ -4,7 +4,7 @@
 このディレクトリは、プログラミング調査を「収集 → 正規化 → 検証 → 参照資産化」するための中核です。
 
 ## 使い方（最短）
-1. 作業前に `./scripts/preplan.sh` を実行し、`research/logs/planning/YYYY-MM-DD__<task-slug>.md` へ計画を記録。
+1. 作業前に `./scripts/preplan.sh` を実行し、`research/logs/planning/YYYY-MM-DD__<task-slug>.md`（slug は衝突防止の安定ハッシュ付き） へ計画を記録。
 2. 調査メモを `00_inbox` に追加。
    - 例: 未整理のURLメモ、一次情報の抜粋、検証前の仮説メモ。
 3. テンプレートを用いて `01_active` に昇格。

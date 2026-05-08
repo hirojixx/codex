@@ -27,6 +27,6 @@ For recurring patterns, read:
 - Keep language and scope consistent within each note.
 
 ## 4) Validate and finalize
-- Run `./scripts/self_review.sh`.
+- Run `./scripts/self_review.sh <task_title>` with the same task title used during planning.
 - Confirm logs reflect the performed maintenance action.
 - Commit with a maintenance-focused message describing user-visible impact.

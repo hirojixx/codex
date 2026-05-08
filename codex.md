@@ -61,8 +61,8 @@
 3. `research/logs/change-log.md` に更新履歴を記録。
 4. 通常作業では `scripts/reindex.sh <stage>` で担当ステージのインデックスシャードだけを再生成。
 5. CIや最終統合時のみ `scripts/reindex_all.sh` で集約インデックス `research/_meta/index.md` を再生成。
-6. 作業前に `scripts/preplan.sh` を実行し、タスク別 planning ログを作成。
-7. ファイル編集後は必ず `scripts/self_review.sh <task_title>` を実行し、対応するタスク別 self-review ログを作成。
+6. 作業前に `scripts/preplan.sh` を実行し、ハッシュ付きタスク別 planning ログを作成。
+7. ファイル編集後は必ず `scripts/self_review.sh <task_title>` を実行し、対応するハッシュ付きタスク別 self-review ログを作成。
 
 ## 8. インデックス運用
 - `research/_meta/index.md` は手編集・頻繁更新対象から外し、CIや最終統合で再生成する集約インデックスとして扱う。
