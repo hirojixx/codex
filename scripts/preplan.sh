@@ -36,6 +36,8 @@ if [[ ! -f "$PLAN_LOG" ]]; then
     echo "# Planning Log: $TASK_TITLE"
     echo
   } > "$PLAN_LOG"
+elif [[ -s "$PLAN_LOG" ]]; then
+  printf '\n' >> "$PLAN_LOG"
 fi
 
 {
@@ -56,7 +58,6 @@ fi
   echo "  2. ファイル変更"
   echo "  3. 自己レビュー実行"
   echo "- status: planned ($TODAY)"
-  echo
 } >> "$PLAN_LOG"
 
 echo "Planning entry appended to $PLAN_LOG"
