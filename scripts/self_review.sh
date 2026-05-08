@@ -19,7 +19,10 @@ if [[ -n "$REINDEX_TARGETS" ]]; then
 else
   changed_stages=()
   for stage in "${STAGES[@]}"; do
-    if git diff --name-only -- "research/$stage" | grep -q .; then
+    stage_path="research/$stage"
+    if ! git diff --quiet -- "$stage_path" \
+      || ! git diff --cached --quiet -- "$stage_path" \
+      || git ls-files --others --exclude-standard -- "$stage_path" | grep -q .; then
       changed_stages+=("$stage")
     fi
   done
