@@ -108,3 +108,15 @@
   3. 自己レビュー実行
 - status: planned (2026-04-16)
 
+## 2026-05-08 01:13:13 UTC
+- task: review_due metadata enforcement
+- planning_prompt: この作業の目的・成功条件・制約は何か？
+- pre_search:
+  - research metadata review_due required
+  - shell script date comparison review_due warnings
+- plan:
+  1. 要件整理
+  2. ファイル変更
+  3. 自己レビュー実行
+- status: planned (2026-05-08)
+

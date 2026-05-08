@@ -10,6 +10,7 @@ TODAY="$(date -u +'%Y-%m-%d')"
 cd "$ROOT_DIR"
 
 ./scripts/reindex.sh >/dev/null
+review_due_output="$(./scripts/check_review_due.sh)"
 
 missing=0
 for required in \
@@ -19,7 +20,8 @@ for required in \
   "research/_templates/research-note.md" \
   "research/_templates/self-review-checklist.md" \
   "research/_templates/planning-brief.md" \
-  "scripts/preplan.sh"; do
+  "scripts/preplan.sh" \
+  "scripts/check_review_due.sh"; do
   if [[ ! -f "$required" ]]; then
     echo "[ERROR] Missing required file: $required"
     missing=1
@@ -39,6 +41,12 @@ fi
 {
   echo "## $DATE_UTC"
   echo "- reindex: passed"
+  echo "- review-due-check: passed"
+  if [[ -n "$review_due_output" ]]; then
+    while IFS= read -r line; do
+      echo "  - $line"
+    done <<< "$review_due_output"
+  fi
   echo "- required-files: passed"
   echo "- planning-log-check: passed ($TODAY)"
   echo "- git-diff-summary:"

@@ -1,6 +1,11 @@
 # Visual Studio Code 実装パターン整理（転用向け）
 
-作成日: 2026-04-14
+- date: 2026-04-14
+- domain: architecture
+- language: typescript
+- status: active
+- reliability: partially-verified
+- review_due: 2026-05-14
 
 ## 0. 目的
 
