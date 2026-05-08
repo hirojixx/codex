@@ -131,3 +131,32 @@
  research/logs/self-review-log.md |  5 +++++
  3 files changed, 19 insertions(+), 1 deletion(-)
 
+## 2026-05-08 01:13:36 UTC
+- reindex: passed
+- required-files: passed
+- planning-log-check: passed (2026-05-08)
+- git-diff-summary:
+ codex.md                         |  17 +++++--
+ research/README.md               |   9 +++-
+ research/_meta/index.md          |   5 +-
+ research/logs/change-log.md      |   6 +++
+ research/logs/planning-log.md    |  12 +++++
+ research/logs/self-review-log.md |   5 ++
+ scripts/reindex.sh               | 107 ++++++++++++++++++++++++++++++++-------
+ 7 files changed, 136 insertions(+), 25 deletions(-)
+
+## 2026-05-08 01:14:04 UTC
+- reindex: skipped (no stage changes detected)
+- required-files: passed
+- planning-log-check: passed (2026-05-08)
+- git-diff-summary:
+ codex.md                         |  17 +++++--
+ research/README.md               |   9 +++-
+ research/_meta/index.md          |   5 +-
+ research/logs/change-log.md      |   6 +++
+ research/logs/planning-log.md    |  12 +++++
+ research/logs/self-review-log.md |  19 +++++++
+ scripts/reindex.sh               | 107 ++++++++++++++++++++++++++++++++-------
+ scripts/self_review.sh           |  23 ++++++++-
+ 8 files changed, 171 insertions(+), 27 deletions(-)
+

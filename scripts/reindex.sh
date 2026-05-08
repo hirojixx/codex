@@ -2,29 +2,100 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-OUT_FILE="$ROOT_DIR/research/_meta/index.md"
+INDEX_DIR="$ROOT_DIR/research/_meta/index"
+STAGES=(00_inbox 01_active 02_reference 03_archive)
 
-{
-  echo "# Research Index"
-  echo
-  echo "Generated: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-  echo
+declare -A STAGE_TITLES=(
+  [00_inbox]="Inbox"
+  [01_active]="Active"
+  [02_reference]="Reference"
+  [03_archive]="Archive"
+)
 
-  for section in 00_inbox 01_active 02_reference 03_archive; do
-    echo "## ${section}"
-    found=0
-    while IFS= read -r file; do
-      found=1
-      rel="${file#$ROOT_DIR/}"
-      echo "- ${rel}"
-    done < <(find "$ROOT_DIR/research/$section" -maxdepth 1 -type f -name '*.md' | sort)
+usage() {
+  cat <<'USAGE'
+Usage: scripts/reindex.sh [all|00_inbox|01_active|02_reference|03_archive ...]
+
+Regenerates stage-specific research index shards under research/_meta/index/.
+When no stage is specified, all stage shards are regenerated. The aggregate
+research/_meta/index.md is intentionally not touched; use scripts/reindex_all.sh
+for CI or final integration updates.
+USAGE
+}
+
+is_stage() {
+  local candidate="$1"
+  local stage
+  for stage in "${STAGES[@]}"; do
+    [[ "$candidate" == "$stage" ]] && return 0
+  done
+  return 1
+}
+
+write_stage_index() {
+  local stage="$1"
+  local out_file="$INDEX_DIR/${stage}.md"
+  local stage_dir="$ROOT_DIR/research/$stage"
+  local found=0
+
+  mkdir -p "$INDEX_DIR"
+
+  {
+    echo "# Research Index: ${stage} (${STAGE_TITLES[$stage]})"
+    echo
+    echo "Generated: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+    echo
+    echo "## ${stage}"
+
+    if [[ -d "$stage_dir" ]]; then
+      while IFS= read -r file; do
+        found=1
+        rel="${file#$ROOT_DIR/}"
+        echo "- ${rel}"
+      done < <(find "$stage_dir" -maxdepth 1 -type f -name '*.md' | sort)
+    fi
 
     if [[ "$found" -eq 0 ]]; then
       echo "- (empty)"
     fi
 
     echo
-  done
-} > "$OUT_FILE"
+  } > "$out_file"
 
-echo "Wrote $OUT_FILE"
+  echo "Wrote $out_file"
+}
+
+targets=()
+if [[ "$#" -eq 0 ]]; then
+  targets=("${STAGES[@]}")
+else
+  for arg in "$@"; do
+    case "$arg" in
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      all)
+        targets=("${STAGES[@]}")
+        ;;
+      *)
+        if ! is_stage "$arg"; then
+          echo "Unknown stage: $arg" >&2
+          usage >&2
+          exit 1
+        fi
+        targets+=("$arg")
+        ;;
+    esac
+  done
+fi
+
+if [[ "${#targets[@]}" -eq 0 ]]; then
+  echo "No targets selected." >&2
+  usage >&2
+  exit 1
+fi
+
+for stage in "${targets[@]}"; do
+  write_stage_index "$stage"
+done
