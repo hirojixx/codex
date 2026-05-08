@@ -13,11 +13,15 @@ OUT_FILE="$ROOT_DIR/research/_meta/index.md"
   for section in 00_inbox 01_active 02_reference 03_archive; do
     echo "## ${section}"
     found=0
-    while IFS= read -r file; do
-      found=1
-      rel="${file#$ROOT_DIR/}"
-      echo "- ${rel}"
-    done < <(find "$ROOT_DIR/research/$section" -maxdepth 1 -type f -name '*.md' | sort)
+    section_dir="$ROOT_DIR/research/$section"
+
+    if [[ -d "$section_dir" ]]; then
+      while IFS= read -r file; do
+        found=1
+        rel="${file#$ROOT_DIR/}"
+        echo "- ${rel}"
+      done < <(find "$section_dir" -maxdepth 1 -type f -name '*.md' | sort)
+    fi
 
     if [[ "$found" -eq 0 ]]; then
       echo "- (empty)"

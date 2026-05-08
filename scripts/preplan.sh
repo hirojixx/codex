@@ -7,16 +7,33 @@ if [[ "$#" -lt 1 ]]; then
 fi
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-PLAN_LOG="$ROOT_DIR/research/logs/planning-log.md"
+PLAN_DIR="$ROOT_DIR/research/logs/planning"
 STAMP="$(date -u +'%Y-%m-%d %H:%M:%S UTC')"
 TODAY="$(date -u +'%Y-%m-%d')"
 TASK_TITLE="$1"
 shift || true
 
-mkdir -p "$(dirname "$PLAN_LOG")"
+slugify() {
+  local input="$1"
+  local slug
+  slug="$(printf '%s' "$input" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')"
+
+  if [[ -z "$slug" ]]; then
+    slug="task"
+  fi
+
+  printf '%s' "$slug"
+}
+
+TASK_SLUG="$(slugify "$TASK_TITLE")"
+PLAN_LOG="$PLAN_DIR/${TODAY}__${TASK_SLUG}.md"
+
+mkdir -p "$PLAN_DIR"
 if [[ ! -f "$PLAN_LOG" ]]; then
   {
-    echo "# Planning Log"
+    echo "# Planning Log: $TASK_TITLE"
     echo
   } > "$PLAN_LOG"
 fi
@@ -24,6 +41,7 @@ fi
 {
   echo "## $STAMP"
   echo "- task: $TASK_TITLE"
+  echo "- task_slug: $TASK_SLUG"
   echo "- planning_prompt: この作業の目的・成功条件・制約は何か？"
   echo "- pre_search:"
   if [[ "$#" -eq 0 ]]; then

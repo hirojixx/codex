@@ -5,7 +5,7 @@
 - scope: {changed-files or feature}
 
 ## 0. Pre-Planning
-- [ ] `./scripts/preplan.sh` を実行したか
+- [ ] `./scripts/preplan.sh` を実行し、タスク別 planning ログを作成したか
 - [ ] planning_prompt（目的・成功条件・制約）を記録したか
 - [ ] 事前検索クエリを2件以上記録したか
 
@@ -26,7 +26,7 @@
 
 ## 4. Verification
 - [ ] `./scripts/reindex.sh` 実行
-- [ ] `./scripts/self_review.sh` 実行
+- [ ] `./scripts/self_review.sh [task_title]` 実行
 - [ ] 差分を目視確認し、不要ファイルが含まれていない
 
 ## 5. Decision
