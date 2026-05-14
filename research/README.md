@@ -25,6 +25,7 @@
 
 ## インデックス更新ルール
 - 通常作業では `research/_meta/index.md` を直接編集しません。このファイルはCIや最終統合時だけ `./scripts/reindex_all.sh` で再生成する集約インデックスです。
-- 日常更新では `research/_meta/index/` 配下のステージ別シャードを更新します。例: inbox担当は `./scripts/reindex.sh 00_inbox`、active担当は `./scripts/reindex.sh 01_active`。
+- 日常更新では `research/_meta/index/` 配下のステージ別シャードを更新します。例: inbox担当は `./scripts/reindex.sh 00_inbox`、active担当は `./scripts/reindex.sh 01_active`。引数なし実行は usage を表示して失敗します。
 - 4並列作業時は、原則として担当ステージまたは担当テーマのシャードだけを更新し、他担当のシャードと集約インデックスには触れません。
 - 複数ステージをまたぐ移動をした場合だけ、移動元と移動先のシャードを明示して再生成します。例: `./scripts/reindex.sh 00_inbox 01_active`。
+- 全ステージのシャード再生成が必要な場合だけ、明示的に `./scripts/reindex.sh all` または `./scripts/reindex_all.sh` を実行します。
