@@ -14,12 +14,13 @@ declare -A STAGE_TITLES=(
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/reindex.sh [all|00_inbox|01_active|02_reference|03_archive ...]
+Usage: scripts/reindex.sh <all|00_inbox|01_active|02_reference|03_archive ...>
 
 Regenerates stage-specific research index shards under research/_meta/index/.
-When no stage is specified, all stage shards are regenerated. The aggregate
-research/_meta/index.md is intentionally not touched; use scripts/reindex_all.sh
-for CI or final integration updates.
+Specify one or more stages for normal work. Use the explicit "all" target, or
+scripts/reindex_all.sh, when every stage shard must be regenerated. The aggregate
+research/_meta/index.md is intentionally not touched by this script; use
+scripts/reindex_all.sh for CI or final integration updates.
 USAGE
 }
 
@@ -67,28 +68,30 @@ write_stage_index() {
 
 targets=()
 if [[ "$#" -eq 0 ]]; then
-  targets=("${STAGES[@]}")
-else
-  for arg in "$@"; do
-    case "$arg" in
-      -h|--help)
-        usage
-        exit 0
-        ;;
-      all)
-        targets=("${STAGES[@]}")
-        ;;
-      *)
-        if ! is_stage "$arg"; then
-          echo "Unknown stage: $arg" >&2
-          usage >&2
-          exit 1
-        fi
-        targets+=("$arg")
-        ;;
-    esac
-  done
+  echo "No target specified." >&2
+  usage >&2
+  exit 1
 fi
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    all)
+      targets=("${STAGES[@]}")
+      ;;
+    *)
+      if ! is_stage "$arg"; then
+        echo "Unknown stage: $arg" >&2
+        usage >&2
+        exit 1
+      fi
+      targets+=("$arg")
+      ;;
+  esac
+done
 
 if [[ "${#targets[@]}" -eq 0 ]]; then
   echo "No targets selected." >&2
