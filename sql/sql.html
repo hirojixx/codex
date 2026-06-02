@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL体系資料 — SQL標準とOracle AI Database 26aiの切り分け・設計・チューニング</title>
+<style>
+:root{--bg:#f6f7f9;--fg:#1d2733;--muted:#617083;--line:#dfe5ec;--card:#fff;--accent:#2b5d8c;--ora:#b33b26;--std:#1f7a5e;--warn:#b4541a;--danger:#9c2a2a;--code:#10253f;--codebg:#eef2f6;--shadow:0 1px 2px rgba(20,30,45,.05),0 8px 22px rgba(20,30,45,.07)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",Meiryo,system-ui,sans-serif;line-height:1.78;font-size:15.8px}.wrap{max-width:1320px;margin:0 auto;padding:0 22px;display:grid;grid-template-columns:300px 1fr;gap:30px}.hero{grid-column:1/-1;background:linear-gradient(135deg,#782f20,#2b5d8c 58%,#1f7a5e);color:white;border-radius:0 0 18px 18px;padding:34px 32px 30px}.hero h1{font-size:1.85rem;margin:.1em 0 .3em;line-height:1.35}.hero p{max-width:980px}.meta{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.85rem;opacity:.92}.pill{display:inline-block;border-radius:999px;padding:.18em .65em;font-weight:700;font-size:.75rem}.p-std{background:#dff0e8;color:#166148}.p-ora{background:#fde8e1;color:#92321f}.p-both{background:#e8eef8;color:#254f7a}.p-risk{background:#fbe6df;color:#9c2a2a}.p-open{background:#f4edf7;color:#74418b}nav{position:sticky;top:14px;align-self:start;max-height:calc(100vh - 28px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);font-size:.86rem}nav h2{font-size:.75rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px}nav a{display:block;text-decoration:none;color:var(--fg);padding:5px 7px;border-left:3px solid transparent;border-radius:7px}nav a:hover{background:#eef3f8;border-left-color:var(--accent)}main{min-width:0;padding-bottom:70px}section{background:var(--card);border:1px solid var(--line);border-radius:15px;margin:0 0 22px;padding:26px 28px;box-shadow:var(--shadow)}h2{font-size:1.32rem;margin:.1em 0 .7em;padding-bottom:.42em;border-bottom:2px solid var(--line)}h3{font-size:1.08rem;color:#244760;margin:1.45em 0 .45em}h4{font-size:1rem;color:#314d65;margin:1.1em 0 .3em}p{margin:.55em 0}.lead{font-size:1.03rem;background:#f3f0fa;border-left:5px solid #5b3da8;border-radius:0 10px 10px 0;padding:13px 16px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}.card{background:#fafcfe;border:1px solid var(--line);border-radius:12px;padding:15px}.card .k{font-size:.72rem;font-weight:800;color:var(--accent);letter-spacing:.08em}.card .t{font-weight:800;margin:.2em 0}.card .d{font-size:.88rem;color:var(--muted)}.tbl{overflow-x:auto;margin:15px 0}table{border-collapse:collapse;width:100%;min-width:760px;font-size:.87rem}th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}th{background:#eef3f8;color:#263f56}tbody tr:nth-child(even){background:#fbfcfe}code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--codebg);color:var(--code);border-radius:5px;padding:.12em .4em;font-size:.86em}pre{background:var(--code);color:#e3edf7;border-radius:11px;padding:15px 16px;overflow:auto;font-size:.82rem;line-height:1.55}pre code{background:transparent;color:inherit;padding:0}.call{border:1px solid;border-radius:11px;padding:12px 15px;margin:14px 0}.call b{display:block;margin-bottom:.2em}.info{background:#eef4fa;border-color:#cfe0ef}.tip{background:#ecf7f1;border-color:#cde8da}.caution{background:#fff3e8;border-color:#efd5bc}.warning{background:#fde8e8;border-color:#efc4c4}.diagram{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:16px;margin:16px 0}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch}.box{border:1px solid #ccd7e2;border-radius:10px;background:white;padding:10px;text-align:center;font-size:.88rem}.arrow{text-align:center;color:var(--muted);font-weight:bold}.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}.small{font-size:.86rem;color:var(--muted)}.src{font-size:.83rem;color:#536274}ul,ol{padding-left:1.35em}li{margin:.32em 0}@media(max-width:980px){.wrap{display:block}.hero{border-radius:0}nav{position:static;margin:16px 0}.flow,.cols{grid-template-columns:1fr}section{padding:20px 18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+<div class="meta"><span>調査・作成日: 2026-06-02</span><span>前提: Oracle AI Database 26ai / SQL:2023</span><span>形式: Single HTML</span></div>
+<h1>SQL体系資料<br>SQL標準とOracle前提を切り分け、設計・チューニング・オプティマイザまでつなげる</h1>
+<p>この資料は、SQLを「文法暗記」ではなく、<strong>データモデル・集合処理・実行計画・運用制約を結びつけて判断するための材料</strong>として整理する。SQL標準の主な機能、Oracle固有機能、DB設計、DB設定、ヒント句、はまりポイントを、相互に行き来できる形でまとめる。</p>
+</header>
+<nav>
+<h2>Table of Contents</h2>
+<a href="#s1">1. この資料の読み方</a>
+<a href="#s2">2. SQL標準とOracleの境界</a>
+<a href="#s3">3. SQL全体地図</a>
+<a href="#s4">4. SQL標準の主要機能</a>
+<a href="#s5">5. Oracle前提で変わる部分</a>
+<a href="#s6">6. DB設計・物理設計</a>
+<a href="#s7">7. SQL実行とオプティマイザ</a>
+<a href="#s8">8. チューニング手順</a>
+<a href="#s9">9. ヒント句とPlan Management</a>
+<a href="#s10">10. DB設定・初期化パラメータ</a>
+<a href="#s11">11. はまりポイント</a>
+<a href="#s12">12. 例で理解する</a>
+<a href="#s13">13. 参照資料</a>
+</nav>
+<main>
+<section id="s1">
+<h2>1. 何についての資料か</h2>
+<p class="lead">理解のために単純化すると、SQLは「表から行を取り出す言語」ではなく、<strong>制約付きのデータ構造に対して、宣言的に結果集合を指定し、DBMSのオプティマイザに実行方法を選ばせる言語</strong>である。厳密には後述するが、この見方を持つと、文法・設計・性能問題が一つにつながる。</p>
+<div class="cards">
+<div class="card"><div class="k">対象</div><div class="t">SQL標準の骨格</div><div class="d">SELECT、JOIN、集約、サブクエリ、CTE、集合演算、制約、トランザクションなど。</div></div>
+<div class="card"><div class="k">対象</div><div class="t">Oracle固有の実務</div><div class="d">ROWNUM/ROWID、DATEの時刻保持、MERGE、階層問合せ、ヒント句、SQL Plan Management、初期化パラメータ。</div></div>
+<div class="card"><div class="k">対象</div><div class="t">設計と性能</div><div class="d">正規化、キー、索引、パーティション、統計、実行計画、バインド、並列実行、メモリ設定。</div></div>
+</div>
+<div class="call info"><b>前提バージョン</b>2026-06-02時点で、Oracleの最新長期サポート系としてOracle AI Database 26aiを前提にする。Oracle公式ドキュメントにはURLパス上 `/23/` を含む26aiページがあるため、ページタイトルと公開内容を優先した。</div>
+<div class="call caution"><b>重要な読み方</b>SQL標準で定義されるもの、Oracleで実装・拡張されるもの、運用環境に依存するものを混ぜると誤解しやすい。資料内では <span class="pill p-std">SQL標準</span> <span class="pill p-ora">Oracle</span> <span class="pill p-both">共通概念</span> <span class="pill p-risk">注意</span> で切り分ける。</div>
+</section>
+<section id="s2">
+<h2>2. なぜSQL標準とOracle前提を分けるべきか</h2>
+<p>SQLはISO/IEC 9075として標準化されているが、実務で使うSQLは常にDBMS実装の影響を受ける。移植性、性能、運用性を判断するには「標準で考える領域」と「Oracleに寄せてよい領域」を分ける必要がある。</p>
+<div class="tbl"><table><thead><tr><th>観点</th><th>SQL標準として考える</th><th>Oracle前提で考える</th><th>判断ポイント</th></tr></thead><tbody>
+<tr><td>データ取得</td><td>SELECT、FROM、WHERE、GROUP BY、HAVING、ORDER BY、JOIN、サブクエリ</td><td>ROWNUM、FETCH FIRST、階層問合せCONNECT BY、MODEL、MATCH_RECOGNIZE、JSON/GRAPH/VECTOR関連</td><td>移植性が必要なら標準寄り。Oracleで長期運用するなら可読性・性能・機能を優先してOracle機能を使う。</td></tr>
+<tr><td>データ型</td><td>数値、文字、日時、真偽値、NULL、標準的な型概念</td><td>NUMBER、VARCHAR2、DATEが時刻を持つ、TIMESTAMP WITH LOCAL TIME ZONE、CLOB/BLOB、JSON、VECTOR、BOOLEAN</td><td>型変換・NLS・桁あふれ・比較規則が性能と正確性に直結する。</td></tr>
+<tr><td>制約</td><td>PRIMARY KEY、FOREIGN KEY、UNIQUE、CHECK、NOT NULL</td><td>DEFERRABLE、RELY/NOVALIDATE、仮想列、関数ベース索引、ドメイン索引との連動</td><td>アプリで守る制約は漏れやすい。DB制約はデータ品質とオプティマイザの前提にもなる。</td></tr>
+<tr><td>性能制御</td><td>標準SQLは実行方法を基本的に指定しない</td><td>ヒント句、実行計画、統計、SQL Plan Baseline、SQL Profile、初期化パラメータ</td><td>ヒントは最後の手段ではなく「限定的な制御手段」。ただし乱用するとアップグレード耐性を下げる。</td></tr>
+</tbody></table></div>
+<div class="call warning"><b>はまりポイント: “ANSI SQLならどこでも動く” ではない</b>標準SQLは共通語彙を与えるが、実装差は大きい。特に日付時刻、文字照合、NULL、MERGE、再帰問合せ、ロック、分離レベル、DDLの暗黙コミット、ヒント、実行計画はDBMSごとの差が実害になりやすい。</div>
+</section>
+<section id="s3">
+<h2>3. SQL全体地図</h2>
+<p>SQLを体系的に見るには、文法を「種類別」に覚えるより、データのライフサイクルに沿って配置すると理解しやすい。</p>
+<div class="diagram">
+<div class="flow"><div class="box"><b>設計</b><br>概念/論理/物理モデル<br>キー・制約・正規化</div><div class="box"><b>定義</b><br>DDL<br>表・索引・ビュー・権限</div><div class="box"><b>操作</b><br>DML<br>SELECT/INSERT/UPDATE/MERGE</div><div class="box"><b>制御</b><br>TCL/DCL<br>COMMIT/ROLLBACK/GRANT</div><div class="box"><b>運用</b><br>統計・実行計画<br>監視・設定・保守</div></div>
+<p class="small">この図は「SQLを書く前に設計があり、SQL実行後に運用がある」ことを示す。単純化しているが、チューニングの多くはSQL本文だけでなく、設計・統計・設定・運用負荷の影響を受ける。</p>
+</div>
+<h3>SQL文の大分類</h3>
+<div class="tbl"><table><thead><tr><th>分類</th><th>代表文</th><th>標準/Oracle</th><th>注意</th></tr></thead><tbody>
+<tr><td>DDL</td><td>CREATE, ALTER, DROP, TRUNCATE, COMMENT</td><td><span class="pill p-both">共通概念</span></td><td>OracleではDDLが暗黙COMMITを伴う。トランザクション中のDDLは特に注意。</td></tr>
+<tr><td>DML</td><td>SELECT, INSERT, UPDATE, DELETE, MERGE</td><td><span class="pill p-both">共通概念</span></td><td>SELECTはデータ変更しないが、実行計画・ロック待ち・一貫性読み取りの影響を受ける。</td></tr>
+<tr><td>TCL</td><td>COMMIT, ROLLBACK, SAVEPOINT</td><td><span class="pill p-both">共通概念</span></td><td>コミット頻度はUNDO、REDO、ロック時間、アプリ再実行性に影響する。</td></tr>
+<tr><td>DCL</td><td>GRANT, REVOKE</td><td><span class="pill p-both">共通概念</span></td><td>権限は最小権限で設計。ロール経由権限とストアドプログラム内権限の違いに注意。</td></tr>
+<tr><td>診断/制御</td><td>EXPLAIN PLAN, ALTER SESSION, DBMS_STATS, DBMS_XPLAN</td><td><span class="pill p-ora">Oracle</span></td><td>実運用では実際に実行されたカーソルの計画を確認する。EXPLAIN PLANだけで判断しない。</td></tr>
+</tbody></table></div>
+</section>
+<section id="s4">
+<h2>4. SQL標準の主要機能</h2>
+<h3>4.1 SELECTの論理的な処理順序</h3>
+<p><span class="pill p-std">SQL標準</span> SQLは宣言的言語なので、実際の物理実行順と論理的な意味の順序は一致しない。理解用には次の順序で考えるとよい。</p>
+<pre><code>FROM / JOIN
+WHERE
+GROUP BY
+HAVING
+SELECT
+DISTINCT
+ORDER BY
+OFFSET / FETCH</code></pre>
+<div class="call caution"><b>はまりポイント: SELECT句の別名はWHEREで使えないことが多い</b>論理的にはWHEREがSELECTより前に評価されるため、SELECTで付けた別名をWHEREで使えると期待すると移植性が落ちる。OracleでもORDER BYでは別名を使えるが、WHEREでは通常使えない。</div>
+<h3>4.2 JOIN</h3>
+<p><span class="pill p-std">SQL標準</span> JOINは「表を横につなぐ」構文だが、実務では行数の増減を支配する。INNER JOIN、LEFT/RIGHT/FULL OUTER JOIN、CROSS JOIN、自己結合、半結合/反結合相当の書き方を理解する。</p>
+<div class="tbl"><table><thead><tr><th>種類</th><th>意味</th><th>典型用途</th><th>はまりポイント</th></tr></thead><tbody>
+<tr><td>INNER JOIN</td><td>結合条件に合う行だけを残す</td><td>注文と顧客など必須関係</td><td>結合キーの重複で行が増える。1対多か多対多かを先に確認。</td></tr>
+<tr><td>LEFT OUTER JOIN</td><td>左表の行を残し、右表がなければNULL</td><td>任意の関連データを付与</td><td>右表条件をWHEREに書くと外部結合が内部結合化しやすい。</td></tr>
+<tr><td>EXISTS</td><td>存在確認</td><td>親に子が存在するか</td><td>SELECTリストより相関条件が重要。NOT IN + NULLよりNOT EXISTSが安全な場合が多い。</td></tr>
+<tr><td>集合演算</td><td>UNION/INTERSECT/EXCEPT相当</td><td>結果集合の合成</td><td>OracleではMINUSが伝統的。重複排除コストに注意し、必要ならUNION ALL。</td></tr>
+</tbody></table></div>
+<h3>4.3 集約・ウィンドウ関数</h3>
+<p><span class="pill p-std">SQL標準</span> GROUP BYは行を集約して行数を減らす。ウィンドウ関数は行数を維持しながら、パーティション内順位、累計、移動平均などを計算する。</p>
+<pre><code>-- 部署ごとの給与合計: 行数は部署数に減る
+SELECT dept_id, SUM(salary) AS total_salary
+FROM employees
+GROUP BY dept_id;
+
+-- 社員行を残しつつ部署内順位を付ける
+SELECT emp_id, dept_id, salary,
+       RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS dept_rank
+FROM employees;</code></pre>
+<div class="call tip"><b>判断基準</b>「グループ単位の1行が欲しい」ならGROUP BY。「明細行を残しながらグループ内情報を足したい」なら分析関数/ウィンドウ関数。</div>
+<h3>4.4 CTE・再帰・サブクエリ</h3>
+<p><span class="pill p-std">SQL標準</span> WITH句は複雑なSQLを分割して読みやすくする。再帰CTEは階層やグラフ探索を表現できる。ただし、Oracleでは従来からCONNECT BYも広く使われ、再帰CTEとの選択が発生する。</p>
+<div class="call caution"><b>はまりポイント: WITH句は必ず中間表を作るわけではない</b>オプティマイザはインライン展開、マテリアライズ、変換を選ぶ場合がある。読みやすさ目的のWITH句が性能上の境界になるとは限らない。</div>
+<h3>4.5 NULLと三値論理</h3>
+<p><span class="pill p-std">SQL標準</span> NULLは「空文字」や「0」ではなく、未知/適用不能を表す。比較結果はTRUE/FALSEだけでなくUNKNOWNを持つ。</p>
+<pre><code>-- col = NULL は期待通りに判定できない
+WHERE col IS NULL
+
+-- NOT IN は副問合せ側にNULLが混ざると結果が空になり得る
+WHERE NOT EXISTS (
+  SELECT 1 FROM child c WHERE c.parent_id = p.parent_id
+)</code></pre>
+<div class="call warning"><b>重大な注意</b>Oracleでは長年、文字列の空文字 `''` はNULLとして扱われる。この挙動を標準SQLや他DBMSと同じだと思うと、NOT NULL制約、文字列結合、比較、移行で事故が起きる。</div>
+
+<h3>4.6 DDL・制約・トランザクション</h3>
+<p><span class="pill p-std">SQL標準</span> SQLの理解ではSELECTだけに偏らないことが重要である。表定義、制約、権限、トランザクション境界が、SQLの正しさと性能を決める。</p>
+<div class="tbl"><table><thead><tr><th>領域</th><th>主要機能</th><th>理解のポイント</th><th>Oracleでの追加注意</th></tr></thead><tbody>
+<tr><td>表定義</td><td>CREATE TABLE、ALTER TABLE、DROP TABLE</td><td>列、型、NULL可否、デフォルト、生成列、主キーを定義する。</td><td>DDLは暗黙COMMIT。オンラインDDL可否、ロック、Edition、メンテナンス時間を確認。</td></tr>
+<tr><td>制約</td><td>PRIMARY KEY、UNIQUE、FOREIGN KEY、CHECK、NOT NULL</td><td>制約はデータ品質だけでなく、オプティマイザが前提にできるメタデータでもある。</td><td>ENABLE/DISABLE、VALIDATE/NOVALIDATE、DEFERRABLE、RELYの意味を運用込みで決める。</td></tr>
+<tr><td>ビュー</td><td>CREATE VIEW</td><td>SQLの抽象化。権限境界や再利用に便利。</td><td>ビュー・マージにより実行計画上は展開される場合がある。更新可能ビューの制約に注意。</td></tr>
+<tr><td>マテリアライズドビュー</td><td>CREATE MATERIALIZED VIEW</td><td>集計や結合結果を物理化し、読取性能を上げる。</td><td>リフレッシュ方式、Query Rewrite、ログ、鮮度、DML負荷を設計する。</td></tr>
+<tr><td>トランザクション</td><td>COMMIT、ROLLBACK、SAVEPOINT</td><td>業務上の一貫した作業単位を定める。</td><td>読み取り一貫性、UNDO、ORA-01555、ロック待ち、DDL暗黙COMMITを理解する。</td></tr>
+</tbody></table></div>
+<div class="call caution"><b>設計判断: 制約をDBに置くかアプリに置くか</b>DB制約は全アプリ・全経路に効くためデータ品質に強い。一方、複雑な業務ルールはアプリ側やトリガー/PLSQLとの分担が必要になる。外部キーを省略するとロードや移行は楽になる場合があるが、孤児データ・結合誤り・削除事故・オプティマイザ前提不足を招く。</div>
+<h3>4.7 SQL標準機能とOracle代替の早見表</h3>
+<div class="tbl"><table><thead><tr><th>やりたいこと</th><th>標準寄りの書き方</th><th>Oracleでよく見る書き方/機能</th><th>判断</th></tr></thead><tbody>
+<tr><td>上位N件</td><td>ORDER BY ... FETCH FIRST n ROWS ONLY</td><td>ROWNUM、分析関数ROW_NUMBER</td><td>安定順序にはORDER BYの同値解消列を追加。古い資産ではROWNUMに注意。</td></tr>
+<tr><td>階層</td><td>再帰WITH</td><td>CONNECT BY PRIOR、SYS_CONNECT_BY_PATH</td><td>標準性なら再帰WITH、既存Oracle階層処理ならCONNECT BYも有力。</td></tr>
+<tr><td>UPSERT</td><td>MERGE</td><td>MERGE、場合により例外処理/INSERT /*+ IGNORE_ROW_ON_DUPKEY_INDEX */</td><td>同時実行、一意制約、トリガー、更新対象重複を検証。</td></tr>
+<tr><td>ページング</td><td>OFFSET ... FETCH</td><td>ROW_NUMBER、ROWNUMラップ</td><td>大きいOFFSETは遅くなりやすい。キーセットページングも候補。</td></tr>
+<tr><td>横持ち変換</td><td>CASE + 集約</td><td>PIVOT/UNPIVOT</td><td>可読性と移植性のどちらを優先するか。</td></tr>
+<tr><td>JSON処理</td><td>SQL/JSON系</td><td>Oracle JSON型、JSON_TABLE、JSON_VALUE、JSON_EXISTS</td><td>制約・索引・更新頻度・スキーマ進化を考える。</td></tr>
+<tr><td>パターン認識</td><td>行パターン認識(SQL標準にも発展)</td><td>MATCH_RECOGNIZE</td><td>強力だがチームの理解コストが高い。代替SQL/アプリ処理も比較。</td></tr>
+</tbody></table></div>
+
+</section>
+<section id="s5">
+<h2>5. Oracle前提で変わる部分</h2>
+<h3>5.1 データ型</h3>
+<div class="tbl"><table><thead><tr><th>Oracle型/概念</th><th>理解</th><th>実務判断</th><th>はまりポイント</th></tr></thead><tbody>
+<tr><td>NUMBER</td><td>高精度な数値型。精度・スケール指定が重要。</td><td>金額・数量はFLOATではなくNUMBER(p,s)を基本に検討。</td><td>暗黙変換で索引が効かない、桁あふれ、丸め。</td></tr>
+<tr><td>VARCHAR2</td><td>可変長文字列。Oracle実務の標準的文字列型。</td><td>VARCHARではなくVARCHAR2を使うのがOracle実務上安全。</td><td>BYTE/CHARセマンティクス、NLS、空文字NULL。</td></tr>
+<tr><td>DATE</td><td>日付だけでなく時分秒を保持する。</td><td>日付だけの業務概念でも時刻混入を設計で扱う。</td><td>`TRUNC(date_col)` をWHEREに書くと索引利用に影響しやすい。</td></tr>
+<tr><td>TIMESTAMP WITH TIME ZONE</td><td>タイムゾーン情報を含む日時。</td><td>国際化・監査ログ・外部連携で検討。</td><td>LOCAL TIME ZONEはDB/セッションタイムゾーン変換の理解が必要。</td></tr>
+<tr><td>BOOLEAN</td><td>Oracle 23ai/26ai系でSQL BOOLEANが利用可能。</td><td>新規設計では真偽値表現の候補になる。</td><td>既存システムや他DB移植ではNUMBER(1)/CHAR(1)との変換方針が必要。</td></tr>
+<tr><td>JSON / VECTOR</td><td>半構造データ・AI Vector Search系の用途。</td><td>リレーショナル中心か、検索/AI機能をDB内で使うかで判断。</td><td>便利さで正規化を崩すと制約・更新・統計・索引設計が難しくなる。</td></tr>
+</tbody></table></div>
+<h3>5.2 Oracle固有/Oracle色の強い構文</h3>
+<ul>
+<li><strong>ROWNUM</strong>: 行番号風の疑似列。ORDER BYより前に評価される文脈があり、上位N件ではFETCH FIRSTやサブクエリとの関係を理解する。</li>
+<li><strong>ROWID</strong>: 行の物理的位置に近い識別子。高速アクセスや診断に使えるが、論理キーの代替にしない。</li>
+<li><strong>CONNECT BY</strong>: 伝統的な階層問合せ。再帰WITHと比較して、既存資産・可読性・標準性で選ぶ。</li>
+<li><strong>MERGE</strong>: UPSERT用途で便利。ただし一意性、同一行複数回更新、トリガー、ロック競合を確認する。</li>
+<li><strong>MODEL / MATCH_RECOGNIZE / PIVOT</strong>: 複雑な分析をSQL内で表現できるが、保守できるチームかを判断する。</li>
+<li><strong>ヒント句</strong>: コメント構文 `/*+ ... */` でオプティマイザに指示を与えるOracle固有の実務手段。</li>
+</ul>
+<div class="call caution"><b>Oracle機能を使う判断</b>「移植性より性能・保守性・Oracle運用との親和性が重要」「Oracle Databaseを中長期で使う」「チームが実行計画を読める」ならOracle機能は有力。逆に、将来DB移行が現実的な場合、アプリSQLを標準寄りに保つ選択肢も残す。</div>
+</section>
+<section id="s6">
+<h2>6. DB設計・物理設計</h2>
+<h3>6.1 概念設計・論理設計・物理設計</h3>
+<div class="tbl"><table><thead><tr><th>層</th><th>決めること</th><th>SQL/Oracleへの影響</th><th>失敗例</th></tr></thead><tbody>
+<tr><td>概念設計</td><td>業務エンティティ、関係、用語</td><td>テーブル名・列名・ドメインの基礎</td><td>「顧客」「契約」「請求先」を混同し、後から条件分岐だらけになる。</td></tr>
+<tr><td>論理設計</td><td>主キー、外部キー、正規化、制約</td><td>JOIN、整合性、更新容易性、オプティマイザの前提</td><td>外部キーを作らず、孤児レコードや重複をアプリで処理する。</td></tr>
+<tr><td>物理設計</td><td>索引、パーティション、表領域、圧縮、LOB配置</td><td>実行計画、I/O、保守、可用性</td><td>検索条件ごとに索引を増やし、DML性能と統計保守が悪化する。</td></tr>
+</tbody></table></div>
+<h3>6.2 正規化と非正規化</h3>
+<p><span class="pill p-both">共通概念</span> 正規化は重複と更新異常を減らす。非正規化は読み取り性能や集計容易性のために冗長性をあえて持つ。どちらか一方が常に正しいわけではない。</p>
+<div class="cols"><div class="call tip"><b>正規化を優先する場面</b>マスタ・トランザクションの整合性が重要、更新が多い、履歴・監査が必要、データ品質をDB制約で守りたい。</div><div class="call caution"><b>非正規化を検討する場面</b>集計・検索が支配的、応答時間要件が厳しい、集約済みビューやマテリアライズドビューで整合性の許容範囲を設計できる。</div></div>
+<h3>6.3 索引設計</h3>
+<p><span class="pill p-ora">Oracle</span> 索引は万能な高速化装置ではない。読み取りを速くする代わりに、INSERT/UPDATE/DELETE、領域、統計、実行計画の複雑性を増やす。</p>
+<div class="tbl"><table><thead><tr><th>索引候補</th><th>使う場面</th><th>避ける/注意する場面</th><th>Oracleでの観点</th></tr></thead><tbody>
+<tr><td>B-tree索引</td><td>選択性の高い検索、結合キー、ORDER BY支援</td><td>低選択性列単独、更新頻度が高すぎる列</td><td>複合索引の列順、クラスタリングファクタ、索引スキップスキャン。</td></tr>
+<tr><td>ビットマップ索引</td><td>DWHで低カーディナリティ列を組み合わせる</td><td>OLTPで高頻度更新</td><td>ロック競合に注意。DWH向き。</td></tr>
+<tr><td>関数ベース索引</td><td>`UPPER(col)` や `TRUNC(date_col)` 条件を支援</td><td>関数の決定性やNLS依存が曖昧</td><td>SQL式と索引式の一致、統計収集が重要。</td></tr>
+<tr><td>パーティション索引</td><td>大規模表、期間分割、保守性</td><td>小規模表、分割キーとアクセスパターンが合わない</td><td>ローカル/グローバル索引、パーティションプルーニング。</td></tr>
+</tbody></table></div>
+<div class="call warning"><b>はまりポイント: “索引を張れば速い” ではない</b>件数が多くても全体の大半を読むならフルスキャンが妥当な場合がある。逆に件数が少なくても暗黙変換・関数適用・統計不備で索引が使われないことがある。</div>
+</section>
+<section id="s7">
+<h2>7. SQL実行の仕組みとオプティマイザ</h2>
+<p><span class="pill p-ora">Oracle</span> OracleのSQL処理は大まかに、解析、最適化、行ソース生成、実行に分けられる。性能問題は実行だけでなく、パース、共有カーソル、統計、バインド、メモリにも出る。</p>
+<div class="diagram"><div class="flow"><div class="box"><b>構文チェック</b><br>SQLとして正しいか</div><div class="box"><b>意味チェック</b><br>表・列・権限</div><div class="box"><b>共有プール確認</b><br>既存カーソル再利用</div><div class="box"><b>最適化</b><br>コスト・統計・変換</div><div class="box"><b>実行</b><br>行ソース・I/O・待機</div></div></div>
+<h3>7.1 コストベースオプティマイザ</h3>
+<p>Oracleの現代的な最適化はコストベースであり、統計情報、システム統計、初期化パラメータ、バインド値、ヒント、SQL変換、利用可能なアクセスパスから実行計画を選ぶ。</p>
+<div class="tbl"><table><thead><tr><th>要素</th><th>見る内容</th><th>ずれる原因</th><th>対策候補</th></tr></thead><tbody>
+<tr><td>表/列統計</td><td>行数、ブロック数、NDV、ヒストグラム</td><td>統計が古い、偏りを表現できない</td><td>DBMS_STATS、ヒストグラム、拡張統計、保留統計の検証。</td></tr>
+<tr><td>カーディナリティ推定</td><td>各ステップの予測行数</td><td>相関列、複雑条件、関数、バインド</td><td>実行計画のE-Rows/A-Rows比較、SQL Monitor、統計フィードバック。</td></tr>
+<tr><td>アクセスパス</td><td>フルスキャン、索引スキャン、パーティション</td><td>索引不適、暗黙変換、低選択性</td><td>SQL修正、索引再設計、関数ベース索引、パーティション設計。</td></tr>
+<tr><td>結合順/結合方式</td><td>Nested Loops、Hash Join、Merge Join</td><td>駆動表誤り、メモリ不足、統計不備</td><td>統計修正、SQL変換、LEADING/USE_*ヒントの限定使用。</td></tr>
+</tbody></table></div>
+<h3>7.2 実行計画を見るときの順序</h3>
+<ol>
+<li>問題SQLのSQL_IDを特定する。</li>
+<li>実際に実行されたカーソルの計画を `DBMS_XPLAN.DISPLAY_CURSOR` で確認する。</li>
+<li>推定行数(E-Rows)と実績行数(A-Rows)の差を見る。</li>
+<li>Predicate Informationで暗黙変換、関数適用、フィルタ条件を確認する。</li>
+<li>待機イベント、I/O、TEMP使用量、PGA、並列度、バッファ取得を確認する。</li>
+<li>SQL本文、統計、索引、パーティション、ヒント、パラメータのどこで直すべきかを分ける。</li>
+</ol>
+<div class="call caution"><b>EXPLAIN PLANだけで判断しない</b>EXPLAIN PLANは実行時のバインド、実カーソル、適応計画、統計フィードバック、実行時情報を完全には反映しないことがある。性能調査では実行済みカーソルと実測値を優先する。</div>
+</section>
+<section id="s8">
+<h2>8. チューニング手順</h2>
+<p>チューニングは「SQLを短くする作業」ではない。目標、測定、原因切り分け、変更、検証、固定化の順で進める。</p>
+<div class="tbl"><table><thead><tr><th>段階</th><th>やること</th><th>Oracleで見るもの</th><th>失敗パターン</th></tr></thead><tbody>
+<tr><td>1. 目標設定</td><td>何秒以内、何件、同時実行数、許容リソースを決める</td><td>AWR/ASH、SQL Monitor、アプリログ</td><td>単発実行だけ速くし、同時実行で悪化。</td></tr>
+<tr><td>2. 測定</td><td>実行時間、CPU、I/O、待機、行数、TEMPを測る</td><td>V$SQL、DBMS_XPLAN、Real-Time SQL Monitoring</td><td>キャッシュが温まった1回だけで判断。</td></tr>
+<tr><td>3. 原因分類</td><td>SQL本文、設計、統計、索引、パラメータ、ロックを分ける</td><td>実行計画、A-Rows/E-Rows、待機イベント</td><td>すぐヒントを入れて根本原因を隠す。</td></tr>
+<tr><td>4. 改善</td><td>最小変更で仮説を検証</td><td>SQL書換、統計、索引、パーティション、ヒント</td><td>複数変更を同時に入れて効果が不明。</td></tr>
+<tr><td>5. 固定化</td><td>再現性、回帰、運用手順を残す</td><td>SQL Plan Baseline、テスト、監視閾値</td><td>本番だけ速い/遅い理由を説明できない。</td></tr>
+</tbody></table></div>
+<h3>8.1 SQL本文で直す候補</h3>
+<ul>
+<li>SELECT * を避け、必要列だけ取得する。</li>
+<li>結合条件を明示し、意図しない多対多結合を排除する。</li>
+<li>WHERE列に関数をかける代わりに範囲条件へ変換する。例: `TRUNC(order_date)=DATE '2026-06-02'` ではなく `order_date >= ... AND order_date < ...`。</li>
+<li>NOT INにNULLが混ざる可能性がある場合はNOT EXISTSを検討する。</li>
+<li>UNIONの重複排除が不要ならUNION ALLにする。</li>
+<li>ページングでは安定したORDER BYを持たせる。同値時の順序不定に注意する。</li>
+<li>巨大なINリスト、暗黙変換、ワイルドカード前方一致、OR連発は実行計画に注意する。</li>
+</ul>
+<h3>8.2 設計/統計/索引で直す候補</h3>
+<ul>
+<li>外部キー列に索引が必要かを、親更新/削除、子検索、ロック影響で判断する。</li>
+<li>複合索引は「等価条件」「範囲条件」「ORDER BY/GROUP BY」「選択性」「圧縮」を合わせて列順を決める。</li>
+<li>相関列は拡張統計を検討する。例: 都道府県と市区町村、ステータスと完了日。</li>
+<li>パーティションはアクセス範囲削減だけでなく、データ削除、ロード、統計、索引保守のためにも使う。</li>
+<li>統計収集は負荷、鮮度、ヒストグラム、サンプル、保留統計、ロック統計を運用設計に含める。</li>
+</ul>
+<div class="call warning"><b>チューニングの副作用</b>あるSQLを速くする索引やパラメータが、別SQLのDMLコスト、実行計画、メモリ、TEMP、ロックを悪化させることがある。単独SQLだけでなくワークロード全体で判断する。</div>
+
+<h3>8.3 ワークロード別のチューニング観点</h3>
+<div class="tbl"><table><thead><tr><th>ワークロード</th><th>優先指標</th><th>典型的な改善策</th><th>避けたいこと</th></tr></thead><tbody>
+<tr><td>OLTP</td><td>短時間応答、同時実行、ロック短縮、少量I/O</td><td>適切なPK/FK索引、バインド変数、短いトランザクション、ホットブロック回避</td><td>ビットマップ索引多用、巨大並列SQL、コミット過多/不足、全件集計の同期実行。</td></tr>
+<tr><td>DWH/分析</td><td>大規模スキャン、集約、並列、TEMP/PGA、バッチ時間</td><td>パーティション、パラレル、ビットマップ索引、マテリアライズドビュー、集計表</td><td>OLTPと同じ索引思想、1行ずつ処理、統計未整備。</td></tr>
+<tr><td>バッチ</td><td>総処理時間、再実行性、REDO/UNDO、ロック範囲</td><td>集合SQL、Direct Path、パーティション交換、適切なコミット単位</td><td>行単位ループ、途中コミットで再実行不能、例外時の不整合。</td></tr>
+<tr><td>検索/API</td><td>初期応答、ページング、安定順序、フェッチ件数</td><td>カバリングに近い索引、キーセットページング、FIRST_ROWS(n)検討</td><td>大OFFSET、曖昧ORDER BY、SELECT *、N+1 SQL。</td></tr>
+</tbody></table></div>
+<h3>8.4 SQLレビューのチェックリスト</h3>
+<ul>
+<li>業務キーとDB制約は一致しているか。</li>
+<li>WHERE条件の列とバインド型は一致しているか。</li>
+<li>結合条件は全て書かれているか。意図しないCROSS JOINはないか。</li>
+<li>外部結合の条件がON/WHEREのどちらに置かれているか。</li>
+<li>GROUP BY前後で行数が想定通りか。</li>
+<li>ORDER BYはページングやFETCH FIRSTに対して決定的か。</li>
+<li>実行計画の推定行数と実績行数に大きな差がないか。</li>
+<li>統計・ヒストグラム・拡張統計が必要なデータ偏りがないか。</li>
+<li>索引追加のDML影響、領域、保守、重複索引を確認したか。</li>
+<li>本番相当のデータ量・偏り・同時実行で測ったか。</li>
+</ul>
+
+</section>
+<section id="s9">
+<h2>9. ヒント句とSQL Plan Management</h2>
+<h3>9.1 ヒント句の位置づけ</h3>
+<p><span class="pill p-ora">Oracle</span> ヒント句はOracle SQLのコメント内に書くオプティマイザへの指示である。標準SQLではない。ヒントは、統計やSQL構造だけでは望ましい計画にできない場合、影響範囲をSQL単位に閉じ込めて制御する手段になる。</p>
+<pre><code>SELECT /*+ gather_plan_statistics leading(o c) use_hash(c) */
+       o.order_id, c.customer_name
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE o.order_date >= DATE '2026-01-01';</code></pre>
+<div class="tbl"><table><thead><tr><th>カテゴリ</th><th>代表ヒント</th><th>使う場面</th><th>注意</th></tr></thead><tbody>
+<tr><td>最適化目標</td><td>ALL_ROWS, FIRST_ROWS(n)</td><td>全体スループットか初期応答かを明確にしたい</td><td>アプリのフェッチ方法と一致しないと期待外れになる。</td></tr>
+<tr><td>アクセスパス</td><td>FULL, INDEX, INDEX_FFS, NO_INDEX</td><td>索引/全表走査の選択を制御したい</td><td>データ量変化で逆効果になりやすい。</td></tr>
+<tr><td>結合順</td><td>LEADING, ORDERED</td><td>駆動表を制御したい</td><td>クエリブロック名を使わないと意図しない箇所に効く/効かない。</td></tr>
+<tr><td>結合方式</td><td>USE_NL, USE_HASH, USE_MERGE</td><td>小規模駆動表、巨大結合、ソート済み結合などを制御</td><td>メモリ不足、TEMP使用、同時実行で悪化しうる。</td></tr>
+<tr><td>SQL変換</td><td>NO_MERGE, MERGE, UNNEST, NO_UNNEST, MATERIALIZE, INLINE</td><td>ビュー/サブクエリ/CTEの変換を制御</td><td>Oracleバージョン差、クエリブロック指定、保守性に注意。</td></tr>
+<tr><td>並列</td><td>PARALLEL, NO_PARALLEL, PQ_DISTRIBUTE</td><td>大規模スキャン/集計/ロード</td><td>リソースを食い尽くしやすい。Resource Managerや並列設定と併せる。</td></tr>
+<tr><td>診断</td><td>GATHER_PLAN_STATISTICS, MONITOR</td><td>実行時統計を取りたい</td><td>診断目的。恒久的に残す場合は負荷と情報漏えいに注意。</td></tr>
+</tbody></table></div>
+<h3>9.2 ヒントが効かない/危ない理由</h3>
+<ul>
+<li>構文上はコメントなので、タイプミスしてもエラーにならず無視される場合がある。</li>
+<li>別名が一致していない、クエリブロックが違う、ビュー変換後に対象が変わる。</li>
+<li>矛盾するヒント、実行不可能なアクセスパス、制約や権限で成立しない指定は採用されない。</li>
+<li>データ量・統計・バージョンが変わると、固定した計画が古くなる。</li>
+<li>ヒントで速くなったように見えて、根本原因が統計不備や設計不備の場合がある。</li>
+</ul>
+<h3>9.3 SQL Plan Management / SQL Profile / SQL Patch</h3>
+<div class="tbl"><table><thead><tr><th>機能</th><th>目的</th><th>向く場面</th><th>注意</th></tr></thead><tbody>
+<tr><td>SQL Plan Baseline</td><td>既知/検証済み計画を使わせ、計画回帰を抑える</td><td>アップグレード、統計更新、重要SQLの安定化</td><td>悪い計画を固定しない。進化/evolve運用が必要。</td></tr>
+<tr><td>SQL Profile</td><td>見積り誤差を補正する補助情報を与える</td><td>SQL Tuning Advisorの推奨、カーディナリティ推定ずれ</td><td>計画を直接固定するものではない。</td></tr>
+<tr><td>SQL Patch</td><td>SQL本文を変えずにヒント等を適用</td><td>アプリ改修が難しい緊急対応</td><td>隠れた変更になりやすいので台帳化・期限設定が必要。</td></tr>
+<tr><td>ヒント埋め込み</td><td>SQL単位で明示的に制御</td><td>SQLを所有し、レビュー・テストできる場合</td><td>移植性低下、将来のデータ変化への追随が弱くなる。</td></tr>
+</tbody></table></div>
+<div class="call tip"><b>実務方針</b>まず統計・設計・SQL本文を疑う。次に、変更できるSQLなら限定的なヒント。変更できない/重要SQLの安定化ならSPMやPatch。いずれも「なぜ必要か」「いつ外すか」を記録する。</div>
+</section>
+<section id="s10">
+<h2>10. DB設定・初期化パラメータ</h2>
+<p><span class="pill p-ora">Oracle</span> DB設定はSQL性能に影響するが、パラメータ変更は広範囲の副作用を持つ。SQL単体の問題をインスタンス全体設定で直そうとすると、別ワークロードを壊すことがある。</p>
+<div class="tbl"><table><thead><tr><th>領域</th><th>代表項目</th><th>見る理由</th><th>注意</th></tr></thead><tbody>
+<tr><td>オプティマイザ</td><td>OPTIMIZER_MODE, OPTIMIZER_FEATURES_ENABLE, OPTIMIZER_DYNAMIC_SAMPLING, OPTIMIZER_USE_SQL_PLAN_BASELINES</td><td>計画選択、バージョン互換、動的サンプリング、SPM利用</td><td>特にOPTIMIZER_FEATURES_ENABLEを古い値に固定するのは移行猶予策であり、恒久策にしない。</td></tr>
+<tr><td>メモリ</td><td>SGA_TARGET, PGA_AGGREGATE_TARGET, PGA_AGGREGATE_LIMIT, MEMORY_TARGET</td><td>バッファキャッシュ、共有プール、ソート/ハッシュ結合</td><td>PGA不足はTEMP流出、SGA不足はI/O増加やパース増加につながる。</td></tr>
+<tr><td>並列実行</td><td>PARALLEL_DEGREE_POLICY, PARALLEL_MAX_SERVERS, PARALLEL_MIN_TIME_THRESHOLD</td><td>DWH/バッチ性能</td><td>OLTPで安易に並列化するとCPU枯渇・キュー待ち・他SQL悪化。</td></tr>
+<tr><td>カーソル/共有</td><td>SESSION_CACHED_CURSORS, CURSOR_SHARING</td><td>パース負荷、リテラルSQL増殖</td><td>CURSOR_SHARING=FORCEは副作用が大きく、アプリ側バインド化が基本。</td></tr>
+<tr><td>UNDO/TEMP/REDO</td><td>UNDO_RETENTION, TEMP表領域、ログ設定</td><td>一貫性読み取り、ソート、ハッシュ、バッチ、復旧</td><td>ORA-01555、TEMP不足、REDO過多、コミット頻度問題。</td></tr>
+</tbody></table></div>
+<div class="call warning"><b>設定変更の原則</b>本番パラメータ変更は、変更前後のAWR/ASH、対象SQL、影響ワークロード、戻し手順、PDB/CDBスコープ、メンテナンス時間帯を揃えて実施する。SQL単体の遅さを全体設定で隠すと、障害時の説明が難しくなる。</div>
+</section>
+<section id="s11">
+<h2>11. はまりポイント集</h2>
+<div class="tbl"><table><thead><tr><th>#</th><th>はまりポイント</th><th>なぜ起きるか</th><th>確認/回避</th></tr></thead><tbody>
+<tr><td>1</td><td>NULL比較</td><td>`= NULL` はUNKNOWNになり期待通りでない</td><td>`IS NULL` / `IS NOT NULL` を使う。</td></tr>
+<tr><td>2</td><td>NOT IN + NULL</td><td>副問合せにNULLがあるとUNKNOWNが伝播</td><td>NOT EXISTS、NULL除外、一意制約を検討。</td></tr>
+<tr><td>3</td><td>Oracle空文字NULL</td><td>`''` がNULL扱い</td><td>移植、NOT NULL、文字列連結のテスト。</td></tr>
+<tr><td>4</td><td>暗黙型変換</td><td>列側変換で索引が使えない/結果がNLS依存</td><td>バインド型を合わせる。Predicate Informationを見る。</td></tr>
+<tr><td>5</td><td>DATEに時刻</td><td>Oracle DATEは時分秒を持つ</td><td>日付範囲は半開区間で書く。</td></tr>
+<tr><td>6</td><td>ROWNUMとORDER BY</td><td>評価順の誤解</td><td>FETCH FIRST、分析関数、サブクエリで明示。</td></tr>
+<tr><td>7</td><td>外部結合のWHERE条件</td><td>右表条件で内部結合化</td><td>ON句に条件を置くか意図を明確化。</td></tr>
+<tr><td>8</td><td>重複行の増殖</td><td>結合キーが一意でない</td><td>キー制約、事前集約、EXISTS化。</td></tr>
+<tr><td>9</td><td>UNIONの不要な重複排除</td><td>ソート/ハッシュコスト</td><td>重複不要ならUNION ALL。</td></tr>
+<tr><td>10</td><td>EXPLAIN PLAN過信</td><td>実行時情報と違う場合</td><td>DISPLAY_CURSOR、SQL Monitor、A-Rowsを見る。</td></tr>
+<tr><td>11</td><td>統計が古い</td><td>大量ロード/削除後に見積りずれ</td><td>DBMS_STATS運用、保留統計、差分確認。</td></tr>
+<tr><td>12</td><td>ヒント無視</td><td>別名/ブロック/矛盾/不可能</td><td>Outline、Hint Reportを確認。</td></tr>
+<tr><td>13</td><td>バインドピーク</td><td>値の偏りで最適計画が違う</td><td>Adaptive Cursor Sharing、ヒストグラム、SQL分岐。</td></tr>
+<tr><td>14</td><td>コミットしすぎ</td><td>再実行性、REDO、整合性に影響</td><td>業務トランザクション単位で設計。</td></tr>
+<tr><td>15</td><td>DDL暗黙COMMIT</td><td>OracleのDDL動作</td><td>トランザクション中にDDLを混ぜない。</td></tr>
+<tr><td>16</td><td>索引過多</td><td>DMLと保守コスト増</td><td>利用状況、重複索引、複合索引統合。</td></tr>
+<tr><td>17</td><td>パーティションキー不一致</td><td>プルーニングできない</td><td>主要検索条件・保守単位と分割キーを合わせる。</td></tr>
+<tr><td>18</td><td>TEMP不足</td><td>ソート/ハッシュ/集約/並列</td><td>実行計画、PGA、TEMP使用量を監視。</td></tr>
+<tr><td>19</td><td>ロック待ちを性能問題と誤認</td><td>待機がCPU/I/Oではない</td><td>待機イベント、ブロッキングセッションを確認。</td></tr>
+<tr><td>20</td><td>NLS依存</td><td>日付/数値/文字比較がセッション依存</td><td>リテラル形式、明示変換、NLSテスト。</td></tr>
+</tbody></table></div>
+</section>
+<section id="s12">
+<h2>12. 例で理解する</h2>
+<h3>12.1 最小例: 日付条件</h3>
+<pre><code>-- 悪い例: 列に関数をかけるため、通常の索引が使いにくい
+WHERE TRUNC(order_date) = DATE '2026-06-02'
+
+-- 改善例: 半開区間で書く
+WHERE order_date >= DATE '2026-06-02'
+  AND order_date <  DATE '2026-06-03'</code></pre>
+<p>見るべき点は「同じ意味に見える条件でも、列側に関数をかけるかどうかでアクセスパスが変わる」ことである。Oracle DATEは時刻を持つため、等価比較だけでは当日全体を表せない。</p>
+<h3>12.2 実務例: 売上集計SQLを段階分割する</h3>
+<pre><code>WITH target_orders AS (
+  SELECT order_id, customer_id, order_date
+  FROM orders
+  WHERE order_date >= DATE '2026-01-01'
+    AND order_date <  DATE '2026-02-01'
+), order_amounts AS (
+  SELECT oi.order_id, SUM(oi.quantity * oi.unit_price) AS amount
+  FROM order_items oi
+  JOIN target_orders o ON o.order_id = oi.order_id
+  GROUP BY oi.order_id
+)
+SELECT c.customer_id, c.customer_name, SUM(a.amount) AS total_amount
+FROM order_amounts a
+JOIN target_orders o ON o.order_id = a.order_id
+JOIN customers c ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.customer_name
+ORDER BY total_amount DESC
+FETCH FIRST 20 ROWS ONLY;</code></pre>
+<p>この例では、対象期間の注文を先に論理的に切り出し、明細集約、顧客集約の順に意図を分けている。実際に中間表が作られるとは限らないため、必要なら実行計画でWITH句の扱いを確認する。</p>
+<h3>12.3 失敗例: ヒントで根本原因を隠す</h3>
+<pre><code>-- とりあえず索引を強制した例
+SELECT /*+ INDEX(o orders_status_idx) */ *
+FROM orders o
+WHERE status = 'CLOSED'
+  AND order_date >= DATE '2026-01-01';</code></pre>
+<p>status='CLOSED' が全体の大半なら索引強制は逆効果になりうる。根本原因は、複合索引の列順、ヒストグラム、期間条件、パーティション、あるいは集計設計かもしれない。ヒントを入れる前に、A-Rows/E-Rows、Predicate Information、I/O、TEMP、待機を確認する。</p>
+</section>
+<section id="s13">
+<h2>13. 参照資料と追加調査ログ</h2>
+<p>主な一次情報はOracle公式ドキュメントとISO公式ページを優先した。詳細な調査ログは <code>sql/research/sources.md</code> に150件記録している。</p>
+<ul class="src">
+<li>Oracle AI Database SQL Language Reference 26ai — SQL構文、データ型、関数、ヒント句、文一覧。</li>
+<li>Oracle AI Database SQL Tuning Guide 26ai — SQL処理、オプティマイザ、統計、実行計画、SQL Plan Management、チューニング方法論。</li>
+<li>Oracle AI Database Database Reference 26ai — 初期化パラメータ、動的性能ビュー、設定項目。</li>
+<li>Oracle AI Database Concepts 26ai — トランザクション、一貫性読み取り、メモリ、ストレージ、スキーマオブジェクトの概念。</li>
+<li>ISO/IEC 9075:2023 official pages — SQL標準の各部構成、SQL/Foundation、SQL/Frameworkなど。</li>
+<li>Oracle AI Database 26ai announcement — 23aiを置き換える長期サポートリリースとしての位置づけ確認。</li>
+</ul>
+<div class="call info"><b>未確定/要検証事項</b>実際のシステムでの最適解は、データ量、偏り、同時実行、ストレージ、ライセンス、Edition、PDB/CDB構成、パッチレベル、アプリのフェッチ方法に依存する。本資料は判断材料であり、個別SQLの最終判断には実測と本番相当データでの検証が必要である。</div>
+</section>
+</main>
+</div>
+</body>
+</html>
