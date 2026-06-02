@@ -1,0 +1,2935 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RDB / Oracle DB設計 別冊 — モデリングとテーブル設計 実践大全 300KB増補版</title>
+<style>
+:root{
+  --bg:#f6f7f9; --fg:#1d2733; --muted:#5b6876; --line:#e1e5ea;
+  --card:#ffffff; --accent:#2b5d8c; --accent2:#1f7a5e; --accent3:#5b3da8;
+  --warn:#b4541a; --danger:#9c2a2a; --tip:#1f7a5e;
+  --code:#0f2540; --codebg:#eef1f5;
+  --shadow:0 1px 2px rgba(20,30,45,.06),0 4px 14px rgba(20,30,45,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","YuGothic","Noto Sans JP","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.78;font-size:15.7px;letter-spacing:.01em}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:292px 1fr;gap:34px}
+header.hero{grid-column:1/-1;background:linear-gradient(135deg,#4d2d88,#2b5d8c 58%,#22634e);color:#fff;border-radius:0 0 16px 16px;padding:34px 30px 30px;margin-bottom:8px}
+header.hero .kicker{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;opacity:.86;margin:0 0 4px}
+header.hero h1{margin:0 0 6px;font-size:1.72rem;line-height:1.36}
+header.hero .sub{opacity:.93;font-size:1.02rem;margin:0;max-width:980px}
+header.hero .meta{margin-top:14px;font-size:.82rem;opacity:.9;display:flex;flex-wrap:wrap;gap:8px 18px}
+nav.toc{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 14px;box-shadow:var(--shadow);font-size:.84rem}
+nav.toc h2{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+nav.toc ol{list-style:none;margin:0;padding:0}
+nav.toc li{margin:1px 0}
+nav.toc .part{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:800;margin:12px 0 4px;padding-left:8px}
+nav.toc a{color:var(--fg);text-decoration:none;display:block;padding:4px 8px;border-radius:7px;border-left:3px solid transparent}
+nav.toc a:hover{background:#eef3f8;border-left-color:var(--accent)}
+main{min-width:0;padding-bottom:60px}
+.part-banner{grid-column:1/-1;margin:10px 0 2px}
+.part-banner h2{font-size:1.0rem;letter-spacing:.08em;color:#fff;background:linear-gradient(90deg,#5b3da8,#2b5d8c);margin:0;padding:10px 18px;border-radius:10px;display:flex;gap:.7em;align-items:center}
+.part-banner h2 small{font-weight:400;opacity:.88;font-size:.78rem;letter-spacing:.02em}
+.part-banner.b2 h2{background:linear-gradient(90deg,#1f7a5e,#2b5d8c)}
+.part-banner.b3 h2{background:linear-gradient(90deg,#8a6a2e,#b4541a)}
+.part-banner.b4 h2{background:linear-gradient(90deg,#9c2a2a,#5b3da8)}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin:0 0 22px;box-shadow:var(--shadow)}
+section.focus{border-color:#cdbfe8;box-shadow:0 0 0 2px rgba(91,61,168,.10),var(--shadow)}
+h2.sec{font-size:1.31rem;margin:.1em 0 .6em;padding-bottom:.4em;border-bottom:2px solid var(--line);line-height:1.42}
+h2.sec .num{color:var(--accent);font-weight:800;margin-right:.5em}
+h3{font-size:1.08rem;margin:1.55em 0 .5em;color:#22425f}
+h4{font-size:.99rem;margin:1.25em 0 .35em;color:#2e4256}
+p{margin:.55em 0}
+.lead{font-size:1.02rem;background:#f3f0fa;border-left:4px solid #5b3da8;padding:12px 16px;border-radius:0 8px 8px 0;margin:0 0 16px}
+ul,ol{margin:.5em 0 .95em;padding-left:1.4em}
+li{margin:.3em 0}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;background:var(--codebg);color:var(--code);padding:.1em .4em;border-radius:5px;font-size:.85em}
+pre{background:var(--code);color:#dfe8f2;padding:14px 16px;border-radius:10px;overflow:auto;font-size:.80rem;line-height:1.55}
+pre code{background:none;color:inherit;padding:0}
+.badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:.18em .58em;border-radius:999px;vertical-align:middle;white-space:nowrap}
+.b-conf{background:#dcefe6;color:#1f7a5e}.b-inf{background:#e9e6f6;color:#5b3da8}.b-asm{background:#f3ece1;color:#8a6a2e}.b-open{background:#fce6ef;color:#a82a64}.b-new{background:#e6eef6;color:#2b5d8c}.b-oracle{background:#e9eef8;color:#224a7a}.b-ddd{background:#eef4ef;color:#1f7a5e}
+.r-h{background:#fbe0e0;color:#9c2a2a}.r-m{background:#fdf0d9;color:#9a661a}.r-l{background:#e3efe5;color:#2e6b3a}
+.ok{background:#dcefe6;color:#1f7a5e}.bad{background:#fbe0e0;color:#9c2a2a}.mid{background:#fdf0d9;color:#9a661a}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:14px 0}
+.card{background:#fafcfe;border:1px solid var(--line);border-radius:11px;padding:15px 16px}
+.card .k{font-size:.72rem;letter-spacing:.08em;color:#5b3da8;font-weight:700;text-transform:uppercase}
+.card .t{font-weight:700;margin:.25em 0 .3em;font-size:1.0rem}
+.card .d{font-size:.86rem;color:var(--muted);line-height:1.62}
+.tbl{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:620px}
+th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+th{background:#eef3f8;color:#2a4256;font-weight:700;font-size:.81rem}
+tbody tr:nth-child(even){background:#fafcfe}
+td code{font-size:.82em}
+.call{border-radius:10px;padding:12px 16px;margin:14px 0;font-size:.92rem;border:1px solid}
+.call .h{font-weight:700;margin-bottom:.25em;display:flex;gap:.5em;align-items:center}
+.note{background:#eef4fa;border-color:#cfe0ef}.note .h{color:var(--accent)}
+.warn{background:#fdf3ea;border-color:#f1d8bf}.warn .h{color:var(--warn)}
+.tip{background:#ecf6f1;border-color:#cfe7da}.tip .h{color:var(--tip)}
+.danger{background:#fbe0e0;border-color:#edc1c1}.danger .h{color:var(--danger)}
+.mech{background:#f3f0fa;border-color:#ddd4f0}.mech .h{color:#5b3da8}
+figure{margin:18px 0;background:#fafcfe;border:1px solid var(--line);border-radius:12px;padding:16px}
+figure svg{display:block;width:100%;height:auto}
+figcaption{font-size:.82rem;color:var(--muted);margin-top:10px;text-align:center}
+.steps{counter-reset:s;list-style:none;padding:0;margin:14px 0}
+.steps li{counter-increment:s;position:relative;padding:10px 12px 10px 50px;border:1px solid var(--line);border-radius:10px;margin:8px 0;background:#fafcfe}
+.steps li::before{content:counter(s);position:absolute;left:12px;top:10px;width:26px;height:26px;border-radius:50%;background:#5b3da8;color:#fff;display:grid;place-items:center;font-weight:700;font-size:.8rem}
+.steps li b{color:#22425f}
+details{border:1px solid var(--line);border-radius:10px;padding:6px 14px;margin:12px 0;background:#fafcfe}
+summary{cursor:pointer;font-weight:600;font-size:.9rem;color:var(--accent)}
+.kv{display:grid;grid-template-columns:180px 1fr;gap:5px 14px;font-size:.9rem;margin:10px 0}.kv dt{font-weight:700;color:#22425f}.kv dd{margin:0;color:#3a4a59}
+.axis-note{font-size:.82rem;color:var(--muted);font-style:italic}.small{font-size:.86rem;color:var(--muted)}
+hr.soft{border:none;border-top:1px dashed var(--line);margin:22px 0}
+a{color:#1e5b90}
+@media (max-width:940px){.wrap{grid-template-columns:1fr;gap:0;padding:0 14px}nav.toc{position:static;max-height:none;margin:10px 0 4px}section{padding:20px 16px}header.hero{padding:26px 18px}.kv{grid-template-columns:1fr}}
+@media print{body{background:#fff;font-size:11px}.wrap{display:block;max-width:none;padding:0}nav.toc{display:none}header.hero,.part-banner h2{-webkit-print-color-adjust:exact;print-color-adjust:exact}header.hero{background:#3f2d78 !important;border-radius:0}section{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid}figure,table,.card{page-break-inside:avoid}a{color:inherit;text-decoration:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <p class="kicker">Readable Technical Docs / DB Modeling Companion</p>
+  <h1>RDB / Oracle DB設計 別冊<br>モデリングとテーブル設計 実践大全<br>300KB増補版</h1>
+  <p class="sub">入会・退会・承認ワークフロー、状態遷移、履歴、時系列、部品タイプ別属性、排他的外部キー、ユニークキーがないデータ、変更される主キー、データ消失事故、ビュー・CQRS・イベントソーシング判断まで。増補版では「状態ごとにテーブルをスライドする」「監査ログで妥協する」「CQRSへ分ける」など、完璧ではない選択肢を比較し、判断材料を増やした。</p>
+  <div class="meta">
+    <span>生成日: 2026-06-02</span>
+    <span>対象: 既習者〜実務設計者</span>
+    <span>前提: Oracle AI Database 26ai を主対象。汎用RDB原則も併記。</span>
+    <span>形式: 自己完結HTML / 日本語</span><span>増補方針: 完璧解ではなく、選択肢・代償・判断基準を多めに提示</span>
+  </div>
+</header>
+
+<nav class="toc"><h2>目次</h2><ol><li class="part">前提</li><li><a href="#s0">0. この資料の読み方</a></li><li><a href="#s1">1. テーブル設計の責務</a></li><li><a href="#s2">2. 全体マップ</a></li><li class="part">第I部 基本軸</li><li><a href="#s3">3. 業務概念の切り分け</a></li><li><a href="#s4">4. リソース・イベント・状態</a></li><li><a href="#s5">5. キーと同一性</a></li><li><a href="#s6">6. 制約と不変条件</a></li><li><a href="#s7">7. 関係の型</a></li><li class="part">第II部 難所パターン</li><li><a href="#s8">8. 排他的外部キー</a></li><li><a href="#s9">9. 多態・サブタイプ</a></li><li><a href="#s10">10. 状態遷移と承認</a></li><li><a href="#s11">11. 時間・履歴・時系列</a></li><li><a href="#s12">12. 外部IDと変更される主キー</a></li><li><a href="#s13">13. ユニークキーがないデータ</a></li><li><a href="#s14">14. データ削除と消失</a></li><li class="part">第III部 実例</li><li><a href="#s15">15. 入会申請・入会・退会</a></li><li><a href="#s16">16. 承認・差戻・却下</a></li><li><a href="#s17">17. 4種類の部品タイプ</a></li><li><a href="#s18">18. BOM・版・構成履歴</a></li><li><a href="#s19">19. 名寄せ・統合・分割</a></li><li class="part">第IV部 性能と進化</li><li><a href="#s20">20. 正規化と非正規化</a></li><li><a href="#s21">21. ビュー・MV・CQRS</a></li><li><a href="#s22">22. イベントソーシング</a></li><li><a href="#s23">23. 索引・パーティション</a></li><li><a href="#s24">24. 並行制御とロック</a></li><li><a href="#s25">25. スキーマ進化</a></li><li class="part">第V部 レビュー</li><li><a href="#s25a">補A. コードマスタ・分類体系</a></li><li><a href="#s25b">補B. 監査・調定</a></li><li><a href="#s25c">補C. テスト観点</a></li><li><a href="#s26">26. アンチパターン集</a></li><li><a href="#s27">27. DDLテンプレート</a></li><li><a href="#s28">28. 設計レビュー質問</a></li><li><a href="#s29">29. 判断表</a></li><li class="part">第VI部 増補: バリエーションと判断材料</li>
+<li><a href="#s31">31. 状態の持ち方バリエーション総覧</a></li>
+<li><a href="#s32">32. ユーザー退会・停止・再入会の設計</a></li>
+<li><a href="#s33">33. 状態別テーブルへスライドする設計</a></li>
+<li><a href="#s34">34. 承認ワークフローの難所パターン</a></li>
+<li><a href="#s35">35. 権限・アカウント・会員資格の分離</a></li>
+<li><a href="#s36">36. 二時間軸・訂正・遡及反映</a></li>
+<li><a href="#s37">37. 履歴方式の比較カタログ</a></li>
+<li><a href="#s38">38. 部品タイプ別属性の追加バリエーション</a></li>
+<li><a href="#s39">39. 排他的FK・多態参照の追加妙技</a></li>
+<li><a href="#s40">40. 一意性がないデータの受け皿設計</a></li>
+<li><a href="#s41">41. 変更される外部キー・名寄せ・承継</a></li>
+<li><a href="#s42">42. 在庫・残高・引当などホット集約</a></li>
+<li><a href="#s43">43. 削除・匿名化・保持期限</a></li>
+<li><a href="#s44">44. ビュー・MV・読取モデルの分離</a></li>
+<li><a href="#s45">45. イベントソーシング採否の細分化</a></li>
+<li><a href="#s46">46. 外部連携・取込・冪等性</a></li>
+<li><a href="#s47">47. マルチテナント・所有権・公開範囲</a></li>
+<li><a href="#s48">48. 追加アンチパターンと推奨度</a></li><li class="part">第VII部 増補: 周辺だが設計で効く領域</li>
+<li><a href="#s48a">48A. 申請・ドラフト・提出スナップショット</a></li>
+<li><a href="#s48b">48B. 添付・コメント・通知・タスク</a></li>
+<li><a href="#s48c">48C. コード体系・分類階層・有効期間</a></li>
+<li><a href="#s48d">48D. パーティション・アーカイブ・IOT</a></li>
+<li><a href="#s48e">48E. 追加レビュー質問100</a></li><li><a href="#s48f">48F. ケース別の設計選択シナリオ</a></li>
+<li><a href="#s48g">48G. コメント・命名・ADRで判断を残す</a></li><li><a href="#s49">49. まとめと参考資料</a></li></ol></nav>
+<main>
+<section id="s0" class="focus">
+      <h2 class="sec"><span class="num">0</span>この資料の読み方</h2>
+      <p class="lead">この資料は、既存のDB設計応用資料のうち「業務をテーブルへ落とす」部分だけを別冊として拡張したもの。理解のために単純化すると、テーブル設計とは「現実の出来事・状態・時間・同一性を、将来壊れにくい形式へ固定する作業」である。</p>
+      
+<div class="cards">
+  <div class="card"><div class="k">重点</div><div class="t">モデリング判断</div><div class="d">どの概念を1表にし、どれを分け、何を履歴化し、どの制約で守るかを扱う。</div></div>
+  <div class="card"><div class="k">範囲</div><div class="t">論理設計〜物理寄り</div><div class="d">概念モデリングだけでなく、Oracleで実装するときのDDL・索引・ビュー・移行まで踏み込む。</div></div>
+  <div class="card"><div class="k">前提</div><div class="t">Oracle 26ai中心</div><div class="d">SQL標準寄りの考え方を土台にしつつ、制約・Flashback/Temporal・JSON Duality・EBRなどはOracle前提で記す。</div></div>
+  <div class="card"><div class="k">注意</div><div class="t">万能解はない</div><div class="d">上級設計は「正しい形を1つ選ぶ」より「どの歪みをどこへ逃がすか」を明示する作業である。</div></div>
+</div>
+<div class="call note"><div class="h">既存資料との関係</div><div>既存資料は「事業の現実は本来リレーショナルではない」「リソース／イベント／状態／履歴を区別する」という大きな軸を示していた。本別冊では、その軸を実際のテーブル設計パターン・DDL例・失敗例・レビュー観点へ展開する。</div></div>
+<p>読み順は「概念の区別 → キーと制約 → 難所パターン → 具体ケース → 性能・進化 → レビュー」の順にしている。先にDDLテンプレートだけを見ると、なぜその形にしたのかが抜けるため、最初は第I部から読むことを推奨する。</p>
+
+    </section><section id="s1" class="focus">
+      <h2 class="sec"><span class="num">1</span>テーブル設計の責務 ― 何を守るための設計か</h2>
+      <p class="lead">テーブル設計は、画面項目を保存する箱を作る作業ではない。上級者は、データの意味・同一性・履歴・整合性・変更容易性を、将来の業務変更と性能要件に耐える形へ配置している。</p>
+      
+
+<figure>
+<svg viewBox="0 0 900 310" role="img" aria-label="テーブル設計の判断階層">
+  <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2b5d8c"/></marker></defs>
+  <rect x="40" y="30" width="170" height="58" rx="10" fill="#f3f0fa" stroke="#5b3da8"/><text x="125" y="55" text-anchor="middle" font-weight="700" fill="#4d2d88">業務意味</text><text x="125" y="75" text-anchor="middle" font-size="12" fill="#5b6876">言葉・境界・責務</text>
+  <rect x="260" y="30" width="170" height="58" rx="10" fill="#eef4ef" stroke="#1f7a5e"/><text x="345" y="55" text-anchor="middle" font-weight="700" fill="#1f5e48">同一性</text><text x="345" y="75" text-anchor="middle" font-size="12" fill="#5b6876">内部ID・外部ID</text>
+  <rect x="480" y="30" width="170" height="58" rx="10" fill="#eef4fa" stroke="#2b5d8c"/><text x="565" y="55" text-anchor="middle" font-weight="700" fill="#22425f">時間</text><text x="565" y="75" text-anchor="middle" font-size="12" fill="#5b6876">現在・履歴・版</text>
+  <rect x="700" y="30" width="170" height="58" rx="10" fill="#fff4e6" stroke="#b4541a"/><text x="785" y="55" text-anchor="middle" font-weight="700" fill="#8a4d15">整合性</text><text x="785" y="75" text-anchor="middle" font-size="12" fill="#5b6876">制約・Tx・不変条件</text>
+  <rect x="150" y="155" width="190" height="64" rx="10" fill="#f7fbff" stroke="#2b5d8c"/><text x="245" y="181" text-anchor="middle" font-weight="700" fill="#22425f">アクセス経路</text><text x="245" y="202" text-anchor="middle" font-size="12" fill="#5b6876">索引・ビュー・集計</text>
+  <rect x="395" y="155" width="190" height="64" rx="10" fill="#f7fbff" stroke="#2b5d8c"/><text x="490" y="181" text-anchor="middle" font-weight="700" fill="#22425f">進化可能性</text><text x="490" y="202" text-anchor="middle" font-size="12" fill="#5b6876">変更・移行・監査</text>
+  <rect x="640" y="155" width="190" height="64" rx="10" fill="#f7fbff" stroke="#2b5d8c"/><text x="735" y="181" text-anchor="middle" font-weight="700" fill="#22425f">物理設計</text><text x="735" y="202" text-anchor="middle" font-size="12" fill="#5b6876">パーティション・MV</text>
+  <line x1="210" y1="59" x2="256" y2="59" stroke="#2b5d8c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="430" y1="59" x2="476" y2="59" stroke="#2b5d8c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="650" y1="59" x2="696" y2="59" stroke="#2b5d8c" stroke-width="2" marker-end="url(#arr)"/>
+  <path d="M785 88 C760 130 725 130 735 151" fill="none" stroke="#2b5d8c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="340" y1="187" x2="391" y2="187" stroke="#2b5d8c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="585" y1="187" x2="636" y2="187" stroke="#2b5d8c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="450" y="270" text-anchor="middle" font-size="13" fill="#5b6876">上流の意味を曖昧にしたまま下流のDDLを固めるほど、後から変更できない負債になる</text>
+</svg>
+<figcaption>図1: テーブル設計の判断階層。業務意味・同一性・時間・整合性を先に決め、その後にアクセス経路と物理設計へ進む。</figcaption>
+</figure>
+
+<h3>テーブル設計で守るべき6つの責務</h3>
+<div class="tbl "><table><thead><tr><th>責務</th><th>設計で決めること</th><th>雑に扱ったときの地獄</th></tr></thead><tbody><tr><td>意味の固定</td><td>「申請」「会員」「ユーザー」「アカウント」などの境界を決める</td><td>同名異義が1表に混ざり、NULLだらけ・条件分岐だらけのゴッドテーブルになる</td></tr><tr><td>同一性の固定</td><td>内部ID、業務キー、外部ID、表示番号を分ける</td><td>外部システムのキー変更で全FKが崩れる。名寄せ不能。過去データの意味が変わる</td></tr><tr><td>時間の固定</td><td>現在値・履歴・有効期間・発生時刻・登録時刻を分ける</td><td>「いつそうだったか」「なぜそうなったか」を後から説明できない</td></tr><tr><td>整合性の固定</td><td>PK/FK/UNIQUE/CHECK/NOT NULL/トランザクション境界を決める</td><td>壊れたデータが入った後でアプリ側だけでは修復不能になる</td></tr><tr><td>検索・集計の固定</td><td>どの画面・帳票・APIがどの形で読むかを意識する</td><td>正規化は美しいが毎回重いJOINになり、後から場当たり的な列追加が始まる</td></tr><tr><td>進化余地の固定</td><td>後で型・意味・状態・外部連携が変わる前提で逃げ道を作る</td><td>列削除・キー変更・履歴追加が大工事になる。データが失われた後で気づく</td></tr></tbody></table></div>
+<div class="call mech"><div class="h">機序: テーブルは「仕様」になる</div><div>一度本番データが入ると、テーブル定義はコードよりも硬い仕様になる。アプリは置き換えられるが、蓄積済みデータの意味は簡単には変えられない。だから設計時点で「何を事実として残すか」「何は導出でよいか」「何を消してはいけないか」を分ける必要がある。</div></div>
+<h3>画面項目から始めると失敗する理由</h3>
+<p>画面は業務の入口だが、データの寿命とは一致しない。画面上は1つの「ステータス」に見えても、DB上では現在状態、状態遷移履歴、承認タスク、通知ログ、監査証跡に分かれることがある。逆に、画面上は複数の入力欄でも、DB上では1つの値オブジェクトやコード体系にまとめた方が安全なこともある。</p>
+<p>実務では、まず「将来説明責任が発生する事実」を特定する。申請が却下された事実、誰が差し戻したか、外部IDがいつ変わったか、部品の構成がどの版で有効だったかは、画面から消えても業務上は残る。この種の事実を現在値列の上書きだけで扱うと、後から監査・復元・調定ができなくなる。</p>
+
+    </section><section id="s2" class="">
+      <h2 class="sec"><span class="num">2</span>全体マップ ― テーブル設計の判断順序</h2>
+      <p class="lead">理解のために単純化すると、DB設計は「何を表すか」から「どう速く読むか」へ流れる。逆に、最初から索引や列名だけ考えると、意味の境界を誤ったまま高速な負債を作る。</p>
+      
+<ol class="steps">
+  <li><b>概念を切る</b>：業務用語を列挙し、同名異義・異名同義を潰す。例: ユーザー、会員、申請者、承認者、アカウントは同じとは限らない。</li>
+  <li><b>リソース・イベント・状態を分ける</b>：在り続けるもの、起きたこと、現在の状態、状態遷移履歴を混ぜない。</li>
+  <li><b>同一性を決める</b>：代理キー、自然キー、外部ID、表示番号、版番号を分ける。変更される可能性のあるキーをPKにしない。</li>
+  <li><b>制約を決める</b>：DBで守る不変条件、アプリで守る遷移条件、バッチで調定する条件を分ける。</li>
+  <li><b>時間を決める</b>：発生時刻、登録時刻、有効期間、処理時刻、削除時刻を分ける。どれを履歴化するか明示する。</li>
+  <li><b>読み方を決める</b>：正規化した書込モデルに対し、一覧・検索・帳票のためのビュー、MV、検索テーブルを検討する。</li>
+  <li><b>変え方を決める</b>：本番稼働後に列追加・分割・型変更・外部ID変更が起きる前提で、移行手順を設計に含める。</li>
+</ol>
+<div class="call tip"><div class="h">実務のレビュー観点</div><div>テーブル一覧を見たときに「これは何の事実を保存している表か」「この行はいつからいつまで有効か」「この行を削除してよいか」「このIDは誰が発行し、変更されるか」を説明できない表は危険である。</div></div>
+
+    </section><div class="part-banner"><h2>第 I 部 基本軸 <small>― 業務概念をテーブルへ落とす前に決めること</small></h2></div><section id="s3" class="focus">
+      <h2 class="sec"><span class="num">3</span>業務概念の切り分け ― 同じ言葉を同じ表にしない</h2>
+      <p class="lead">テーブル設計の事故は、列の型よりも概念の境界で起きる。「顧客」「ユーザー」「会員」「申請」「部品」のような言葉は、部門・画面・外部システムによって意味がずれる。</p>
+      
+<h3>同名異義・異名同義を先に処理する</h3>
+<div class="tbl "><table><thead><tr><th>現象</th><th>例</th><th>設計上の扱い</th></tr></thead><tbody><tr><td>同名異義</td><td>営業の「顧客」は見込み客を含むが、請求の「顧客」は請求先だけ</td><td>1表に統合せず、文脈ごとの集約を分ける。共有するのは同一性または参照だけ</td></tr><tr><td>異名同義</td><td>品目・部品・アイテム・SKUが同じ実体を指している</td><td>用語を統一し、別表にしない。別名はコード体系・表示名として扱う</td></tr><tr><td>状態違い</td><td>入会申請者と会員は同じ人物だが、業務上の責務が違う</td><td>Person/User と MembershipApplication / Membership を分ける</td></tr><tr><td>役割違い</td><td>同じユーザーが申請者にも承認者にもなる</td><td>ユーザー表に「承認者フラグ」を固定せず、ロール・権限・組織所属で表す</td></tr><tr><td>版違い</td><td>部品AのRev.1とRev.2は同じ部品か別物か</td><td>設計・購買・製造のどこで同一視するかにより、part と part_revision を分ける</td></tr></tbody></table></div>
+<p>概念の境界は、最終的に不変条件の境界でもある。たとえば「申請」は差し戻し・却下を持つが、「会員」は入会日・退会日・会員番号を持つ。これを1つの <code>users</code> 表に詰め込むと、申請中ユーザーには会員番号がNULL、退会済ユーザーにはログイン不可フラグ、却下ユーザーには却下理由、招待中ユーザーには期限、というように、1表の中に複数のライフサイクルが混ざる。</p>
+<div class="call danger"><div class="h">ゴッドテーブル化の初期症状</div><div>列名に <code>xxx_type</code>、<code>xxx_status</code>、<code>xxx_flag</code>、<code>xxx_date1</code>、<code>memo1</code> が増え、NOT NULLにできる列が少なくなり、CHECK制約がほとんど書けない。この状態は、概念が1表に混ざっている可能性が高い。</div></div>
+<h3>境界を切るための質問</h3>
+<ul>
+  <li>その行は、業務上いつ生まれ、いつ消えるのか。</li>
+  <li>その行の主語は誰か。人か、アカウントか、会員資格か、申請か、承認タスクか。</li>
+  <li>同じIDで追跡したい寿命はどこまでか。申請から退会までか、再入会後も同一か。</li>
+  <li>その表の全行に必ず成り立つ不変条件を1文で言えるか。</li>
+  <li>同じ言葉でも、外部システムや部門で意味が違わないか。</li>
+</ul>
+
+    </section><section id="s4" class="focus">
+      <h2 class="sec"><span class="num">4</span>リソース・イベント・状態 ― まずこの3つを分ける</h2>
+      <p class="lead">既存資料でも強調されていた通り、リソースは「在り続けるもの」、イベントは「起きたこと」、状態は「イベントの結果として現在どうなっているか」である。この3つを混ぜると履歴と監査が壊れる。</p>
+      
+
+<figure>
+<svg viewBox="0 0 900 360" role="img" aria-label="リソース・イベント・状態・射影の関係">
+  <defs><marker id="ar2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f7a5e"/></marker></defs>
+  <rect x="45" y="55" width="210" height="120" rx="12" fill="#eef4ef" stroke="#1f7a5e"/>
+  <text x="150" y="84" text-anchor="middle" font-size="15" font-weight="700" fill="#1f5e48">リソース</text>
+  <text x="65" y="112" font-size="12" fill="#3a4a59">顧客・部品・会員・申請</text><text x="65" y="135" font-size="12" fill="#3a4a59">同一性を持ち、現在値がある</text><text x="65" y="158" font-size="12" fill="#3a4a59">UPDATE されることがある</text>
+  <rect x="345" y="55" width="210" height="120" rx="12" fill="#f3e8ef" stroke="#a82a64"/>
+  <text x="450" y="84" text-anchor="middle" font-size="15" font-weight="700" fill="#7a2350">イベント</text>
+  <text x="365" y="112" font-size="12" fill="#3a4a59">申請された・承認された・退会した</text><text x="365" y="135" font-size="12" fill="#3a4a59">発生時刻と原因が本質</text><text x="365" y="158" font-size="12" fill="#3a4a59">INSERT only が自然</text>
+  <rect x="645" y="55" width="210" height="120" rx="12" fill="#fff4e6" stroke="#b4541a"/>
+  <text x="750" y="84" text-anchor="middle" font-size="15" font-weight="700" fill="#8a4d15">状態</text>
+  <text x="665" y="112" font-size="12" fill="#3a4a59">申請中・差し戻し・承認済</text><text x="665" y="135" font-size="12" fill="#3a4a59">イベントの結果として変わる</text><text x="665" y="158" font-size="12" fill="#3a4a59">現在値＋履歴で持つ</text>
+  <rect x="210" y="245" width="220" height="78" rx="12" fill="#eef4fa" stroke="#2b5d8c"/>
+  <text x="320" y="273" text-anchor="middle" font-size="15" font-weight="700" fill="#22425f">履歴・監査ログ</text><text x="320" y="297" text-anchor="middle" font-size="12" fill="#5b6876">過去を説明するための事実</text>
+  <rect x="510" y="245" width="220" height="78" rx="12" fill="#eef4fa" stroke="#2b5d8c"/>
+  <text x="620" y="273" text-anchor="middle" font-size="15" font-weight="700" fill="#22425f">射影・読取モデル</text><text x="620" y="297" text-anchor="middle" font-size="12" fill="#5b6876">検索・一覧・集計のための形</text>
+  <line x1="255" y1="115" x2="341" y2="115" stroke="#1f7a5e" stroke-width="2" marker-end="url(#ar2)"/><text x="298" y="101" text-anchor="middle" font-size="11" fill="#5b6876">操作</text>
+  <line x1="555" y1="115" x2="641" y2="115" stroke="#1f7a5e" stroke-width="2" marker-end="url(#ar2)"/><text x="598" y="101" text-anchor="middle" font-size="11" fill="#5b6876">導出</text>
+  <path d="M450 175 C430 215 365 220 325 243" fill="none" stroke="#1f7a5e" stroke-width="2" marker-end="url(#ar2)"/>
+  <path d="M750 175 C725 225 665 225 625 243" fill="none" stroke="#1f7a5e" stroke-width="2" marker-end="url(#ar2)"/>
+  <path d="M150 175 C185 230 245 230 315 243" fill="none" stroke="#1f7a5e" stroke-width="2" marker-end="url(#ar2)"/>
+</svg>
+<figcaption>図2: リソース・イベント・状態・履歴・射影の関係。状態はリソースの列でもあるが、本質的にはイベントの蓄積から説明される。</figcaption>
+</figure>
+
+<div class="tbl "><table><thead><tr><th>種類</th><th>性質</th><th>典型テーブル</th><th>主な操作</th><th>失敗例</th></tr></thead><tbody><tr><td>リソース</td><td>同一性を持ち、属性が変わる</td><td>member, part, supplier, account</td><td>INSERT / UPDATE</td><td>部品名変更で過去の帳票まで新名称に見える</td></tr><tr><td>イベント</td><td>発生時刻を持ち、原則不変</td><td>membership_event, approval_event, inventory_movement</td><td>INSERT only</td><td>承認済フラグだけで、誰がいつ承認したか分からない</td></tr><tr><td>状態</td><td>リソースの現在の局面</td><td>application.current_status, membership.status</td><td>現在値更新＋履歴追記</td><td>status上書きだけで差戻履歴が消える</td></tr><tr><td>射影</td><td>検索・一覧・集計のための導出形</td><td>member_search_view, application_summary_mv</td><td>再生成可能な更新</td><td>射影を真実扱いして、再計算不能になる</td></tr></tbody></table></div>
+<h3>イベントを可変列で持つと何が消えるか</h3>
+<p>例として <code>membership.status = 'APPROVED'</code> だけを持つと、「承認された」という現在状態は分かる。しかし、誰が承認したか、承認前に差し戻しがあったか、却下後に再申請されたか、システム処理で承認されたか、人が判断したかは消える。状態列は高速な検索には便利だが、事実の説明責任を持てない。</p>
+<p>上級者は、状態を「現在値」として持つ場合でも、状態を変えたイベントまたは履歴を別表に残す。現在値は読みを速くするためのキャッシュ、履歴は説明責任を持つ事実、と役割を分ける。</p>
+<div class="call tip"><div class="h">基本形</div><div>基幹系では「現在値列 + 状態遷移履歴 + 必要ならイベントログ」が基本形になる。現在値だけは速いが消える情報が多く、イベントだけは正確だが現在値検索が重くなる。二段持ちの冗長性は、意図的な妥協である。</div></div>
+
+    </section><section id="s5" class="focus">
+      <h2 class="sec"><span class="num">5</span>キーと同一性 ― 主キー・業務キー・外部IDを混ぜない</h2>
+      <p class="lead">主キーは「行を不変に識別するための内部的な錨」である。業務上の番号、外部システムのID、表示用コード、版番号は重要だが、変更される可能性があるなら主キーにしない。</p>
+      
+<h3>キーの種類</h3>
+<div class="tbl "><table><thead><tr><th>キー</th><th>意味</th><th>変更可能性</th><th>推奨用途</th></tr></thead><tbody><tr><td>代理キー / surrogate key</td><td>DB内部で発行する不変ID。例: member_id</td><td>原則変更しない</td><td>PK、FKの参照先。長期保存データの同一性</td></tr><tr><td>自然キー / natural key</td><td>業務上の一意識別子。例: 会員番号、品番、法人番号</td><td>制度・連携・業務都合で変わることがある</td><td>UNIQUE候補。ただし変更・再利用・欠損を確認</td></tr><tr><td>外部ID</td><td>外部システムが発行するID。例: CRM顧客ID、PLM部品ID</td><td>相手都合で変わる。重複・再利用もありうる</td><td>対応表で管理。PK/FKに直結しない</td></tr><tr><td>表示番号</td><td>画面や帳票に出す番号。例: 申請番号 APP-2026-0001</td><td>採番ルール変更・再発番がありうる</td><td>UNIQUE制約は可。ただし内部IDとは分ける</td></tr><tr><td>版キー</td><td>Rev、版、適用開始日など</td><td>変更というより新しい版が増える</td><td>part_revision など別表化し、親ID + revision_no を一意にする</td></tr></tbody></table></div>
+
+<figure>
+<svg viewBox="0 0 900 280" role="img" aria-label="内部IDと外部IDのクロスウォーク">
+  <defs><marker id="ar5" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2b5d8c"/></marker></defs>
+  <rect x="55" y="70" width="210" height="95" rx="12" fill="#eef4ef" stroke="#1f7a5e"/>
+  <text x="160" y="100" text-anchor="middle" font-weight="700" fill="#1f5e48">内部エンティティ</text><text x="78" y="128" font-size="12" fill="#3a4a59">member_id / part_id</text><text x="78" y="150" font-size="12" fill="#3a4a59">不変の代理キー</text>
+  <rect x="345" y="45" width="220" height="145" rx="12" fill="#eef4fa" stroke="#2b5d8c"/>
+  <text x="455" y="73" text-anchor="middle" font-weight="700" fill="#22425f">外部ID対応表</text><text x="368" y="100" font-size="12" fill="#3a4a59">system_code</text><text x="368" y="122" font-size="12" fill="#3a4a59">external_key</text><text x="368" y="144" font-size="12" fill="#3a4a59">valid_from / valid_to</text><text x="368" y="166" font-size="12" fill="#3a4a59">confidence / source_batch</text>
+  <rect x="645" y="70" width="210" height="95" rx="12" fill="#fff4e6" stroke="#b4541a"/>
+  <text x="750" y="100" text-anchor="middle" font-weight="700" fill="#8a4d15">外部システム</text><text x="668" y="128" font-size="12" fill="#3a4a59">会員番号・品番・取引先コード</text><text x="668" y="150" font-size="12" fill="#3a4a59">変更・再利用・欠損しうる</text>
+  <line x1="265" y1="118" x2="341" y2="118" stroke="#2b5d8c" stroke-width="2" marker-end="url(#ar5)"/>
+  <line x1="565" y1="118" x2="641" y2="118" stroke="#2b5d8c" stroke-width="2" marker-end="url(#ar5)"/>
+  <text x="450" y="235" text-anchor="middle" font-size="12" fill="#5b6876">外部キーを主キーにしない。外部IDは「観測された識別子」として対応表に履歴化する。</text>
+</svg>
+<figcaption>図5: 内部IDと外部IDの分離。外部識別子は業務上重要でも、変更・再利用・名寄せ失敗の可能性があるため、内部同一性とは分ける。</figcaption>
+</figure>
+
+<h3>変更される可能性がある主キーの扱い</h3>
+<p>外部システム連携がある場合、「外部から来るIDが一意だからPKにする」は危険である。外部IDが後から訂正された場合、自システム内のFK、履歴、監査ログ、メッセージ、帳票がすべて古い値を参照する。技術的にはON UPDATE CASCADEを持つDBもあるが、Oracleでは主キーをFKで広く参照させてから値を変える設計自体を避ける方が安全である。</p>
+<p>実務解は、内部代理キーを不変の主キーにし、外部IDは <code>external_identifier</code> 対応表で持つ。対応表には、外部システム名、外部ID、内部ID、有効期間、取り込みバッチ、確信度、訂正理由を持たせる。これにより、外部ID変更は「対応表の履歴追加」として扱え、内部の参照は壊れない。</p>
+<pre><code>CREATE TABLE member (
+  member_id       NUMBER GENERATED ALWAYS AS IDENTITY,
+  member_no       VARCHAR2(40),
+  display_name    VARCHAR2(200) NOT NULL,
+  created_at      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_member PRIMARY KEY (member_id),
+  CONSTRAINT uq_member_no UNIQUE (member_no)
+);
+
+CREATE TABLE external_identifier (
+  external_identifier_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  entity_type      VARCHAR2(40) NOT NULL,
+  entity_id        NUMBER NOT NULL,
+  system_code      VARCHAR2(40) NOT NULL,
+  external_key     VARCHAR2(200) NOT NULL,
+  valid_from       TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  valid_to         TIMESTAMP DEFAULT TIMESTAMP &#x27;9999-12-31 00:00:00&#x27; NOT NULL,
+  source_batch_id  VARCHAR2(80),
+  confidence_score NUMBER(5,2),
+  CONSTRAINT pk_external_identifier PRIMARY KEY (external_identifier_id),
+  CONSTRAINT uq_extid_current UNIQUE (entity_type, system_code, external_key, valid_to)
+);</code></pre>
+<div class="call warn"><div class="h">注意: 外部ID対応表のFK</div><div>上記例は entity_type + entity_id の汎用対応表であり、そのままでは entity_id に厳密なFKを張りにくい。厳密性を優先するならエンティティごとに対応表を分けるか、共通の entity_registry を親にする。汎用性と参照整合性はトレードオフになる。</div></div>
+
+    </section><section id="s6" class="focus">
+      <h2 class="sec"><span class="num">6</span>制約と不変条件 ― DBで守るもの、アプリで守るもの</h2>
+      <p class="lead">制約は、アプリのバグやバッチの事故からデータを守る最後の防壁である。OracleではPK、UNIQUE、FK、CHECK、NOT NULL、DEFERRABLE、NOVALIDATEなどを使い分ける。</p>
+      
+<h3>制約の使い分け</h3>
+<div class="tbl "><table><thead><tr><th>制約</th><th>守れること</th><th>守れないこと</th><th>設計上の注意</th></tr></thead><tbody><tr><td>PRIMARY KEY</td><td>行の同一性。NULL不可、一意</td><td>業務上の意味の正しさ</td><td>変更される値をPKにしない。複合PKはFK側が重くなる</td></tr><tr><td>UNIQUE</td><td>候補キー、重複禁止</td><td>NULLを含む場合の意図しない複数行</td><td>条件付き一意は関数索引・仮想列で表現</td></tr><tr><td>FOREIGN KEY</td><td>参照先の存在</td><td>参照先の状態条件。例: 承認済の親だけ参照</td><td>親子が同一DB内にあることが基本。分散は別途対策</td></tr><tr><td>CHECK</td><td>1行内で完結する条件</td><td>他行・前状態・集計条件</td><td>状態遷移ルールや期間重複はCHECKだけでは守れない</td></tr><tr><td>NOT NULL</td><td>必須項目</td><td>業務的に「いつ必須か」が条件付きの項目</td><td>状態により必須なら表分割やCHECKを検討</td></tr><tr><td>DEFERRABLE</td><td>トランザクション末尾まで制約検査を遅延</td><td>すべての制約を万能に遅延できるわけではない</td><td>一括入替・循環参照・スナップショット更新で有効</td></tr></tbody></table></div>
+<p>Oracleの外部キーは、子の値が親の主キーまたは一意キーに一致することを要求する。複合外部キーは、親側の複合PK/UNIQUEと列数・型が対応している必要がある。これは参照整合性の基本であり、設計レビューでは「FKを張れる形になっているか」を最初に見る。</p>
+<h3>条件付き一意制約の例</h3>
+<p>退会済や論理削除済を残しつつ、アクティブな会員だけメールアドレスを一意にしたい場合、単純な <code>UNIQUE(email)</code> では過去行と衝突する。Oracleでは仮想列または関数ベース一意索引を使う。NULLは一意索引上で複数許容されるため、条件外をNULLに落とすのが定番である。</p>
+<pre><code>CREATE TABLE member_account (
+  member_account_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  email             VARCHAR2(320) NOT NULL,
+  closed_at         TIMESTAMP,
+  active_email_key  VARCHAR2(320)
+    GENERATED ALWAYS AS (
+      CASE WHEN closed_at IS NULL THEN LOWER(email) END
+    ) VIRTUAL,
+  CONSTRAINT pk_member_account PRIMARY KEY (member_account_id),
+  CONSTRAINT uq_member_account_active_email UNIQUE (active_email_key)
+);</code></pre>
+<div class="call mech"><div class="h">機序: 制約が効く範囲を意識する</div><div>CHECKは同じ行の値しか見られない。FKは存在は守るが、親が承認済か、期限内か、削除済でないかは普通のFKだけでは守れない。UNIQUEは一意性を守るが、名寄せの曖昧さは守れない。制約の種類ごとに守れる世界が違う。</div></div>
+<h3>制約を後付けするとき</h3>
+<p>既存データが大量にある本番では、いきなり全行検査付きで制約を追加すると長時間ロックや失敗が起きる。Oracleでは <code>ENABLE NOVALIDATE</code> により「既存行は検証しないが、新規DMLには効かせる」という段階を作れる。移行では、まず新規の破壊を止め、既存不整合を別途調定し、最後にVALIDATEする。</p>
+<pre><code>ALTER TABLE approval_request ADD CONSTRAINT fk_approval_request_member
+  FOREIGN KEY (member_id) REFERENCES member(member_id)
+  ENABLE NOVALIDATE;
+
+-- 既存不整合を調査して修正後、検証へ進める
+ALTER TABLE approval_request MODIFY CONSTRAINT fk_approval_request_member VALIDATE;</code></pre>
+
+    </section><section id="s7" class="">
+      <h2 class="sec"><span class="num">7</span>関係の型 ― 1対多、多対多、依存、排他、再帰</h2>
+      <p class="lead">リレーションは単にFKを張るだけではない。親子の寿命、削除ルール、履歴化、排他性、順序、版、有効期間まで含めて設計する。</p>
+      
+<h3>代表的な関係パターン</h3>
+<div class="tbl "><table><thead><tr><th>関係</th><th>例</th><th>基本設計</th><th>注意点</th></tr></thead><tbody><tr><td>1対多</td><td>会員が複数の申請を持つ</td><td>子に親IDを持たせる</td><td>親削除時に子を消すか残すか。監査が必要なら物理削除しない</td></tr><tr><td>1対1</td><td>会員と会員プロフィール</td><td>同じPKを子表のPK/FKにする</td><td>本当に1対1か、任意の詳細属性か、型別サブタイプかを確認</td></tr><tr><td>多対多</td><td>ユーザーとロール</td><td>中間表 user_role(user_id, role_id)</td><td>開始日・終了日・付与者を持つなら中間表はイベント/履歴に近い</td></tr><tr><td>依存関係</td><td>申請に添付ファイルがぶら下がる</td><td>子は親なしに存在しない</td><td>親の状態変更で子が追加不可になるなど、状態条件はアプリ層も必要</td></tr><tr><td>排他的関係</td><td>コメントの対象が申請/部品/注文のどれか1つ</td><td>排他的FK、親共通化、対象別表に分ける</td><td>汎用 target_type + target_id はFKが効かず危険</td></tr><tr><td>再帰</td><td>部品構成、組織階層</td><td>自己FK、エッジ表、閉包表</td><td>サイクル、版、有効期間、数量、代替を忘れると破綻</td></tr></tbody></table></div>
+<h3>中間表は「ただの紐付け」とは限らない</h3>
+<p>多対多の中間表は、最初は <code>(user_id, role_id)</code> だけで済むように見える。しかし実務では、付与者、付与理由、開始日、終了日、承認番号、取り消し理由が後から必要になることが多い。この時点で中間表は「関係の現在値」ではなく「ロール付与イベント」または「有効期間を持つ関係」になる。</p>
+<pre><code>CREATE TABLE user_role_assignment (
+  user_role_assignment_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  user_id        NUMBER NOT NULL,
+  role_id        NUMBER NOT NULL,
+  valid_from     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  valid_to       TIMESTAMP DEFAULT TIMESTAMP &#x27;9999-12-31 00:00:00&#x27; NOT NULL,
+  assigned_by    NUMBER NOT NULL,
+  reason         VARCHAR2(1000),
+  CONSTRAINT pk_user_role_assignment PRIMARY KEY (user_role_assignment_id),
+  CONSTRAINT fk_ura_user FOREIGN KEY (user_id) REFERENCES app_user(user_id),
+  CONSTRAINT fk_ura_role FOREIGN KEY (role_id) REFERENCES app_role(role_id),
+  CONSTRAINT ck_ura_period CHECK (valid_from &lt; valid_to)
+);</code></pre>
+<div class="call warn"><div class="h">削除ルールを先に決める</div><div><code>ON DELETE CASCADE</code> は便利だが、監査対象の子行まで消す危険がある。申請・承認・履歴・取引・外部連携ログには原則使わない。マスタの詳細属性など、親なしでは意味を持たず監査不要なものに限定する。</div></div>
+
+    </section><div class="part-banner b2"><h2>第 II 部 難所パターン <small>― 単純に管理すると後で地獄を見るケース</small></h2></div><section id="s8" class="focus">
+      <h2 class="sec"><span class="num">8</span>排他的外部キー ― 「どれか1つを参照する」をどう表すか</h2>
+      <p class="lead">コメント、添付、承認、通知、監査ログなどは、対象が申請・会員・部品・注文のいずれか1つになることがある。素朴な target_type + target_id は柔軟だが、DBのFKが効かない。</p>
+      
+<h3>方式比較</h3>
+<div class="tbl "><table><thead><tr><th>方式</th><th>例</th><th>利点</th><th>欠点</th><th>採用基準</th></tr></thead><tbody><tr><td>target_type + target_id</td><td>comment(target_type, target_id)</td><td>列が少なく追加が簡単</td><td>FKが効かない。存在しない対象を参照できる</td><td>監査性が低い補助ログ、対象消失を許容できる場合だけ</td></tr><tr><td>NULL許容FK複数 + CHECKで1つだけ必須</td><td>comment(application_id, member_id, part_id)</td><td>各FKが効く。排他性もCHECKで守れる</td><td>対象種類が増えるたび列追加</td><td>対象種類が少数・安定している場合</td></tr><tr><td>親共通テーブル / registry</td><td>comment(target_entity_id)</td><td>FKを1本にできる。対象追加に強い</td><td>対象側に共通親の採用が必要。JOINが増える</td><td>多くの対象に共通のコメント/添付/承認を付ける基盤</td></tr><tr><td>対象別テーブル</td><td>application_comment, part_comment</td><td>型安全・FK安全・制約が明快</td><td>一覧統合にUNION VIEWが必要</td><td>対象ごとに属性・権限・ライフサイクルが違う場合</td></tr><tr><td>アプリ検証 + 非制約</td><td>ログテーブル等</td><td>書込が軽い</td><td>不整合を防げない</td><td>検索・監査の主データではなく、破損許容のイベントログ</td></tr></tbody></table></div>
+<h3>NULL許容FK複数 + CHECKの例</h3>
+<p>対象種類が4つ程度で増えにくいなら、各対象へのFKを個別列として持ち、CHECKで「ちょうど1つだけNOT NULL」を守る。これは見た目は冗長だが、DBの参照整合性を守れる強い設計である。</p>
+<pre><code>CREATE TABLE attachment (
+  attachment_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  application_id NUMBER,
+  member_id      NUMBER,
+  part_id        NUMBER,
+  approval_id    NUMBER,
+  file_name      VARCHAR2(400) NOT NULL,
+  created_at     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_attachment PRIMARY KEY (attachment_id),
+  CONSTRAINT fk_att_application FOREIGN KEY (application_id) REFERENCES membership_application(application_id),
+  CONSTRAINT fk_att_member      FOREIGN KEY (member_id)      REFERENCES member(member_id),
+  CONSTRAINT fk_att_part        FOREIGN KEY (part_id)        REFERENCES part(part_id),
+  CONSTRAINT fk_att_approval    FOREIGN KEY (approval_id)    REFERENCES approval_request(approval_request_id),
+  CONSTRAINT ck_att_exactly_one_target CHECK (
+    (CASE WHEN application_id IS NULL THEN 0 ELSE 1 END) +
+    (CASE WHEN member_id      IS NULL THEN 0 ELSE 1 END) +
+    (CASE WHEN part_id        IS NULL THEN 0 ELSE 1 END) +
+    (CASE WHEN approval_id    IS NULL THEN 0 ELSE 1 END) = 1
+  )
+);</code></pre>
+<h3>親共通テーブル / entity_registry の例</h3>
+<p>対象種類が増え続ける場合、共通の <code>entity_registry</code> を作り、各対象がそこへ1対1でぶら下がる方式がある。コメントや添付は registry を参照するためFKを1本にできる。ただし、すべての対象が共通親を持つという設計方針を採る必要がある。</p>
+<pre><code>CREATE TABLE entity_registry (
+  entity_id   NUMBER GENERATED ALWAYS AS IDENTITY,
+  entity_type VARCHAR2(40) NOT NULL,
+  created_at  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_entity_registry PRIMARY KEY (entity_id),
+  CONSTRAINT ck_entity_type CHECK (entity_type IN (&#x27;APPLICATION&#x27;,&#x27;MEMBER&#x27;,&#x27;PART&#x27;,&#x27;APPROVAL&#x27;))
+);
+
+CREATE TABLE application_entity (
+  application_id NUMBER NOT NULL,
+  entity_id      NUMBER NOT NULL,
+  CONSTRAINT pk_application_entity PRIMARY KEY (application_id),
+  CONSTRAINT uq_application_entity UNIQUE (entity_id),
+  CONSTRAINT fk_ae_application FOREIGN KEY (application_id) REFERENCES membership_application(application_id),
+  CONSTRAINT fk_ae_entity FOREIGN KEY (entity_id) REFERENCES entity_registry(entity_id)
+);
+
+CREATE TABLE entity_comment (
+  comment_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  entity_id  NUMBER NOT NULL,
+  body       VARCHAR2(4000) NOT NULL,
+  created_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_entity_comment PRIMARY KEY (comment_id),
+  CONSTRAINT fk_comment_entity FOREIGN KEY (entity_id) REFERENCES entity_registry(entity_id)
+);</code></pre>
+<div class="call danger"><div class="h">危険: 汎用 target_type + target_id の誘惑</div><div>この方式は最初は速い。だが、対象が削除された、IDが別表と衝突した、権限チェックを忘れた、JOINできない、集計で対象名を出せない、といった事故が起きやすい。業務の主データ・監査対象・ユーザー操作対象には原則使わない。</div></div>
+
+    </section><section id="s9" class="focus">
+      <h2 class="sec"><span class="num">9</span>多態・サブタイプ ― 部品タイプごとに管理項目が違う場合</h2>
+      <p class="lead">「ある部品が取りうる種類が4種類あり、それぞれ管理データが異なる」ケースは、RDB設計で頻出する。選択肢は、単一表、型別表、サブタイプ表、JSON、EAVに分かれる。</p>
+      
+
+<figure>
+<svg viewBox="0 0 900 330" role="img" aria-label="部品タイプ別サブタイプテーブル設計">
+  <defs><marker id="ar4" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2b5d8c"/></marker></defs>
+  <rect x="350" y="35" width="200" height="85" rx="12" fill="#eef4ef" stroke="#1f7a5e"/>
+  <text x="450" y="62" text-anchor="middle" font-weight="700" fill="#1f5e48">PART</text>
+  <text x="370" y="88" font-size="12" fill="#3a4a59">part_id PK</text><text x="370" y="108" font-size="12" fill="#3a4a59">part_type / common attrs</text>
+  <g font-size="12" fill="#3a4a59">
+    <rect x="70" y="205" width="170" height="70" rx="10" fill="#fafcfe" stroke="#2b5d8c"/><text x="155" y="230" text-anchor="middle" font-weight="700" fill="#22425f">ELECTRIC_PART</text><text x="90" y="253">part_id PK/FK</text>
+    <rect x="270" y="205" width="170" height="70" rx="10" fill="#fafcfe" stroke="#2b5d8c"/><text x="355" y="230" text-anchor="middle" font-weight="700" fill="#22425f">MECHANICAL_PART</text><text x="290" y="253">part_id PK/FK</text>
+    <rect x="470" y="205" width="170" height="70" rx="10" fill="#fafcfe" stroke="#2b5d8c"/><text x="555" y="230" text-anchor="middle" font-weight="700" fill="#22425f">SOFTWARE_PART</text><text x="490" y="253">part_id PK/FK</text>
+    <rect x="670" y="205" width="170" height="70" rx="10" fill="#fafcfe" stroke="#2b5d8c"/><text x="755" y="230" text-anchor="middle" font-weight="700" fill="#22425f">SERVICE_PART</text><text x="690" y="253">part_id PK/FK</text>
+  </g>
+  <g stroke="#2b5d8c" stroke-width="2" fill="none">
+    <path d="M450 120 C390 165 215 168 155 202" marker-end="url(#ar4)"/>
+    <path d="M450 120 C420 160 385 170 355 202" marker-end="url(#ar4)"/>
+    <path d="M450 120 C480 160 525 170 555 202" marker-end="url(#ar4)"/>
+    <path d="M450 120 C515 165 690 168 755 202" marker-end="url(#ar4)"/>
+  </g>
+</svg>
+<figcaption>図4: 共通属性を親テーブルへ、型固有属性を1:1のサブタイプテーブルへ分離する設計。型ごとの制約・索引・NOT NULLを守りやすい。</figcaption>
+</figure>
+
+<h3>方式比較</h3>
+<div class="tbl "><table><thead><tr><th>方式</th><th>構造</th><th>強み</th><th>弱み</th><th>向くケース</th></tr></thead><tbody><tr><td>単一表継承 / STI</td><td>part 1表に全タイプの列を持つ</td><td>JOIN不要。検索が簡単</td><td>NULLだらけ。タイプ別NOT NULLやFKが弱い</td><td>タイプ差が小さい、列数が少ない</td></tr><tr><td>クラステーブル継承 / CTI</td><td>part + electric_part 等の1:1子表</td><td>共通属性と型固有制約を両立</td><td>JOINが増える。タイプ変更が難しい</td><td>タイプ差が大きく、型ごとの制約が重要</td></tr><tr><td>具象テーブル継承 / TPC</td><td>electric_part, mechanical_part を別表</td><td>各型に最適化できる</td><td>共通検索にUNIONが必要。共通FKが張りにくい</td><td>型ごとにほぼ別業務</td></tr><tr><td>JSON自由属性</td><td>part.common + spec_json</td><td>柔軟。項目追加が速い</td><td>検索・制約・型保証が弱くなる</td><td>表示専用・稀な検索・外部仕様の一時保持</td></tr><tr><td>EAV</td><td>part_attribute(name,value)</td><td>列追加不要</td><td>型・制約・検索・性能・可読性が崩れやすい</td><td>原則避ける。どうしても動的属性が必要な限定領域</td></tr></tbody></table></div>
+<h3>推奨基本形: 共通表 + 型別1:1表 + JSON自由特性</h3>
+<p>実務でバランスがよいのは、共通属性を <code>part</code>、型固有かつ検索・制約対象の属性を型別1:1表、検索しない自由特性をJSONへ逃がす三層構成である。これにより、RDBの制約を活かす部分と柔軟性を取る部分を分離できる。</p>
+<pre><code>CREATE TABLE part (
+  part_id      NUMBER GENERATED ALWAYS AS IDENTITY,
+  part_no      VARCHAR2(80) NOT NULL,
+  part_type    VARCHAR2(30) NOT NULL,
+  part_name    VARCHAR2(300) NOT NULL,
+  lifecycle_status VARCHAR2(30) DEFAULT &#x27;DRAFT&#x27; NOT NULL,
+  created_at   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_part PRIMARY KEY (part_id),
+  CONSTRAINT uq_part_no UNIQUE (part_no),
+  CONSTRAINT ck_part_type CHECK (part_type IN (&#x27;ELECTRIC&#x27;,&#x27;MECHANICAL&#x27;,&#x27;SOFTWARE&#x27;,&#x27;SERVICE&#x27;))
+);
+
+CREATE TABLE electric_part_detail (
+  part_id        NUMBER NOT NULL,
+  voltage_rating NUMBER(10,2) NOT NULL,
+  current_rating NUMBER(10,2),
+  connector_type VARCHAR2(80),
+  spec_json      JSON,
+  CONSTRAINT pk_electric_part_detail PRIMARY KEY (part_id),
+  CONSTRAINT fk_electric_part FOREIGN KEY (part_id) REFERENCES part(part_id),
+  CONSTRAINT ck_electric_voltage CHECK (voltage_rating &gt; 0)
+);
+
+CREATE TABLE mechanical_part_detail (
+  part_id      NUMBER NOT NULL,
+  material_cd  VARCHAR2(40) NOT NULL,
+  weight_g     NUMBER(12,3),
+  tolerance    VARCHAR2(80),
+  spec_json    JSON,
+  CONSTRAINT pk_mechanical_part_detail PRIMARY KEY (part_id),
+  CONSTRAINT fk_mechanical_part FOREIGN KEY (part_id) REFERENCES part(part_id)
+);</code></pre>
+<div class="call warn"><div class="h">型と子表の一致をどう守るか</div><div><code>part.part_type = ELECTRIC</code> の行だけが <code>electric_part_detail</code> を持つ、という条件は単純なFKだけでは完全に守りにくい。厳密に守るなら、複合キー <code>(part_id, part_type)</code> を親にして子表側に固定タイプ列を持たせる、またはアプリ/トリガで検査する。</div></div>
+<pre><code>-- 型一致をDB制約で寄せる例
+ALTER TABLE part ADD CONSTRAINT uq_part_id_type UNIQUE (part_id, part_type);
+
+CREATE TABLE electric_part_detail_strict (
+  part_id   NUMBER NOT NULL,
+  part_type VARCHAR2(30) DEFAULT &#x27;ELECTRIC&#x27; NOT NULL,
+  voltage_rating NUMBER(10,2) NOT NULL,
+  CONSTRAINT pk_epd_strict PRIMARY KEY (part_id),
+  CONSTRAINT ck_epd_type CHECK (part_type = &#x27;ELECTRIC&#x27;),
+  CONSTRAINT fk_epd_part_type FOREIGN KEY (part_id, part_type)
+    REFERENCES part(part_id, part_type)
+);</code></pre>
+<h3>EAVを使うなら隔離する</h3>
+<p>EAVは、属性名・値・型を行で持つため、列追加なしに項目を増やせる。しかし「数値として範囲チェックしたい」「属性AとBの組み合わせを一意にしたい」「索引で速く検索したい」「画面で型に応じて検証したい」といった要求が出た瞬間に複雑化する。使うなら、検索・制約・集計の対象外である自由メモ領域に隔離し、基幹属性には使わない。</p>
+
+    </section><section id="s10" class="focus">
+      <h2 class="sec"><span class="num">10</span>状態遷移と承認 ― status列だけで管理しない</h2>
+      <p class="lead">入会申請、承認、差し戻し、却下、承認、退会などは、状態列だけで表すと履歴・理由・承認者・権限・再申請の扱いが消える。状態は現在値、遷移はイベントとして持つ。</p>
+      
+
+<figure>
+<svg viewBox="0 0 900 350" role="img" aria-label="入会申請と承認状態遷移">
+  <defs><marker id="ar3" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2b5d8c"/></marker></defs>
+  <g font-size="12" font-weight="700">
+    <rect x="60" y="65" width="140" height="56" rx="10" fill="#eef4fa" stroke="#2b5d8c"/><text x="130" y="99" text-anchor="middle">下書き</text>
+    <rect x="260" y="65" width="140" height="56" rx="10" fill="#f3f0fa" stroke="#5b3da8"/><text x="330" y="99" text-anchor="middle">申請中</text>
+    <rect x="460" y="65" width="140" height="56" rx="10" fill="#fff4e6" stroke="#b4541a"/><text x="530" y="99" text-anchor="middle">差し戻し</text>
+    <rect x="660" y="65" width="140" height="56" rx="10" fill="#eef4ef" stroke="#1f7a5e"/><text x="730" y="99" text-anchor="middle">承認済</text>
+    <rect x="360" y="215" width="140" height="56" rx="10" fill="#fbe0e0" stroke="#9c2a2a"/><text x="430" y="249" text-anchor="middle">却下</text>
+    <rect x="660" y="215" width="140" height="56" rx="10" fill="#fbe0e0" stroke="#9c2a2a"/><text x="730" y="249" text-anchor="middle">退会済</text>
+  </g>
+  <g stroke="#2b5d8c" stroke-width="2" fill="none">
+    <line x1="200" y1="93" x2="256" y2="93" marker-end="url(#ar3)"/><text x="228" y="78" text-anchor="middle" fill="#5b6876" font-size="11">提出</text>
+    <line x1="400" y1="93" x2="456" y2="93" marker-end="url(#ar3)"/><text x="428" y="78" text-anchor="middle" fill="#5b6876" font-size="11">差戻</text>
+    <path d="M530 121 C515 160 390 160 345 124" marker-end="url(#ar3)"/><text x="445" y="154" text-anchor="middle" fill="#5b6876" font-size="11">再提出</text>
+    <line x1="400" y1="93" x2="656" y2="93" marker-end="url(#ar3)"/><text x="530" y="48" text-anchor="middle" fill="#5b6876" font-size="11">承認</text>
+    <path d="M330 121 C345 175 385 190 420 213" marker-end="url(#ar3)"/><text x="365" y="178" fill="#5b6876" font-size="11">却下</text>
+    <line x1="730" y1="121" x2="730" y2="211" marker-end="url(#ar3)"/><text x="748" y="172" fill="#5b6876" font-size="11">退会</text>
+  </g>
+  <text x="450" y="315" text-anchor="middle" font-size="12" fill="#5b6876">状態列は検索のために保持し、状態遷移履歴・承認イベントで「誰が・いつ・なぜ」を残す</text>
+</svg>
+<figcaption>図3: 入会申請の状態遷移例。これは理解用に単純化した図であり、実務では承認段階・権限・取消・再申請期限などが加わる。</figcaption>
+</figure>
+
+<h3>状態設計の基本構成</h3>
+<div class="tbl "><table><thead><tr><th>表</th><th>役割</th><th>例</th></tr></thead><tbody><tr><td>membership_application</td><td>申請リソース。現在状態と申請者・申請内容のスナップショットを持つ</td><td>application_id, applicant_user_id, current_status, submitted_at</td></tr><tr><td>application_status_history</td><td>状態遷移履歴。誰がいつ何から何へ変えたかを持つ</td><td>from_status, to_status, changed_by, changed_at, reason</td></tr><tr><td>approval_request</td><td>承認プロセスの単位。段階・担当・期限・結果を持つ</td><td>step_no, approver_user_id, approval_status</td></tr><tr><td>approval_event</td><td>承認操作イベント。承認・差戻・却下・取消の事実</td><td>event_type, occurred_at, actor_user_id, comment</td></tr><tr><td>membership</td><td>承認後に生まれる会員資格。申請とは別ライフサイクル</td><td>member_id, joined_at, left_at, membership_status</td></tr></tbody></table></div>
+<pre><code>CREATE TABLE membership_application (
+  application_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  applicant_user_id NUMBER NOT NULL,
+  application_no VARCHAR2(40) NOT NULL,
+  current_status VARCHAR2(30) DEFAULT &#x27;DRAFT&#x27; NOT NULL,
+  submitted_at TIMESTAMP,
+  decided_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_membership_application PRIMARY KEY (application_id),
+  CONSTRAINT uq_membership_application_no UNIQUE (application_no),
+  CONSTRAINT ck_application_status CHECK (current_status IN (
+    &#x27;DRAFT&#x27;,&#x27;SUBMITTED&#x27;,&#x27;RETURNED&#x27;,&#x27;REJECTED&#x27;,&#x27;APPROVED&#x27;,&#x27;CANCELED&#x27;
+  ))
+);
+
+CREATE TABLE application_status_history (
+  status_history_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  application_id NUMBER NOT NULL,
+  from_status VARCHAR2(30),
+  to_status   VARCHAR2(30) NOT NULL,
+  changed_by  NUMBER NOT NULL,
+  changed_at  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  reason      VARCHAR2(1000),
+  CONSTRAINT pk_application_status_history PRIMARY KEY (status_history_id),
+  CONSTRAINT fk_ash_application FOREIGN KEY (application_id)
+    REFERENCES membership_application(application_id)
+);</code></pre>
+<h3>状態遷移表をマスタ化する</h3>
+<p>「どの状態からどの状態へ遷移可能か」をDBにマスタとして持つと、画面制御・テスト・レビューで有効である。ただし、実際に遷移を強制するにはアプリ層の状態機械やトランザクション処理が必要であり、CHECK制約だけでは前状態を参照できない。</p>
+<pre><code>CREATE TABLE application_status_transition_rule (
+  from_status VARCHAR2(30) NOT NULL,
+  to_status   VARCHAR2(30) NOT NULL,
+  action_code VARCHAR2(40) NOT NULL,
+  requires_comment CHAR(1) DEFAULT &#x27;N&#x27; NOT NULL,
+  CONSTRAINT pk_app_status_transition_rule PRIMARY KEY (from_status, to_status),
+  CONSTRAINT ck_astr_comment CHECK (requires_comment IN (&#x27;Y&#x27;,&#x27;N&#x27;))
+);
+
+INSERT INTO application_status_transition_rule VALUES (&#x27;DRAFT&#x27;,&#x27;SUBMITTED&#x27;,&#x27;SUBMIT&#x27;,&#x27;N&#x27;);
+INSERT INTO application_status_transition_rule VALUES (&#x27;SUBMITTED&#x27;,&#x27;RETURNED&#x27;,&#x27;RETURN&#x27;,&#x27;Y&#x27;);
+INSERT INTO application_status_transition_rule VALUES (&#x27;RETURNED&#x27;,&#x27;SUBMITTED&#x27;,&#x27;RESUBMIT&#x27;,&#x27;N&#x27;);
+INSERT INTO application_status_transition_rule VALUES (&#x27;SUBMITTED&#x27;,&#x27;APPROVED&#x27;,&#x27;APPROVE&#x27;,&#x27;N&#x27;);
+INSERT INTO application_status_transition_rule VALUES (&#x27;SUBMITTED&#x27;,&#x27;REJECTED&#x27;,&#x27;REJECT&#x27;,&#x27;Y&#x27;);</code></pre>
+<div class="call danger"><div class="h">危険: status列だけの承認管理</div><div><code>status</code> をAPPROVEDに更新するだけの実装では、承認者・承認根拠・承認前の差戻し・再申請・却下理由・取消履歴が消える。後から内部統制・監査・顧客説明が必要になった時点でデータは戻らない。</div></div>
+<h3>現在値と履歴の同期</h3>
+<p>状態遷移時は、同一トランザクションで <code>membership_application.current_status</code> を更新し、<code>application_status_history</code> と <code>approval_event</code> に追記する。現在値と履歴が乖離しないよう、状態更新処理の入口をアプリのサービス層またはDBパッケージに集約する。</p>
+
+    </section><section id="s11" class="focus">
+      <h2 class="sec"><span class="num">11</span>時間・履歴・時系列 ― 発生時刻、有効期間、記録時刻を分ける</h2>
+      <p class="lead">履歴設計で最も重要なのは、時間の種類を混ぜないこと。業務上いつ有効だったか、いつ発生したか、いつDBへ記録されたか、いつ訂正されたかは別の意味を持つ。</p>
+      
+<h3>時間の種類</h3>
+<div class="tbl "><table><thead><tr><th>時間</th><th>意味</th><th>例</th><th>典型列</th></tr></thead><tbody><tr><td>発生時刻 / event time</td><td>業務上の出来事が起きた時刻</td><td>承認した時刻、入庫した時刻</td><td>occurred_at, approved_at</td></tr><tr><td>登録時刻 / recorded time</td><td>システムに記録された時刻</td><td>夜間バッチで取り込んだ時刻</td><td>created_at, imported_at</td></tr><tr><td>有効期間 / valid time</td><td>業務上その値が有効な期間</td><td>価格が2026-04-01から有効</td><td>valid_from, valid_to</td></tr><tr><td>処理時刻 / processing time</td><td>バッチやワークフローが処理した時刻</td><td>通知送信、連携完了</td><td>processed_at, sent_at</td></tr><tr><td>訂正時刻 / correction time</td><td>過去事実を訂正した時刻</td><td>誤入力の修正</td><td>corrected_at, superseded_at</td></tr></tbody></table></div>
+<p>時系列データは大きく3つに分かれる。業務的な低頻度履歴、トランザクションイベント、高頻度計測値である。RDBが得意なのは前2つであり、高頻度センサやログを基幹RDBへ無差別に入れると、索引・パーティション・保持期間・集計で苦しくなる。</p>
+<div class="tbl "><table><thead><tr><th>類型</th><th>例</th><th>設計</th></tr></thead><tbody><tr><td>業務的な期間履歴</td><td>価格、所属、契約、BOM適用期間</td><td>半開区間 [valid_from, valid_to) を基本にする。現在行は遠未来日またはNULLで表す</td></tr><tr><td>トランザクション履歴</td><td>入出庫、承認、残高変動</td><td>イベント追記 + 必要なら現在値/集計を別途キャッシュ</td></tr><tr><td>高頻度時系列</td><td>IoT、監視メトリクス、アプリログ</td><td>専用ストアまたはパーティション表。RDBには集約済みや業務判断に必要な粒度のみ</td></tr></tbody></table></div>
+<h3>半開区間の基本</h3>
+<p>期間履歴は、下端を含み上端を含まない <code>[valid_from, valid_to)</code> で持つと扱いやすい。2026-04-01から2026-05-01まで有効なら、条件は <code>valid_from <= t AND t < valid_to</code> になる。隣接する期間の境界が重複しないため、日付・時刻の精度変更にも強い。</p>
+<pre><code>CREATE TABLE member_grade_history (
+  member_grade_history_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  member_id   NUMBER NOT NULL,
+  grade_cd    VARCHAR2(30) NOT NULL,
+  valid_from  TIMESTAMP NOT NULL,
+  valid_to    TIMESTAMP DEFAULT TIMESTAMP &#x27;9999-12-31 00:00:00&#x27; NOT NULL,
+  changed_by  NUMBER NOT NULL,
+  changed_reason VARCHAR2(1000),
+  CONSTRAINT pk_member_grade_history PRIMARY KEY (member_grade_history_id),
+  CONSTRAINT fk_mgh_member FOREIGN KEY (member_id) REFERENCES member(member_id),
+  CONSTRAINT ck_mgh_period CHECK (valid_from &lt; valid_to)
+);
+
+-- ある時点 t の会員グレード
+SELECT *
+FROM member_grade_history
+WHERE member_id = :member_id
+  AND valid_from &lt;= :as_of
+  AND :as_of &lt; valid_to;</code></pre>
+<div class="call warn"><div class="h">区間重複はCHECKだけでは守れない</div><div>「同じ会員について有効期間が重ならない」は他行との関係なので、単純なCHECKでは守れない。Oracleで厳密に守るには、ロック順序を決めたアプリ処理、トリガ、日単位スライステーブル、または導入可能なら専用の整合性検査手段を検討する。</div></div>
+<h3>履歴の3方式</h3>
+<div class="tbl "><table><thead><tr><th>方式</th><th>説明</th><th>利点</th><th>欠点</th></tr></thead><tbody><tr><td>上書き + 監査ログ</td><td>現行表を更新し、変更ログを別途残す</td><td>現行検索が速い</td><td>復元・差分比較がログ依存になる</td></tr><tr><td>履歴テーブル方式</td><td>現行表とは別に history 表を持つ</td><td>理解しやすく、監査向き</td><td>二重管理。履歴更新漏れ対策が必要</td></tr><tr><td>イベントソーシング寄り</td><td>変更をイベントとして追記し、現在値は射影</td><td>再構築・監査に強い</td><td>実装・運用・イベント設計が難しい</td></tr></tbody></table></div>
+<p>OracleにはFlashback Query、Flashback Data Archive/Flashback Time Travel、Temporal Validityに関係する機能がある。これらは履歴参照の強力な補助になるが、業務上の「なぜこの状態になったか」「誰が承認したか」「どの理由で訂正されたか」はアプリのイベント/履歴設計で明示的に持つべきである。</p>
+
+    </section><section id="s12" class="">
+      <h2 class="sec"><span class="num">12</span>外部IDと変更される主キー ― 連携データを内部同一性から切り離す</h2>
+      <p class="lead">外部システム連携では、相手のIDが一意に見えても、それを自システムの主キーにしてはいけない場面が多い。外部IDは「観測された識別子」であり、内部同一性とは別に履歴化する。</p>
+      
+<h3>外部IDで起きる事故</h3>
+<div class="tbl "><table><thead><tr><th>事故</th><th>例</th><th>被害</th><th>設計対策</th></tr></thead><tbody><tr><td>訂正</td><td>外部CRMの顧客コードが統合で変わった</td><td>FKが古いコードを参照し続ける、または一括更新で履歴が改竄される</td><td>内部IDをPKにし、外部ID対応表に履歴を持つ</td></tr><tr><td>再利用</td><td>退会者の会員番号が数年後に再利用された</td><td>過去の取引が別人に紐づく</td><td>外部IDに有効期間とシステムコードを含める</td></tr><tr><td>欠損</td><td>初回連携時は仮ID、後で正式IDが来る</td><td>PK変更が必要になる</td><td>仮外部IDと正式外部IDを別レコードとして対応表に保持</td></tr><tr><td>多重対応</td><td>1社が複数の取引先コードを持つ</td><td>一意制約が貼れない。名寄せが崩れる</td><td>外部IDは多対多対応を許す。代表IDは別途決める</td></tr><tr><td>マージ/分割</td><td>会社合併・部品統合・アカウント統合</td><td>過去事実の帰属が変わる</td><td>merge_event, split_event, successor_relation を残す</td></tr></tbody></table></div>
+<h3>クロスウォーク表の設計</h3>
+<p>外部ID対応表は、単なる <code>external_id</code> 列ではなく、どの外部システムの、どの種類の識別子で、いつからいつまで有効で、どの取り込みで得られたかを持つ。外部IDが変更されたら過去行を物理更新するのではなく、旧対応の <code>valid_to</code> を閉じ、新対応を追加する。</p>
+<pre><code>CREATE TABLE member_external_id (
+  member_external_id_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  member_id       NUMBER NOT NULL,
+  system_code     VARCHAR2(40) NOT NULL,
+  external_id_type VARCHAR2(40) DEFAULT &#x27;PRIMARY&#x27; NOT NULL,
+  external_id     VARCHAR2(200) NOT NULL,
+  valid_from      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  valid_to        TIMESTAMP DEFAULT TIMESTAMP &#x27;9999-12-31 00:00:00&#x27; NOT NULL,
+  source_file_id  NUMBER,
+  is_verified     CHAR(1) DEFAULT &#x27;N&#x27; NOT NULL,
+  CONSTRAINT pk_member_external_id PRIMARY KEY (member_external_id_id),
+  CONSTRAINT fk_mei_member FOREIGN KEY (member_id) REFERENCES member(member_id),
+  CONSTRAINT ck_mei_period CHECK (valid_from &lt; valid_to),
+  CONSTRAINT ck_mei_verified CHECK (is_verified IN (&#x27;Y&#x27;,&#x27;N&#x27;))
+);
+
+-- 現在有効な外部IDの重複を禁止する一例
+CREATE UNIQUE INDEX uq_mei_current
+ON member_external_id (
+  system_code,
+  external_id_type,
+  external_id,
+  CASE WHEN valid_to = TIMESTAMP &#x27;9999-12-31 00:00:00&#x27; THEN 1 END
+);</code></pre>
+<div class="call tip"><div class="h">内部IDは業務上見せなくてよい</div><div>内部IDはDB・API・内部処理の同一性を守るための錨であり、ユーザーに見せる必要はない。画面や帳票には表示番号を出し、外部連携には相手のIDを対応表から解決する。</div></div>
+<h3>イベントとしてのID変更</h3>
+<p>外部ID変更は、単に対応表を更新するだけでなく、ID変更イベントとして記録しておくと調定に強い。どの外部イベントにより、どの旧IDがどの新IDへ変わったか、誰が承認したかを残すことで、連携先との不一致を説明できる。</p>
+
+    </section><section id="s13" class="focus">
+      <h2 class="sec"><span class="num">13</span>ユニークキーが存在しないデータ ― 無理に一意化しない</h2>
+      <p class="lead">現実のデータには、ユニークキーが存在しない、欠損している、重複する、誤っている、後から判明するものがある。無理に一意制約を貼ると、取り込み不能・誤名寄せ・データ消失が起きる。</p>
+      
+<h3>一意でないデータの扱い</h3>
+<div class="tbl "><table><thead><tr><th>状況</th><th>例</th><th>やってはいけないこと</th><th>設計</th></tr></thead><tbody><tr><td>完全な一意キーがない</td><td>氏名・生年月日・電話番号だけ</td><td>氏名+電話をPKにする</td><td>raw取り込み表 + 内部ID + 名寄せ候補表</td></tr><tr><td>重複が意味を持つ</td><td>同じ品番が取引先ごとに違う</td><td>品番単独UNIQUEにする</td><td>スコープ付き一意。例: supplier_id + supplier_part_no</td></tr><tr><td>欠損がある</td><td>外部IDが一部NULL</td><td>NULLをダミー値で埋める</td><td>未確定IDとして扱い、後で対応表に追加</td></tr><tr><td>誤入力がある</td><td>メールアドレス重複、法人番号誤り</td><td>古い行を上書きして消す</td><td>訂正履歴・検証状態を持つ</td></tr><tr><td>同一性が確率的</td><td>会社名表記揺れ</td><td>自動で1社に確定統合する</td><td>候補・確信度・人手確認ステータスを持つ</td></tr></tbody></table></div>
+<h3>Raw / Canonical / Match の三層</h3>
+<p>外部ファイル・スクレイピング・手入力・古い基幹データのように品質が低いデータは、正規表へ直接入れない。まず raw 表に原文を保存し、canonical 表へ正規化し、match 表で「どの内部エンティティ候補に対応するか」を管理する。これにより、後から名寄せロジックを改善しても原文を失わない。</p>
+<pre><code>CREATE TABLE raw_member_import (
+  raw_import_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  source_system VARCHAR2(40) NOT NULL,
+  source_record_key VARCHAR2(200),
+  raw_payload CLOB CHECK (raw_payload IS JSON),
+  imported_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  import_batch_id VARCHAR2(80) NOT NULL,
+  CONSTRAINT pk_raw_member_import PRIMARY KEY (raw_import_id)
+);
+
+CREATE TABLE member_match_candidate (
+  match_candidate_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  raw_import_id NUMBER NOT NULL,
+  member_id NUMBER,
+  match_score NUMBER(5,2) NOT NULL,
+  match_status VARCHAR2(30) DEFAULT &#x27;CANDIDATE&#x27; NOT NULL,
+  reviewed_by NUMBER,
+  reviewed_at TIMESTAMP,
+  CONSTRAINT pk_member_match_candidate PRIMARY KEY (match_candidate_id),
+  CONSTRAINT fk_mmc_raw FOREIGN KEY (raw_import_id) REFERENCES raw_member_import(raw_import_id),
+  CONSTRAINT fk_mmc_member FOREIGN KEY (member_id) REFERENCES member(member_id),
+  CONSTRAINT ck_mmc_status CHECK (match_status IN (&#x27;CANDIDATE&#x27;,&#x27;CONFIRMED&#x27;,&#x27;REJECTED&#x27;,&#x27;MERGED&#x27;))
+);</code></pre>
+<div class="call danger"><div class="h">危険: 取り込み時に重複を捨てる</div><div><code>MERGE</code> や <code>INSERT IGNORE</code> 的な処理で、重複と見なした行を捨てると、後から誤名寄せに気づいても復元できない。生データは必ず raw として保持し、正規化・名寄せは再実行可能にする。</div></div>
+<h3>一意性のスコープを見つける</h3>
+<p>「ユニークキーがない」と思えるデータでも、スコープを足すと一意になることがある。取引先品番は取引先内では一意、会員番号は会員制度内では一意、部品Revは部品内では一意、申請番号は年度・組織内では一意、という形である。一意制約を貼る前に、必ずスコープを言語化する。</p>
+
+    </section><section id="s14" class="">
+      <h2 class="sec"><span class="num">14</span>データ削除と消失 ― 物理削除してよいもの、いけないもの</h2>
+      <p class="lead">「不要になったからDELETE」は、多くの業務データでは危険である。削除には、物理削除、論理削除、終了、有効期限切れ、取消、無効化、訂正があり、それぞれ意味が違う。</p>
+      
+<h3>削除の種類</h3>
+<div class="tbl "><table><thead><tr><th>種類</th><th>意味</th><th>例</th><th>設計</th></tr></thead><tbody><tr><td>物理削除</td><td>DBから行を消す</td><td>一時作業データ、再生成可能キャッシュ</td><td>監査不要・参照なし・再生成可能なものに限定</td></tr><tr><td>論理削除</td><td>削除済みフラグを立てる</td><td>ユーザーが削除した下書き</td><td>削除者・削除時刻・理由を持つ。UNIQUE条件に注意</td></tr><tr><td>終了</td><td>ライフサイクルが終わった</td><td>退会、契約終了</td><td>statusやvalid_toで表す。過去事実は残す</td></tr><tr><td>取消</td><td>起きた事実を取り消す事実</td><td>申請取消、仕訳取消</td><td>取消イベントを追加。元イベントは消さない</td></tr><tr><td>訂正</td><td>誤りを正す</td><td>承認者訂正、金額訂正</td><td>旧版を閉じて新版を追加。訂正理由を残す</td></tr><tr><td>匿名化</td><td>個人情報を消すが取引事実は残す</td><td>退会後の個人情報削除</td><td>個人識別情報と業務事実を分離して設計</td></tr></tbody></table></div>
+<div class="call danger"><div class="h">データが消えてなくなる典型</div><div>状態を上書きする、履歴を持たない、外部取り込みのrawを捨てる、削除済み行を物理削除する、親削除で子をCASCADE削除する、番号変更で過去FKを更新する。これらは、後から「過去を説明したい」となった時点で取り返しがつかない。</div></div>
+<h3>退会は削除ではない</h3>
+<p>会員の退会は、会員資格の終了であって、人物・アカウント・過去申請・承認履歴・請求履歴を消すこととは別である。個人情報保護のために匿名化や削除が必要な場合でも、業務事実を保持するテーブルと個人識別情報を持つテーブルを分けておくと、保持と削除の両立がしやすい。</p>
+<pre><code>CREATE TABLE membership (
+  membership_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  member_id NUMBER NOT NULL,
+  joined_at TIMESTAMP NOT NULL,
+  left_at TIMESTAMP,
+  membership_status VARCHAR2(30) DEFAULT &#x27;ACTIVE&#x27; NOT NULL,
+  leave_reason_cd VARCHAR2(40),
+  CONSTRAINT pk_membership PRIMARY KEY (membership_id),
+  CONSTRAINT fk_membership_member FOREIGN KEY (member_id) REFERENCES member(member_id),
+  CONSTRAINT ck_membership_status CHECK (membership_status IN (&#x27;ACTIVE&#x27;,&#x27;SUSPENDED&#x27;,&#x27;LEFT&#x27;,&#x27;CANCELED&#x27;)),
+  CONSTRAINT ck_membership_period CHECK (left_at IS NULL OR joined_at &lt; left_at)
+);
+
+CREATE TABLE membership_event (
+  membership_event_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  membership_id NUMBER NOT NULL,
+  event_type VARCHAR2(40) NOT NULL,
+  occurred_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  actor_user_id NUMBER,
+  reason VARCHAR2(1000),
+  CONSTRAINT pk_membership_event PRIMARY KEY (membership_event_id),
+  CONSTRAINT fk_me_membership FOREIGN KEY (membership_id) REFERENCES membership(membership_id),
+  CONSTRAINT ck_me_event_type CHECK (event_type IN (&#x27;JOINED&#x27;,&#x27;SUSPENDED&#x27;,&#x27;REACTIVATED&#x27;,&#x27;LEFT&#x27;,&#x27;CANCELED&#x27;,&#x27;CORRECTED&#x27;))
+);</code></pre>
+<h3>削除と一意制約の衝突</h3>
+<p>論理削除した行を残す場合、単純なUNIQUE制約が再登録を妨げることがある。アクティブ行だけ一意にする条件付き一意索引、退会後も同じメールを再利用不可にするポリシー、履歴として同じ値を複数回許すポリシーのどれかを業務的に決める必要がある。</p>
+
+    </section><div class="part-banner b3"><h2>第 III 部 実例 <small>― 具体ケースをどうテーブルへ落とすか</small></h2></div><section id="s15" class="focus">
+      <h2 class="sec"><span class="num">15</span>入会申請・入会・退会のモデル</h2>
+      <p class="lead">入会管理は、ユーザー、申請、承認、会員資格、退会、再入会が絡むため、単純な users.status ではすぐ破綻する。申請と会員資格のライフサイクルを分ける。</p>
+      
+<h3>概念分割</h3>
+<div class="tbl "><table><thead><tr><th>概念</th><th>行の意味</th><th>寿命</th><th>主な列</th></tr></thead><tbody><tr><td>app_user</td><td>ログイン主体または操作主体</td><td>アカウント作成〜停止</td><td>email, auth_status, last_login_at</td></tr><tr><td>person_profile</td><td>本人情報。必要なら個人情報分離</td><td>本人情報登録〜匿名化</td><td>name, birth_date, address 等</td></tr><tr><td>membership_application</td><td>入会したいという申請</td><td>下書き〜承認/却下/取消</td><td>application_no, applicant_user_id, current_status</td></tr><tr><td>approval_request</td><td>承認プロセスの要求</td><td>承認開始〜完了/取消</td><td>step, approver, due_at, approval_status</td></tr><tr><td>membership</td><td>会員資格</td><td>入会〜退会/取消</td><td>member_id, joined_at, left_at, status</td></tr><tr><td>membership_event</td><td>会員資格に起きた事実</td><td>永続</td><td>JOINED, LEFT, SUSPENDED 等</td></tr></tbody></table></div>
+<h3>最小構成DDL</h3>
+<pre><code>CREATE TABLE app_user (
+  user_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  login_email VARCHAR2(320) NOT NULL,
+  auth_status VARCHAR2(30) DEFAULT &#x27;ACTIVE&#x27; NOT NULL,
+  created_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_app_user PRIMARY KEY (user_id),
+  CONSTRAINT uq_app_user_email UNIQUE (login_email),
+  CONSTRAINT ck_app_user_status CHECK (auth_status IN (&#x27;ACTIVE&#x27;,&#x27;LOCKED&#x27;,&#x27;DISABLED&#x27;))
+);
+
+CREATE TABLE member (
+  member_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  user_id NUMBER,
+  member_no VARCHAR2(40),
+  created_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_member PRIMARY KEY (member_id),
+  CONSTRAINT uq_member_user UNIQUE (user_id),
+  CONSTRAINT uq_member_no UNIQUE (member_no),
+  CONSTRAINT fk_member_user FOREIGN KEY (user_id) REFERENCES app_user(user_id)
+);
+
+CREATE TABLE membership_application (
+  application_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  applicant_user_id NUMBER NOT NULL,
+  target_member_id NUMBER,
+  application_no VARCHAR2(40) NOT NULL,
+  current_status VARCHAR2(30) DEFAULT &#x27;DRAFT&#x27; NOT NULL,
+  application_payload CLOB CHECK (application_payload IS JSON),
+  submitted_at TIMESTAMP,
+  decided_at TIMESTAMP,
+  CONSTRAINT pk_membership_application PRIMARY KEY (application_id),
+  CONSTRAINT uq_membership_application_no UNIQUE (application_no),
+  CONSTRAINT fk_ma_user FOREIGN KEY (applicant_user_id) REFERENCES app_user(user_id),
+  CONSTRAINT fk_ma_member FOREIGN KEY (target_member_id) REFERENCES member(member_id)
+);</code></pre>
+<div class="call note"><div class="h">申請時点のスナップショット</div><div>申請内容は、後からユーザーのプロフィールが変わっても当時の申請内容を再現できる必要がある。そのため、申請テーブルに申請時点のJSONスナップショットまたは正規化された申請明細を持つ。現在のプロフィールを参照するだけでは、過去の申請書が変わってしまう。</div></div>
+<h3>再入会をどう扱うか</h3>
+<p>再入会時に同じ <code>member_id</code> を使うか、新しい <code>membership</code> 行を作るかは業務判断である。人物として同じ、会員資格として別、会員番号は再利用しない、というように同一性の粒度を分ける。一般には <code>member</code> は人物/会員主体、<code>membership</code> は会員資格の期間として分けると、再入会・休会・退会履歴を扱いやすい。</p>
+<div class="tbl "><table><thead><tr><th>論点</th><th>選択肢A</th><th>選択肢B</th><th>推奨</th></tr></thead><tbody><tr><td>再入会</td><td>同じmembershipを再開</td><td>新しいmembership期間を作る</td><td>期間を正確に扱うなら新行</td></tr><tr><td>会員番号</td><td>同じ番号を維持</td><td>再入会ごとに新番号</td><td>会員制度次第。過去帳票との整合を優先</td></tr><tr><td>申請と会員</td><td>申請行を会員に変換</td><td>申請承認後に会員/資格行を作成</td><td>ライフサイクル分離のため後者</td></tr><tr><td>退会後ログイン</td><td>userを無効化</td><td>membershipだけ終了</td><td>会員機能と認証主体を分けて判断</td></tr></tbody></table></div>
+
+    </section><section id="s16" class="focus">
+      <h2 class="sec"><span class="num">16</span>承認・差し戻し・却下のモデル</h2>
+      <p class="lead">承認は単なるステータス更新ではなく、判断・責任・権限・証跡の集合である。申請本体、承認要求、承認イベント、状態履歴を分けると拡張に強い。</p>
+      
+<h3>承認モデルの分解</h3>
+<div class="tbl "><table><thead><tr><th>対象</th><th>意味</th><th>なぜ分けるか</th></tr></thead><tbody><tr><td>approval_flow_definition</td><td>承認ルート定義。どの条件で何段階承認か</td><td>ルート変更を履歴化し、過去申請に影響させない</td></tr><tr><td>approval_request</td><td>特定申請に対する承認プロセスのインスタンス</td><td>申請ごとに承認者・期限・状態が変わる</td></tr><tr><td>approval_task</td><td>承認者1人または1グループのタスク</td><td>並列承認、代理承認、再割当を扱う</td></tr><tr><td>approval_event</td><td>承認操作の事実</td><td>誰が何をしたかを消さない</td></tr><tr><td>status_history</td><td>申請状態の結果</td><td>申請全体の現在状態と履歴を確認する</td></tr></tbody></table></div>
+<pre><code>CREATE TABLE approval_request (
+  approval_request_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  application_id NUMBER NOT NULL,
+  request_status VARCHAR2(30) DEFAULT &#x27;IN_PROGRESS&#x27; NOT NULL,
+  flow_version NUMBER NOT NULL,
+  started_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  completed_at TIMESTAMP,
+  CONSTRAINT pk_approval_request PRIMARY KEY (approval_request_id),
+  CONSTRAINT fk_ar_application FOREIGN KEY (application_id) REFERENCES membership_application(application_id),
+  CONSTRAINT ck_ar_status CHECK (request_status IN (&#x27;IN_PROGRESS&#x27;,&#x27;APPROVED&#x27;,&#x27;REJECTED&#x27;,&#x27;CANCELED&#x27;,&#x27;EXPIRED&#x27;))
+);
+
+CREATE TABLE approval_task (
+  approval_task_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  approval_request_id NUMBER NOT NULL,
+  step_no NUMBER NOT NULL,
+  approver_user_id NUMBER,
+  approver_role_cd VARCHAR2(40),
+  task_status VARCHAR2(30) DEFAULT &#x27;PENDING&#x27; NOT NULL,
+  assigned_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  acted_at TIMESTAMP,
+  CONSTRAINT pk_approval_task PRIMARY KEY (approval_task_id),
+  CONSTRAINT fk_at_request FOREIGN KEY (approval_request_id) REFERENCES approval_request(approval_request_id),
+  CONSTRAINT ck_at_status CHECK (task_status IN (&#x27;PENDING&#x27;,&#x27;APPROVED&#x27;,&#x27;RETURNED&#x27;,&#x27;REJECTED&#x27;,&#x27;CANCELED&#x27;,&#x27;SKIPPED&#x27;)),
+  CONSTRAINT ck_at_assignee CHECK (
+    (CASE WHEN approver_user_id IS NULL THEN 0 ELSE 1 END) +
+    (CASE WHEN approver_role_cd IS NULL THEN 0 ELSE 1 END) = 1
+  )
+);
+
+CREATE TABLE approval_event (
+  approval_event_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  approval_request_id NUMBER NOT NULL,
+  approval_task_id NUMBER,
+  event_type VARCHAR2(40) NOT NULL,
+  actor_user_id NUMBER NOT NULL,
+  occurred_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  comment_text VARCHAR2(2000),
+  CONSTRAINT pk_approval_event PRIMARY KEY (approval_event_id),
+  CONSTRAINT fk_ae_request FOREIGN KEY (approval_request_id) REFERENCES approval_request(approval_request_id),
+  CONSTRAINT fk_ae_task FOREIGN KEY (approval_task_id) REFERENCES approval_task(approval_task_id),
+  CONSTRAINT ck_ae_event_type CHECK (event_type IN (&#x27;APPROVED&#x27;,&#x27;RETURNED&#x27;,&#x27;REJECTED&#x27;,&#x27;CANCELED&#x27;,&#x27;REASSIGNED&#x27;,&#x27;COMMENTED&#x27;))
+);</code></pre>
+<div class="call tip"><div class="h">差し戻しと却下を分ける</div><div>差し戻しは「修正すれば再提出可能」、却下は「この申請は終端」という意味である。両方をNGステータスでまとめると、再提出可否、通知文面、監査、集計が壊れる。</div></div>
+<h3>承認ルート変更への備え</h3>
+<p>承認ルートは必ず変わる。組織変更、金額条件、代理承認、緊急承認、段階追加が起きる。過去の申請は当時のルートで判断された事実を残す必要があるため、承認定義はバージョン化し、申請インスタンスには使用した <code>flow_version</code> または定義スナップショットを保持する。</p>
+
+    </section><section id="s17" class="">
+      <h2 class="sec"><span class="num">17</span>4種類の部品タイプのモデル</h2>
+      <p class="lead">部品タイプごとに管理データが異なる場合、最初に「共通検索したい項目」「型別に制約したい項目」「自由に増える項目」を分ける。全部を1表にするか、全部をEAVにするかの二択ではない。</p>
+      
+<h3>3層分離</h3>
+<div class="tbl "><table><thead><tr><th>層</th><th>内容</th><th>例</th><th>保存場所</th></tr></thead><tbody><tr><td>共通属性</td><td>全タイプに共通し、検索・一覧・参照に使う</td><td>品番、品名、ライフサイクル、所有部門</td><td>part</td></tr><tr><td>型固有属性</td><td>特定タイプだけに必須で、制約・検索が必要</td><td>電圧、材質、ライセンス種別、サービスSLA</td><td>part_type_detail tables</td></tr><tr><td>自由属性</td><td>外部仕様や補足で、検索頻度が低い</td><td>メーカー独自仕様、任意メモ</td><td>JSON列または属性テーブル</td></tr><tr><td>関係属性</td><td>部品間の構成・代替・互換</td><td>BOM、代替品、後継品</td><td>関係テーブル</td></tr><tr><td>版属性</td><td>Revごとに変わる値</td><td>図面、仕様、重量、認証</td><td>part_revision / revision_detail</td></tr></tbody></table></div>
+<h3>タイプ変更を許すか</h3>
+<p>部品タイプは分類に見えるが、実務では型固有の必須項目・承認ルート・BOM上の扱いが変わるため、安易に変更可能にしない方がよい。タイプ変更を許すなら、旧タイプ詳細行をどう閉じるか、新タイプ詳細をどう作るか、過去Revの型は変えるかを決める必要がある。</p>
+<div class="tbl "><table><thead><tr><th>論点</th><th>変更不可</th><th>変更可</th></tr></thead><tbody><tr><td>整合性</td><td>簡単。子表との対応が安定</td><td>移行処理が必要</td></tr><tr><td>履歴</td><td>別部品または新Revで扱う</td><td>タイプ変更履歴が必要</td></tr><tr><td>画面</td><td>タイプ確定後は固定</td><td>入力項目の再検証が必要</td></tr><tr><td>推奨</td><td>部品の本質分類なら変更不可</td><td>仮分類・取込分類なら変更可。ただし確定後固定</td></tr></tbody></table></div>
+<h3>検索用ビュー</h3>
+<p>型別テーブルに分けると、一覧検索でJOINやUNIONが必要になる。これは悪ではない。書込モデルの整合性を優先し、検索はビューやMVで補助する。たとえば部品一覧は、共通列に加えて型ごとの主要属性だけを横持ちしたビューを作る。</p>
+<pre><code>CREATE OR REPLACE VIEW v_part_search AS
+SELECT p.part_id,
+       p.part_no,
+       p.part_name,
+       p.part_type,
+       ep.voltage_rating,
+       mp.material_cd,
+       NULL AS software_license_cd,
+       p.lifecycle_status
+FROM part p
+LEFT JOIN electric_part_detail ep ON ep.part_id = p.part_id
+LEFT JOIN mechanical_part_detail mp ON mp.part_id = p.part_id;</code></pre>
+<div class="call warn"><div class="h">ビューに制約が効くと思わない</div><div>Oracleではビュー制約は直接強制されない。ビューは読みやすさや互換性には有効だが、データ整合性は基底表の制約で守る。</div></div>
+
+    </section><section id="s18" class="">
+      <h2 class="sec"><span class="num">18</span>BOM・版・構成履歴 ― 部品構成は現在値だけで持たない</h2>
+      <p class="lead">製造・PLM領域では、部品そのもの、部品Rev、BOM構成、構成の有効期間、代替、後継、ECOを分ける必要がある。現在の親子関係だけを持つと、過去製品を再現できない。</p>
+      
+<h3>BOMで分けるべき概念</h3>
+<div class="tbl "><table><thead><tr><th>概念</th><th>意味</th><th>例</th></tr></thead><tbody><tr><td>part</td><td>部品の同一性。品番単位</td><td>P-1000</td></tr><tr><td>part_revision</td><td>部品の設計版</td><td>P-1000 Rev.A, Rev.B</td></tr><tr><td>bom_header</td><td>親Revの構成表</td><td>P-1000 Rev.B のBOM</td></tr><tr><td>bom_line</td><td>親に含まれる子Rev/子部品</td><td>子部品、数量、単位、位置番号</td></tr><tr><td>effectivity</td><td>いつ・どのロット・どのシリアルに有効か</td><td>2026-04-01以降、SN1000以降</td></tr><tr><td>engineering_change</td><td>変更指示・承認</td><td>ECO-2026-001</td></tr><tr><td>substitute / alternate</td><td>代替・互換</td><td>Aの代替にBを許す</td></tr></tbody></table></div>
+<pre><code>CREATE TABLE part_revision (
+  part_revision_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  part_id NUMBER NOT NULL,
+  revision_no VARCHAR2(40) NOT NULL,
+  revision_status VARCHAR2(30) DEFAULT &#x27;DRAFT&#x27; NOT NULL,
+  released_at TIMESTAMP,
+  CONSTRAINT pk_part_revision PRIMARY KEY (part_revision_id),
+  CONSTRAINT uq_part_revision UNIQUE (part_id, revision_no),
+  CONSTRAINT fk_pr_part FOREIGN KEY (part_id) REFERENCES part(part_id),
+  CONSTRAINT ck_pr_status CHECK (revision_status IN (&#x27;DRAFT&#x27;,&#x27;REVIEW&#x27;,&#x27;RELEASED&#x27;,&#x27;OBSOLETE&#x27;))
+);
+
+CREATE TABLE bom_line (
+  bom_line_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  parent_part_revision_id NUMBER NOT NULL,
+  child_part_revision_id NUMBER NOT NULL,
+  line_no NUMBER NOT NULL,
+  quantity NUMBER(18,6) NOT NULL,
+  unit_cd VARCHAR2(20) NOT NULL,
+  valid_from TIMESTAMP DEFAULT TIMESTAMP &#x27;1900-01-01 00:00:00&#x27; NOT NULL,
+  valid_to TIMESTAMP DEFAULT TIMESTAMP &#x27;9999-12-31 00:00:00&#x27; NOT NULL,
+  CONSTRAINT pk_bom_line PRIMARY KEY (bom_line_id),
+  CONSTRAINT fk_bl_parent FOREIGN KEY (parent_part_revision_id) REFERENCES part_revision(part_revision_id),
+  CONSTRAINT fk_bl_child FOREIGN KEY (child_part_revision_id) REFERENCES part_revision(part_revision_id),
+  CONSTRAINT uq_bom_line_no UNIQUE (parent_part_revision_id, line_no, valid_to),
+  CONSTRAINT ck_bom_line_qty CHECK (quantity &gt; 0),
+  CONSTRAINT ck_bom_line_period CHECK (valid_from &lt; valid_to),
+  CONSTRAINT ck_bom_no_self CHECK (parent_part_revision_id &lt;&gt; child_part_revision_id)
+);</code></pre>
+<div class="call danger"><div class="h">BOMの現在値だけ管理する危険</div><div>現在BOMだけを上書きすると、過去に出荷した製品の構成、原価計算、品質問題の影響範囲、部品交換履歴が再現できない。製造・PLMでは「いつの、どの版の構成か」が本質的なデータである。</div></div>
+<h3>サイクル検出</h3>
+<p>BOMは通常DAGであり、親部品の子に自分自身や祖先が入ると展開が壊れる。単純な <code>parent <> child</code> CHECKでは直接自己参照しか防げない。深いサイクル検出は再帰クエリ、トリガ、アプリの登録処理、または閉包表で守る。</p>
+<h3>閉包表の検討</h3>
+<p>多段BOMを頻繁に展開するなら、親子エッジ表だけでは再帰コストが重くなる。祖先・子孫・深さを持つ閉包表を維持すると読取は速いが、BOM変更時の更新が重くなる。書込頻度が低く読取頻度が高いPLM/原価/影響分析では検討価値がある。</p>
+
+    </section><section id="s19" class="">
+      <h2 class="sec"><span class="num">19</span>名寄せ・統合・分割 ― 同一性は後から変わる</h2>
+      <p class="lead">顧客・会社・部品・ユーザーは、後から「同じだった」「別だった」と判明する。安易にFKを付け替えると過去事実が改竄されるため、統合・分割自体をイベントとして残す。</p>
+      
+<h3>統合と分割の表現</h3>
+<div class="tbl "><table><thead><tr><th>操作</th><th>意味</th><th>危険な実装</th><th>推奨</th></tr></thead><tbody><tr><td>名寄せ候補</td><td>同じかもしれない</td><td>自動で片方を削除</td><td>候補表にscore/status/reviewerを持つ</td></tr><tr><td>統合 / merge</td><td>AとBを同一主体として扱う</td><td>Bの全FKをAへ更新しBを削除</td><td>merge_eventを残し、代表IDと被統合IDを管理</td></tr><tr><td>分割 / split</td><td>AからB/Cが分かれた</td><td>過去行を適当に新IDへ移す</td><td>split_eventと有効期間で扱う</td></tr><tr><td>承継 / successor</td><td>会社合併・部品後継</td><td>旧IDを新IDへ上書き</td><td>successor_relationで旧新関係を持つ</td></tr></tbody></table></div>
+<pre><code>CREATE TABLE entity_merge_event (
+  merge_event_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  entity_type VARCHAR2(40) NOT NULL,
+  survivor_entity_id NUMBER NOT NULL,
+  merged_entity_id NUMBER NOT NULL,
+  merged_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  merged_by NUMBER NOT NULL,
+  reason VARCHAR2(1000),
+  CONSTRAINT pk_entity_merge_event PRIMARY KEY (merge_event_id),
+  CONSTRAINT ck_eme_not_same CHECK (survivor_entity_id &lt;&gt; merged_entity_id)
+);
+
+CREATE TABLE entity_successor_relation (
+  successor_relation_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  entity_type VARCHAR2(40) NOT NULL,
+  predecessor_entity_id NUMBER NOT NULL,
+  successor_entity_id NUMBER NOT NULL,
+  relation_type VARCHAR2(40) NOT NULL,
+  valid_from TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  CONSTRAINT pk_entity_successor_relation PRIMARY KEY (successor_relation_id),
+  CONSTRAINT ck_esr_type CHECK (relation_type IN (&#x27;MERGED_TO&#x27;,&#x27;REPLACED_BY&#x27;,&#x27;SPLIT_TO&#x27;,&#x27;RENAMED_TO&#x27;))
+);</code></pre>
+<div class="call warn"><div class="h">過去のFKを付け替えるか問題</div><div>過去の注文が旧会社Aに対するものだったなら、合併後も注文当時の相手はAである。現在の請求先や後継会社を知りたい場合は、承継関係から導出する。過去事実のFKを新会社Bへ直接更新すると、履歴が改竄される。</div></div>
+<h3>名寄せ済みビュー</h3>
+<p>業務上は代表IDで集計したい場合がある。この場合、基底データを変更するのではなく、名寄せ解決ビューや集計ビューを用意する。これにより、過去事実を保持しつつ、現在の代表主体で分析できる。</p>
+
+    </section><div class="part-banner b4"><h2>第 IV 部 性能と進化 <small>― 正しさを壊さずに速くし、変えられる設計にする</small></h2></div><section id="s20" class="">
+      <h2 class="sec"><span class="num">20</span>正規化と非正規化 ― いつ崩すか</h2>
+      <p class="lead">正規化は、更新異常と重複を避けるための基本である。しかし、実務では検索・帳票・集計のために非正規化や導出値の保持が必要になる。重要なのは、真実の源泉とキャッシュを混ぜないこと。</p>
+      
+<h3>非正規化の判断表</h3>
+<div class="tbl "><table><thead><tr><th>状況</th><th>正規化のまま</th><th>非正規化を検討</th><th>守る条件</th></tr></thead><tbody><tr><td>通常の業務更新</td><td>更新頻度が普通でJOINも軽い</td><td>不要</td><td>制約で整合性を守る</td></tr><tr><td>一覧画面が重い</td><td>索引・JOIN見直しで足りる</td><td>検索ビュー、MV、検索テーブル</td><td>元データから再生成できる</td></tr><tr><td>集計が重い</td><td>都度集計で許容</td><td>日次/月次集計テーブル</td><td>更新タイミングと遅延を明記</td></tr><tr><td>現在値取得が多い</td><td>履歴最新行を毎回取る</td><td>現在値列を持つ</td><td>履歴更新と同一Txで同期</td></tr><tr><td>外部API向け</td><td>正規表からレスポンス生成</td><td>API専用読取モデル</td><td>書込モデルを汚さない</td></tr></tbody></table></div>
+<div class="call mech"><div class="h">機序: 書込モデルと読取モデルの責務が違う</div><div>書込モデルは整合性・更新容易性・不変条件を守るために正規化する。読取モデルは画面・検索・帳票の要求に合わせて冗長でもよい。問題は、読取モデルを唯一の真実として更新し始めることである。</div></div>
+<h3>導出値を持つ場合のルール</h3>
+<ul>
+  <li>導出元を明確にする。例: 残高は入出金イベントの合計。</li>
+  <li>導出値を直接手修正しない。訂正イベントを入れて再計算する。</li>
+  <li>導出元と導出値の差分を検出する調定クエリを持つ。</li>
+  <li>リアルタイム整合が必要か、数分/日次遅延を許すかを明記する。</li>
+  <li>再生成できない導出値は、実は導出値ではなく業務事実である可能性を疑う。</li>
+</ul>
+<pre><code>-- イベントから現在値を調定する考え方の例
+SELECT m.member_id,
+       m.cached_point_balance,
+       COALESCE(SUM(e.point_delta), 0) AS calculated_balance
+FROM member m
+LEFT JOIN member_point_event e ON e.member_id = m.member_id
+GROUP BY m.member_id, m.cached_point_balance
+HAVING m.cached_point_balance &lt;&gt; COALESCE(SUM(e.point_delta), 0);</code></pre>
+
+    </section><section id="s21" class="">
+      <h2 class="sec"><span class="num">21</span>ビュー・マテリアライズドビュー・CQRS ― 読む形を分ける</h2>
+      <p class="lead">書込モデルを正規化した結果、読みが重くなることはある。その場合、ビュー、マテリアライズドビュー、検索テーブル、CQRS風の読取モデルを段階的に検討する。</p>
+      
+
+<figure>
+<svg viewBox="0 0 900 310" role="img" aria-label="正規化書込モデルと読取モデル">
+  <defs><marker id="ar6" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f7a5e"/></marker></defs>
+  <rect x="50" y="60" width="230" height="95" rx="12" fill="#eef4ef" stroke="#1f7a5e"/><text x="165" y="90" text-anchor="middle" font-weight="700" fill="#1f5e48">書込モデル</text><text x="76" y="118" font-size="12" fill="#3a4a59">正規化・制約・不変条件</text><text x="76" y="140" font-size="12" fill="#3a4a59">更新単位を小さく守る</text>
+  <rect x="340" y="60" width="230" height="95" rx="12" fill="#f3e8ef" stroke="#a82a64"/><text x="455" y="90" text-anchor="middle" font-weight="700" fill="#7a2350">イベント / 変更ログ</text><text x="366" y="118" font-size="12" fill="#3a4a59">状態遷移・差分・監査</text><text x="366" y="140" font-size="12" fill="#3a4a59">再構築できる根拠</text>
+  <rect x="630" y="60" width="230" height="95" rx="12" fill="#eef4fa" stroke="#2b5d8c"/><text x="745" y="90" text-anchor="middle" font-weight="700" fill="#22425f">読取モデル</text><text x="656" y="118" font-size="12" fill="#3a4a59">ビュー・MV・検索テーブル</text><text x="656" y="140" font-size="12" fill="#3a4a59">画面・帳票・集計向け</text>
+  <line x1="280" y1="108" x2="336" y2="108" stroke="#1f7a5e" stroke-width="2" marker-end="url(#ar6)"/><text x="308" y="92" text-anchor="middle" font-size="11" fill="#5b6876">発生</text>
+  <line x1="570" y1="108" x2="626" y2="108" stroke="#1f7a5e" stroke-width="2" marker-end="url(#ar6)"/><text x="598" y="92" text-anchor="middle" font-size="11" fill="#5b6876">射影</text>
+  <path d="M165 155 C220 230 685 230 745 155" fill="none" stroke="#b4541a" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="455" y="245" text-anchor="middle" font-size="12" fill="#8a4d15">読取モデルは壊れても再生成できるよう、正規化モデルまたはイベントを真実の源泉にする</text>
+</svg>
+<figcaption>図6: 書込モデル・イベント・読取モデルの分離。CQRSやイベントソーシングを全面採用しなくても、この分離は局所的に有効。</figcaption>
+</figure>
+
+<h3>選択肢</h3>
+<div class="tbl "><table><thead><tr><th>方式</th><th>特徴</th><th>利点</th><th>欠点</th><th>向くケース</th></tr></thead><tbody><tr><td>通常ビュー</td><td>SQLを名前付きで再利用。データは保持しない</td><td>互換性・可読性・権限分離</td><td>実行時コストは基底表次第</td><td>複雑JOINの隠蔽、旧API互換</td></tr><tr><td>マテリアライズドビュー</td><td>結果を実体化し、リフレッシュする</td><td>重い集計・JOINを高速化</td><td>鮮度・リフレッシュコスト・制約あり</td><td>帳票、ダッシュボード、集計</td></tr><tr><td>検索テーブル</td><td>アプリ/バッチで読取用表を更新</td><td>自由度が高い</td><td>同期ロジックが必要</td><td>全文検索、複雑条件、API応答</td></tr><tr><td>CQRS</td><td>書込モデルと読取モデルを明示分離</td><td>読み最適化と書込整合を両立</td><td>複雑性・最終的整合性</td><td>高負荷検索、複数UI、集計重視</td></tr><tr><td>イベントソーシング + 射影</td><td>イベントを真実とし、読取を再生成</td><td>監査・再構築に強い</td><td>難易度高い</td><td>履歴が本質の領域</td></tr></tbody></table></div>
+<p>Oracleのマテリアライズドビューは強力だが、リフレッシュ待ちにより基底データと同期していない状態がありうる。したがって、MVを使う場合は、鮮度要件、リフレッシュ方式、許容遅延、障害時の再構築手順を仕様に含める。</p>
+<h3>CQRSを局所採用する</h3>
+<p>CQRSは全面的に導入すると複雑だが、局所採用は有効である。たとえば承認一覧、部品検索、会員ダッシュボード、BOM展開結果など、読みの形が書込の正規形と大きく異なる領域では、書込モデルを守ったまま読取モデルを作る。</p>
+<div class="call warn"><div class="h">CQRSは万能高速化ではない</div><div>CQRSは「読みと書きのモデルを分ける」設計であり、単なるキャッシュではない。同期遅延、イベント順序、再実行、重複処理、障害復旧、読取モデル再構築を扱う必要がある。多くのCRUD画面に全面適用すると、複雑性だけが増える。</div></div>
+
+    </section><section id="s22" class="">
+      <h2 class="sec"><span class="num">22</span>イベントソーシング ― 検討すべき箇所、避けるべき箇所</h2>
+      <p class="lead">イベントソーシングは、現在状態を直接保存する代わりに、状態変化イベントの列を真実の源泉にする設計である。履歴・監査・再構築に強いが、実装と運用の難度は高い。</p>
+      
+<h3>検討する価値がある領域</h3>
+<div class="tbl "><table><thead><tr><th>領域</th><th>理由</th><th>注意</th></tr></thead><tbody><tr><td>会計・残高・在庫</td><td>差分イベントが自然。訂正は逆イベントで表せる</td><td>集計残高のキャッシュと調定が必要</td></tr><tr><td>承認・ワークフロー</td><td>誰が何をしたかが本質</td><td>現在状態の射影を持つ</td></tr><tr><td>監査ログ・操作履歴</td><td>履歴そのものが価値</td><td>個人情報や保持期限との調整</td></tr><tr><td>外部連携イベント</td><td>再送・冪等性・順序管理が必要</td><td>外部イベントIDと処理状態を持つ</td></tr><tr><td>BOM/ECO</td><td>変更理由と適用時点が重要</td><td>構成展開の読取モデルが必要</td></tr></tbody></table></div>
+<h3>避けるべき領域</h3>
+<div class="tbl "><table><thead><tr><th>領域</th><th>理由</th></tr></thead><tbody><tr><td>単純なマスタCRUD</td><td>履歴要件が薄い場合、イベント再生のコストだけが増える</td></tr><tr><td>頻繁に全件修正するデータ</td><td>イベント数が膨れ、意味ある履歴になりにくい</td></tr><tr><td>イベント設計が安定していない初期探索</td><td>イベントスキーマ変更が重い</td></tr><tr><td>強い即時一貫読取が広範囲に必要</td><td>射影遅延を許容しにくい</td></tr></tbody></table></div>
+<h3>RDBでイベント表を持つ基本</h3>
+<pre><code>CREATE TABLE domain_event (
+  domain_event_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  aggregate_type VARCHAR2(80) NOT NULL,
+  aggregate_id NUMBER NOT NULL,
+  event_type VARCHAR2(80) NOT NULL,
+  event_version NUMBER DEFAULT 1 NOT NULL,
+  occurred_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  actor_user_id NUMBER,
+  event_payload CLOB CHECK (event_payload IS JSON),
+  idempotency_key VARCHAR2(200),
+  CONSTRAINT pk_domain_event PRIMARY KEY (domain_event_id),
+  CONSTRAINT uq_domain_event_idempotency UNIQUE (idempotency_key)
+);
+
+CREATE INDEX ix_domain_event_agg
+ON domain_event (aggregate_type, aggregate_id, domain_event_id);</code></pre>
+<div class="call mech"><div class="h">機序: イベントは過去を書き換えないため強い</div><div>イベントソーシングが強いのは、現在値を直接上書きせず、変更の事実を追記するからである。過去状態の再現、読取モデルの再生成、監査、訂正処理に強い。ただし、イベントの順序・バージョン・冪等性・スナップショット・再生性能を設計しないと運用が難しい。</div></div>
+<h3>スナップショット</h3>
+<p>イベントが増えると、毎回先頭から再生するのは重い。一定件数または一定時点ごとにスナップショットを持ち、そこから後続イベントだけ再生する。スナップショットは導出値なので、再生成可能にする。</p>
+
+    </section><section id="s23" class="">
+      <h2 class="sec"><span class="num">23</span>索引・パーティション ― テーブル設計時点で読む形を想像する</h2>
+      <p class="lead">物理設計は最後だが、最後まで無視してよいわけではない。履歴表、イベント表、BOM、承認一覧、外部ID対応表は、典型アクセスがはっきりしているため、設計時点で索引とパーティションを検討する。</p>
+      
+<h3>典型索引</h3>
+<div class="tbl "><table><thead><tr><th>表</th><th>主な検索</th><th>索引候補</th></tr></thead><tbody><tr><td>status_history</td><td>対象IDごとの最新履歴</td><td>(application_id, changed_at DESC, status_history_id DESC)</td></tr><tr><td>event</td><td>集約ごとのイベント再生</td><td>(aggregate_type, aggregate_id, domain_event_id)</td></tr><tr><td>external_identifier</td><td>外部IDから内部ID解決</td><td>(system_code, external_id_type, external_id, valid_to)</td></tr><tr><td>approval_task</td><td>承認者の未処理一覧</td><td>(approver_user_id, task_status, assigned_at)</td></tr><tr><td>period_history</td><td>ある時点の有効行</td><td>(entity_id, valid_from, valid_to)</td></tr><tr><td>bom_line</td><td>親Revの子一覧</td><td>(parent_part_revision_id, line_no)</td></tr></tbody></table></div>
+<h3>最新行取得の落とし穴</h3>
+<p>履歴テーブルから最新行を取る処理は頻出する。<code>MAX(changed_at)</code> だけでJOINすると、同時刻が複数ある場合に重複する。必ずタイブレーク用の単調増加IDを含めるか、現在値列・現在行フラグ・MVを持つ。</p>
+<pre><code>-- 最新状態を安全に取る例: ROW_NUMBERでタイブレークする
+SELECT *
+FROM (
+  SELECT h.*,
+         ROW_NUMBER() OVER (
+           PARTITION BY h.application_id
+           ORDER BY h.changed_at DESC, h.status_history_id DESC
+         ) AS rn
+  FROM application_status_history h
+)
+WHERE rn = 1;</code></pre>
+<h3>パーティション</h3>
+<p>イベント表や履歴表は時間とともに増え続ける。保持期間、アーカイブ、削除、集計の単位が月/日なら、発生時刻または登録時刻でレンジ/インターバルパーティションを検討する。Oracleのパーティションは可用性・管理性・性能に効くが、キー選択を誤ると剪定が効かない。</p>
+<div class="call tip"><div class="h">索引は読みの前払い・書きの後払い</div><div>索引は検索を速くするが、INSERT/UPDATE/DELETEのたびに保守される。承認イベントや入出庫イベントのような追記表では、必要な索引を絞る。検索画面ごとに無秩序に索引を増やす前に、読取モデルやMVの方が適切かを検討する。</div></div>
+<h3>Invisible Indexで検証する</h3>
+<p>OracleのInvisible Indexは、DMLでは保守されるが通常はオプティマイザに使われないため、索引削除や一時索引の検証に使える。既存本番で索引をいきなり削除する前に、見えなくして影響を見る設計が可能である。</p>
+
+    </section><section id="s24" class="">
+      <h2 class="sec"><span class="num">24</span>並行制御とロック ― モデリングが競合を決める</h2>
+      <p class="lead">同じ業務でも、現在値を1行で更新する設計と、イベントを追記する設計では競合の起き方が変わる。テーブル設計は、同時実行時の正しさにも影響する。</p>
+      
+<h3>競合しやすい設計</h3>
+<div class="tbl "><table><thead><tr><th>設計</th><th>競合の起き方</th><th>対策</th></tr></thead><tbody><tr><td>残高を1行の列で持つ</td><td>同じ口座/会員の残高更新が集中</td><td>差分UPDATE、イベント追記、楽観/悲観ロック</td></tr><tr><td>申請のstatusを複数画面が更新</td><td>承認と取消が同時に走る</td><td>状態遷移を単一サービスに集約し、version列で楽観ロック</td></tr><tr><td>表示順を整数で持つ</td><td>並べ替え時に多数行更新</td><td>順序値の間隔、専用並べ替え処理、ロック範囲を限定</td></tr><tr><td>在庫数を上書き</td><td>入出庫同時更新でロストアップデート</td><td>在庫移動イベント + 現在在庫キャッシュ</td></tr><tr><td>名寄せでFK一括更新</td><td>他処理と衝突し過去が変わる</td><td>統合イベントと代表解決ビュー</td></tr></tbody></table></div>
+<h3>version列による楽観ロック</h3>
+<pre><code>ALTER TABLE membership_application ADD row_version NUMBER DEFAULT 0 NOT NULL;
+
+-- 読み取った row_version と一致する場合だけ更新
+UPDATE membership_application
+   SET current_status = :new_status,
+       row_version = row_version + 1
+ WHERE application_id = :application_id
+   AND row_version = :read_row_version;
+
+-- 更新件数が0なら、誰かが先に変更したため再読込・再判断する</code></pre>
+<h3>SELECT FOR UPDATEによる悲観ロック</h3>
+<p>競合が頻繁で処理時間が短い場合、先に対象行をロックする方が分かりやすい。Oracleでは <code>SELECT ... FOR UPDATE</code> などで取得したロックは、コミットまたはロールバックで解放される。複数行をロックする場合は、全処理で同じ順序にし、デッドロックを避ける。</p>
+<pre><code>SELECT current_status, row_version
+  FROM membership_application
+ WHERE application_id = :application_id
+ FOR UPDATE;
+
+-- 状態遷移可能か確認し、同一Txで現在値更新と履歴追記を行う</code></pre>
+<div class="call mech"><div class="h">機序: 追記は競合を減らす</div><div>イベント追記は、同じ集約に対してもINSERT中心になるため、現在値1行を奪い合う設計より競合を減らせる。ただし、同じ集約内の順序保証、重複イベント防止、射影更新の整合性は別途必要である。</div></div>
+
+    </section><section id="s25" class="">
+      <h2 class="sec"><span class="num">25</span>スキーマ進化 ― 後で変更できるテーブルにする</h2>
+      <p class="lead">設計は一度では終わらない。列追加、型変更、表分割、状態追加、外部ID追加、履歴追加は必ず起きる。後で変えられる形にしておくこともテーブル設計の一部である。</p>
+      
+<h3>変更に強い設計原則</h3>
+<div class="tbl "><table><thead><tr><th>原則</th><th>理由</th><th>例</th></tr></thead><tbody><tr><td>意味の再利用をしない</td><td>同じ列を別意味で使うと移行不能</td><td><code>status</code> に承認状態と会員状態を混ぜない</td></tr><tr><td>代理キーを使う</td><td>外部ID変更に耐える</td><td><code>member_id</code> と <code>member_no</code> を分ける</td></tr><tr><td>履歴を先に考える</td><td>後から過去は作れない</td><td>状態遷移履歴、外部ID履歴、BOM適用期間</td></tr><tr><td>NULL追加から始める</td><td>既存行を壊さず移行できる</td><td>列追加→バックフィル→NOT NULL</td></tr><tr><td>古い形と新しい形を共存させる</td><td>無停止移行に必要</td><td>expand/contract、二重書き、ビュー互換</td></tr><tr><td>読取互換をビューで作る</td><td>アプリ変更を段階化できる</td><td>旧列名ビュー、統合ビュー</td></tr></tbody></table></div>
+<h3>expand / contract の適用</h3>
+<ol class="steps">
+  <li><b>Expand</b>: 新列・新表・新制約を互換的に追加する。既存アプリを壊さない。</li>
+  <li><b>Dual Write</b>: 新規更新を旧新両方に書く。先に新規の取りこぼしを止める。</li>
+  <li><b>Backfill</b>: 既存データを小さな単位で埋める。冪等にする。</li>
+  <li><b>Switch Read</b>: 読みを新形式へ切り替える。差分調定を行う。</li>
+  <li><b>Contract</b>: 旧列・旧表・旧処理を削除する。ここで初めて不可逆にする。</li>
+</ol>
+<p>Oracleには、DBMS_REDEFINITION によるオンライン再定義、Edition-Based Redefinition による稼働中アップグレード、制約のNOVALIDATE/VALIDATE、Invisible Indexなど、移行を段階化する機能がある。ただし、機能があっても設計が破壊的なら安全にはならない。アプリとDBの互換期間を設計する必要がある。</p>
+<div class="call warn"><div class="h">状態値の追加もスキーマ変更である</div><div>列を増やさなくても、<code>status</code> に新しい値を追加するだけで、画面、バッチ、集計、通知、権限、遷移チェック、外部連携が影響を受ける。状態値はDB制約・アプリ列挙型・テストケース・帳票条件と一体で管理する。</div></div>
+
+    </section><div class="part-banner b2"><h2>第 V 部 レビュー <small>― 事故を防ぐための確認表とテンプレート</small></h2></div>
+<section id="s25a">
+  <h2 class="sec"><span class="num">補A</span>コードマスタ・列挙値・分類体系</h2>
+  <p class="lead">ステータス、区分、タイプ、理由コードは、テーブル設計上の小物に見えるが、実際には業務ルールの入口である。CHECK制約で固定するのか、コードマスタで運用変更可能にするのか、階層分類として持つのかを誤ると、後からDDL・画面・バッチ・外部連携が広範囲に壊れる。</p>
+  <h3>CHECK制約かコードマスタか</h3>
+  <div class="tbl"><table><thead><tr><th>対象</th><th>CHECK制約向き</th><th>コードマスタ向き</th><th>判断</th></tr></thead><tbody><tr><td>状態値</td><td>状態機械の根幹で、追加がリリースを伴うもの</td><td>運用で頻繁に増える補助状態</td><td>アプリロジックが分岐する値はCHECK/enumで強く管理</td></tr><tr><td>理由コード</td><td>固定的な法的理由など</td><td>顧客別・部門別に増える理由</td><td>帳票分類に使うならマスタ化</td></tr><tr><td>部品タイプ</td><td>型別テーブルや必須項目に影響するもの</td><td>単なる表示カテゴリ</td><td>テーブル構造に影響するならCHECKで安易に増やさない</td></tr><tr><td>権限ロール</td><td>システム標準ロール</td><td>組織が追加する業務ロール</td><td>権限評価方式とセットで決める</td></tr><tr><td>国・通貨・単位</td><td>標準規格があるもの</td><td>社内独自単位や変換係数があるもの</td><td>標準コード + 社内マスタの二層も検討</td></tr></tbody></table></div>
+  <p>コード値の設計で重要なのは、「値の追加が単なるデータ追加か、システム仕様変更か」を見極めることである。たとえば <code>application_status</code> に <code>REJECTED</code> を追加するのは、画面、通知、集計、承認ルート、再申請可否、API互換に影響するため仕様変更である。一方、却下理由の細分類を追加するだけなら、コードマスタで運用変更できる方がよい。</p>
+  <h3>コードマスタの基本形</h3>
+  <pre><code>CREATE TABLE code_set (
+  code_set_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  code_set_name VARCHAR2(80) NOT NULL,
+  description VARCHAR2(1000),
+  is_system_managed CHAR(1) DEFAULT &#x27;N&#x27; NOT NULL,
+  CONSTRAINT pk_code_set PRIMARY KEY (code_set_id),
+  CONSTRAINT uq_code_set_name UNIQUE (code_set_name),
+  CONSTRAINT ck_code_set_system CHECK (is_system_managed IN (&#x27;Y&#x27;,&#x27;N&#x27;))
+);
+
+CREATE TABLE code_value (
+  code_value_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  code_set_id NUMBER NOT NULL,
+  code_value VARCHAR2(80) NOT NULL,
+  display_name VARCHAR2(200) NOT NULL,
+  display_order NUMBER DEFAULT 0 NOT NULL,
+  is_active CHAR(1) DEFAULT &#x27;Y&#x27; NOT NULL,
+  valid_from TIMESTAMP DEFAULT TIMESTAMP &#x27;1900-01-01 00:00:00&#x27; NOT NULL,
+  valid_to TIMESTAMP DEFAULT TIMESTAMP &#x27;9999-12-31 00:00:00&#x27; NOT NULL,
+  CONSTRAINT pk_code_value PRIMARY KEY (code_value_id),
+  CONSTRAINT uq_code_value UNIQUE (code_set_id, code_value),
+  CONSTRAINT fk_cv_code_set FOREIGN KEY (code_set_id) REFERENCES code_set(code_set_id),
+  CONSTRAINT ck_cv_active CHECK (is_active IN (&#x27;Y&#x27;,&#x27;N&#x27;)),
+  CONSTRAINT ck_cv_period CHECK (valid_from &lt; valid_to)
+);</code></pre>
+  <div class="call warn"><div class="h">コードマスタを何でも受け皿にしない</div><div>コードマスタは運用変更には強いが、アプリの分岐条件までデータ化すると、仕様がDBデータの中に隠れる。状態機械、権限、型別必須項目、外部連携ステータスのように処理を左右する値は、DDL・アプリ定数・テストケースで強く管理する。</div></div>
+  <h3>階層分類とタグ</h3>
+  <p>部品分類や商品カテゴリは、単純なコード値ではなく階層を持つことが多い。階層検索が浅ければ自己参照FKでよいが、祖先・子孫検索が頻繁なら閉包表を検討する。タグは多対多関連表で持つのが基本であり、カンマ区切り文字列は検索・一意性・参照整合性を失うため避ける。</p>
+  <pre><code>CREATE TABLE part_category (
+  category_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  parent_category_id NUMBER,
+  category_cd VARCHAR2(80) NOT NULL,
+  category_name VARCHAR2(200) NOT NULL,
+  CONSTRAINT pk_part_category PRIMARY KEY (category_id),
+  CONSTRAINT uq_part_category_cd UNIQUE (category_cd),
+  CONSTRAINT fk_pc_parent FOREIGN KEY (parent_category_id) REFERENCES part_category(category_id)
+);
+
+CREATE TABLE part_tag_assignment (
+  part_id NUMBER NOT NULL,
+  tag_id NUMBER NOT NULL,
+  assigned_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  assigned_by NUMBER NOT NULL,
+  CONSTRAINT pk_part_tag_assignment PRIMARY KEY (part_id, tag_id),
+  CONSTRAINT fk_pta_part FOREIGN KEY (part_id) REFERENCES part(part_id)
+);</code></pre>
+</section>
+
+<section id="s25b">
+  <h2 class="sec"><span class="num">補B</span>監査列・トレーサビリティ・調定</h2>
+  <p class="lead">監査列は、すべての表に機械的に <code>created_at</code> と <code>updated_at</code> を置けばよいわけではない。誰が、どの処理で、どの外部メッセージを根拠に、何を変えたかを追跡できる粒度を決める必要がある。</p>
+  <h3>監査の粒度</h3>
+  <div class="tbl"><table><thead><tr><th>粒度</th><th>例</th><th>向く用途</th><th>注意</th></tr></thead><tbody><tr><td>行監査列</td><td>created_at, created_by, updated_at, updated_by</td><td>通常のマスタ更新追跡</td><td>何がどう変わったかは分からない</td></tr><tr><td>状態履歴</td><td>from_status, to_status, changed_by</td><td>ライフサイクル監査</td><td>状態以外の属性変更は別途必要</td></tr><tr><td>イベントログ</td><td>event_type, payload, actor, occurred_at</td><td>業務操作の説明</td><td>イベント設計とバージョン管理が必要</td></tr><tr><td>変更前後差分</td><td>before_value, after_value</td><td>項目単位の監査</td><td>量が増える。機密情報の扱いに注意</td></tr><tr><td>外部連携ログ</td><td>message_id, payload, result</td><td>再送・冪等性・障害調査</td><td>raw保持期間と個人情報に注意</td></tr></tbody></table></div>
+  <h3>共通監査列の例</h3>
+  <pre><code>-- 例: 各業務表に共通で置く列
+created_at      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+created_by      NUMBER,
+updated_at      TIMESTAMP,
+updated_by      NUMBER,
+row_version     NUMBER DEFAULT 0 NOT NULL,
+source_system   VARCHAR2(40),
+source_trace_id VARCHAR2(200)</code></pre>
+  <p><code>source_trace_id</code> は、外部メッセージID、バッチID、リクエストID、ジョブ実行IDなど、後からログとDB行を突き合わせるためのキーである。障害調査や調定では、「この行はどの入力から作られたか」を追えることが重要になる。</p>
+  <h3>調定クエリを設計成果物に含める</h3>
+  <p>履歴と現在値、外部IDと内部ID、イベントと集計値、送信済みメッセージと相手先受信結果など、二重管理や非同期処理を採用した箇所には必ず差分が生じうる。上級設計では、差分をゼロにする処理だけでなく、差分を検出する調定クエリを持つ。</p>
+  <pre><code>-- 例: 申請の現在状態と最新履歴の差分検出
+WITH latest_history AS (
+  SELECT application_id, to_status,
+         ROW_NUMBER() OVER (
+           PARTITION BY application_id
+           ORDER BY changed_at DESC, status_history_id DESC
+         ) rn
+  FROM application_status_history
+)
+SELECT a.application_id, a.current_status, h.to_status AS latest_history_status
+FROM membership_application a
+JOIN latest_history h
+  ON h.application_id = a.application_id
+ AND h.rn = 1
+WHERE a.current_status &lt;&gt; h.to_status;</code></pre>
+  <div class="call tip"><div class="h">監査は後付けしにくい</div><div>監査列は後から追加できるが、過去の「誰が・なぜ」は復元できない。特に承認、退会、削除、価格、BOM、外部連携、権限変更は初期設計で監査粒度を決める。</div></div>
+</section>
+
+<section id="s25c">
+  <h2 class="sec"><span class="num">補C</span>設計を検証するテスト観点</h2>
+  <p class="lead">テーブル設計はER図を描いて終わりではない。代表データ、異常データ、並行更新、履歴復元、移行、削除、外部ID変更をテストデータとして流し、設計が壊れないことを確認する。</p>
+  <h3>テストケース分類</h3>
+  <div class="tbl"><table><thead><tr><th>分類</th><th>テストすること</th><th>例</th></tr></thead><tbody><tr><td>正常系</td><td>標準的な登録・更新・参照ができる</td><td>入会申請→承認→会員作成</td></tr><tr><td>状態遷移異常</td><td>禁止遷移が防げる</td><td>却下済から承認済へ直接変更できない</td></tr><tr><td>履歴復元</td><td>過去時点を再現できる</td><td>2026-04-01時点の会員グレードを取得</td></tr><tr><td>同一性変更</td><td>外部ID訂正に耐える</td><td>CRM ID変更後も過去申請が同じ内部会員を指す</td></tr><tr><td>重複・欠損</td><td>ユニークキーなしデータを失わない</td><td>同姓同名・電話番号欠損のrawを保持</td></tr><tr><td>排他的参照</td><td>どれか1対象だけを参照する</td><td>添付が申請と部品の両方に紐づく行を拒否</td></tr><tr><td>削除/退会</td><td>物理削除せず終了として扱う</td><td>退会後も承認履歴を参照できる</td></tr><tr><td>並行更新</td><td>ロストアップデートを防ぐ</td><td>2人が同じ申請を同時承認/差戻し</td></tr><tr><td>移行</td><td>旧スキーマから新スキーマへ欠損なく移る</td><td>二重書き中の新規申請を取りこぼさない</td></tr><tr><td>性能</td><td>代表検索が索引・パーティションを使う</td><td>承認者の未処理一覧、外部ID逆引き</td></tr></tbody></table></div>
+  <h3>データセットで検証する</h3>
+  <p>設計レビューでは、DDLだけでなく、最低限のサンプルデータを流すと欠陥が見つかりやすい。状態遷移、期間重複、同時刻履歴、外部ID変更、再入会、部品タイプ追加、BOM改版、名寄せ誤りを含むデータを作る。これにより、SQLで取れると思っていた情報が取れない、制約で守れると思っていた条件が守れない、といった問題を早期に発見できる。</p>
+  <pre><code>-- 設計検証で必ず入れたいサンプルの例
+-- 1. 下書き -&gt; 申請中 -&gt; 差戻し -&gt; 再申請 -&gt; 承認済
+-- 2. 申請中 -&gt; 却下
+-- 3. 承認済 -&gt; 会員作成 -&gt; 退会 -&gt; 再入会
+-- 4. 外部ID A -&gt; 外部ID B へ変更
+-- 5. 同じ氏名・同じ生年月日だが別人
+-- 6. 同じ部品の Rev.A / Rev.B と、BOM有効期間変更
+-- 7. 最新履歴 changed_at が同一時刻の2行</code></pre>
+  <div class="call danger"><div class="h">テストしないと見えない欠陥</div><div>ER図上は整っていても、実データを入れると「この状態で必須になる列がNULL」「最新行が一意に決まらない」「退会後に再登録できない」「外部ID変更でUNIQUEに衝突」「BOMの過去構成が取れない」といった欠陥が出る。テーブル設計はサンプルデータと代表クエリで検証する。</div></div>
+</section>
+<section id="s26" class="focus">
+      <h2 class="sec"><span class="num">26</span>アンチパターン集</h2>
+      <p class="lead">上級者は、良い設計パターンだけでなく「後で必ず壊れる形」を知っている。以下は、実務で地獄を作りやすい典型である。</p>
+      
+<div class="tbl "><table><thead><tr><th>アンチパターン</th><th>なぜ危険か</th><th>代替</th></tr></thead><tbody><tr><td>status列だけで履歴なし</td><td>現在は見えるが、過去・理由・承認者が消える</td><td>状態履歴・イベントを追加する</td></tr><tr><td>target_type + target_id 汎用参照</td><td>FKが効かず、存在しない対象を参照する</td><td>排他的FK、共通親、対象別表へ</td></tr><tr><td>外部IDをPKにする</td><td>外部都合の変更で内部参照が壊れる</td><td>内部代理キー + 外部ID対応表</td></tr><tr><td>EAVで基幹属性を持つ</td><td>型・制約・索引・SQLが壊れる</td><td>共通列 + 型別表 + JSON自由属性</td></tr><tr><td>物理削除で退会を表す</td><td>退会履歴・過去取引が消える</td><td>終了状態・退会イベント・匿名化分離</td></tr><tr><td>最新行をMAX日時だけで取る</td><td>同時刻複数で重複・不定になる</td><td>タイブレークID、現在値、MV</td></tr><tr><td>NULLに複数の意味を持たせる</td><td>未入力・不明・対象外が区別できない</td><td>状態列や理由コードで区別</td></tr><tr><td>マスタ名を過去帳票で直接参照</td><td>名称変更で過去帳票が変わる</td><td>スナップショットまたは履歴名を持つ</td></tr><tr><td>UNIQUEがないデータを無理に統合</td><td>誤名寄せ・取り込み不能</td><td>raw保持・候補管理・人手確認</td></tr><tr><td>CASCADE削除を安易に使う</td><td>監査対象の子行まで消える</td><td>削除ポリシーを表ごとに決める</td></tr><tr><td>列名に1,2,3を付ける</td><td>意味が増殖し拡張不能</td><td>子表へ分離</td></tr><tr><td>JSONへ検索属性を逃がす</td><td>後から索引・制約・集計が難しい</td><td>検索属性は列または型別表へ</td></tr><tr><td>コード値をCHECKだけに埋める</td><td>運用追加がDDLになる</td><td>安定列挙はCHECK、運用変更ありはコードマスタ</td></tr><tr><td>承認ルートを現在マスタだけ参照</td><td>過去申請の承認ルートが変わる</td><td>ルート定義バージョン/スナップショット</td></tr><tr><td>BOMを現在親子だけで持つ</td><td>過去構成・影響分析が不能</td><td>Rev・有効期間・ECOを持つ</td></tr></tbody></table></div>
+<div class="call tip"><div class="h">アンチパターンの共通点</div><div>ほとんどの事故は「意味を混ぜる」「時間を消す」「同一性を外部に委ねる」「DB制約を捨てる」「導出値を真実にする」のどれかである。設計レビューでは、この5つを重点的に見る。</div></div>
+
+    </section><section id="s27" class="">
+      <h2 class="sec"><span class="num">27</span>DDLテンプレート集</h2>
+      <p class="lead">ここでは、よく使うテーブル形をテンプレートとしてまとめる。実案件では命名規約、監査列、権限、パーティション、コメント、採番方式をプロジェクト標準に合わせる。</p>
+      
+<h3>リソース表</h3>
+<pre><code>CREATE TABLE resource_example (
+  resource_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  business_no VARCHAR2(80),
+  resource_name VARCHAR2(300) NOT NULL,
+  resource_status VARCHAR2(30) DEFAULT &#x27;ACTIVE&#x27; NOT NULL,
+  created_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  updated_at TIMESTAMP,
+  row_version NUMBER DEFAULT 0 NOT NULL,
+  CONSTRAINT pk_resource_example PRIMARY KEY (resource_id),
+  CONSTRAINT uq_resource_example_business_no UNIQUE (business_no),
+  CONSTRAINT ck_resource_example_status CHECK (resource_status IN (&#x27;ACTIVE&#x27;,&#x27;INACTIVE&#x27;,&#x27;CLOSED&#x27;))
+);</code></pre>
+<h3>イベント表</h3>
+<pre><code>CREATE TABLE event_example (
+  event_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  aggregate_id NUMBER NOT NULL,
+  event_type VARCHAR2(80) NOT NULL,
+  occurred_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  actor_id NUMBER,
+  event_payload CLOB CHECK (event_payload IS JSON),
+  idempotency_key VARCHAR2(200),
+  CONSTRAINT pk_event_example PRIMARY KEY (event_id),
+  CONSTRAINT uq_event_example_idempotency UNIQUE (idempotency_key)
+);
+
+CREATE INDEX ix_event_example_aggregate
+ON event_example (aggregate_id, event_id);</code></pre>
+<h3>状態履歴</h3>
+<pre><code>CREATE TABLE status_history_example (
+  status_history_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  target_id NUMBER NOT NULL,
+  from_status VARCHAR2(30),
+  to_status VARCHAR2(30) NOT NULL,
+  changed_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  changed_by NUMBER NOT NULL,
+  reason VARCHAR2(1000),
+  CONSTRAINT pk_status_history_example PRIMARY KEY (status_history_id)
+);
+
+CREATE INDEX ix_she_latest
+ON status_history_example (target_id, changed_at DESC, status_history_id DESC);</code></pre>
+<h3>期間履歴</h3>
+<pre><code>CREATE TABLE period_history_example (
+  period_history_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  target_id NUMBER NOT NULL,
+  value_cd VARCHAR2(40) NOT NULL,
+  valid_from TIMESTAMP NOT NULL,
+  valid_to TIMESTAMP DEFAULT TIMESTAMP &#x27;9999-12-31 00:00:00&#x27; NOT NULL,
+  CONSTRAINT pk_period_history_example PRIMARY KEY (period_history_id),
+  CONSTRAINT ck_phe_period CHECK (valid_from &lt; valid_to)
+);
+
+CREATE INDEX ix_phe_asof
+ON period_history_example (target_id, valid_from, valid_to);</code></pre>
+<h3>Outbox / 外部連携</h3>
+<pre><code>CREATE TABLE integration_outbox (
+  outbox_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  aggregate_type VARCHAR2(80) NOT NULL,
+  aggregate_id NUMBER NOT NULL,
+  event_type VARCHAR2(80) NOT NULL,
+  payload CLOB CHECK (payload IS JSON),
+  publish_status VARCHAR2(30) DEFAULT &#x27;PENDING&#x27; NOT NULL,
+  created_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  published_at TIMESTAMP,
+  retry_count NUMBER DEFAULT 0 NOT NULL,
+  idempotency_key VARCHAR2(200) NOT NULL,
+  CONSTRAINT pk_integration_outbox PRIMARY KEY (outbox_id),
+  CONSTRAINT uq_outbox_idempotency UNIQUE (idempotency_key),
+  CONSTRAINT ck_outbox_status CHECK (publish_status IN (&#x27;PENDING&#x27;,&#x27;PUBLISHED&#x27;,&#x27;FAILED&#x27;,&#x27;CANCELED&#x27;))
+);
+
+CREATE INDEX ix_outbox_pending
+ON integration_outbox (publish_status, created_at);</code></pre>
+<h3>冪等受信</h3>
+<pre><code>CREATE TABLE inbound_message_log (
+  inbound_message_log_id NUMBER GENERATED ALWAYS AS IDENTITY,
+  source_system VARCHAR2(40) NOT NULL,
+  message_id VARCHAR2(200) NOT NULL,
+  received_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  processed_at TIMESTAMP,
+  process_status VARCHAR2(30) DEFAULT &#x27;RECEIVED&#x27; NOT NULL,
+  raw_payload CLOB CHECK (raw_payload IS JSON),
+  CONSTRAINT pk_inbound_message_log PRIMARY KEY (inbound_message_log_id),
+  CONSTRAINT uq_inbound_message UNIQUE (source_system, message_id),
+  CONSTRAINT ck_inbound_message_status CHECK (process_status IN (&#x27;RECEIVED&#x27;,&#x27;PROCESSED&#x27;,&#x27;FAILED&#x27;,&#x27;IGNORED&#x27;))
+);</code></pre>
+
+    </section><section id="s28" class="">
+      <h2 class="sec"><span class="num">28</span>設計レビュー質問</h2>
+      <p class="lead">テーブル設計レビューでは、列名の好みよりも、意味・同一性・時間・整合性・進化可能性を見る。以下の質問に答えられない箇所は、後で負債化しやすい。</p>
+      
+<div class="tbl "><table><thead><tr><th>観点</th><th>質問</th></tr></thead><tbody><tr><td>意味</td><td>この表の1行は何を意味するか。全行に共通する不変条件を言えるか。</td></tr><tr><td>同一性</td><td>PKは将来も変わらないか。外部ID・表示番号・業務キーと分かれているか。</td></tr><tr><td>時間</td><td>発生時刻・登録時刻・有効期間・訂正時刻が混ざっていないか。</td></tr><tr><td>履歴</td><td>上書きして消える情報はないか。誰がいつなぜ変えたか必要ないか。</td></tr><tr><td>制約</td><td>DBで守れる不変条件をアプリ任せにしていないか。逆にDBで守れない遷移をCHECKに押し込んでいないか。</td></tr><tr><td>参照</td><td>FKを張れる形か。排他的参照や汎用参照で整合性を失っていないか。</td></tr><tr><td>削除</td><td>物理削除してよいか。退会・取消・終了・匿名化を区別しているか。</td></tr><tr><td>性能</td><td>主な検索条件・一覧・帳票・集計を説明できるか。索引・MV・読取モデルの要否を判断したか。</td></tr><tr><td>進化</td><td>列追加、状態追加、外部ID変更、表分割、履歴追加をどう移行するか。</td></tr><tr><td>運用</td><td>調定クエリ、再処理、冪等性、監査、障害時復旧を考慮したか。</td></tr></tbody></table></div>
+<h3>レビューの進め方</h3>
+<ol class="steps">
+  <li><b>表ごとに1行の意味を読む</b>：テーブル名ではなく、1行が何の事実かを確認する。</li>
+  <li><b>キーを確認する</b>：PK、候補キー、外部ID、表示番号、版キーの違いを確認する。</li>
+  <li><b>履歴要件を逆質問する</b>：「1年後に当時の状態を説明できますか」と問う。</li>
+  <li><b>削除を確認する</b>：「この行を消すと何が説明できなくなるか」を問う。</li>
+  <li><b>代表クエリを確認する</b>：一覧、詳細、集計、外部連携、バッチの代表SQLを想像する。</li>
+  <li><b>変更シナリオを投げる</b>：状態追加、外部ID変更、型追加、承認段階追加、再入会などを当てる。</li>
+</ol>
+
+    </section><section id="s29" class="">
+      <h2 class="sec"><span class="num">29</span>判断表 ― 迷ったときの選択基準</h2>
+      <p class="lead">テーブル設計には万能解がない。迷ったときは、検索性・制約・履歴・変更頻度・性能・運用を軸に選ぶ。</p>
+      
+<div class="tbl "><table><thead><tr><th>迷い</th><th>第一候補</th><th>別案</th><th>判断基準</th></tr></thead><tbody><tr><td>現在値だけか履歴も持つか</td><td>履歴も持つ</td><td>現在値だけ</td><td>監査・説明・復元が必要なら履歴必須</td></tr><tr><td>代理キーか自然キーか</td><td>代理キーPK + 自然キーUNIQUE</td><td>自然キーPK</td><td>自然キーが本当に不変なら自然キーPKも可。ただし外部連携では代理キー推奨</td></tr><tr><td>型別列をどう持つか</td><td>共通表 + 型別1:1表</td><td>単一表/JSON/EAV</td><td>型ごとの必須・制約・検索が多いなら型別表</td></tr><tr><td>排他的FK</td><td>FK複数 + CHECK or 共通親</td><td>target_type + id</td><td>整合性重視なら汎用参照を避ける</td></tr><tr><td>承認状態</td><td>現在値 + 状態履歴 + 承認イベント</td><td>statusだけ</td><td>証跡が必要なら履歴/イベント必須</td></tr><tr><td>期間履歴</td><td>半開区間 [from,to)</td><td>閉区間/NULL終端</td><td>クエリ単純性と隣接バグ回避で半開区間</td></tr><tr><td>非正規化</td><td>まず正規化、読取モデルで補助</td><td>最初から横持ち</td><td>導出元と再生成性を明確にできるなら非正規化可</td></tr><tr><td>CQRS</td><td>局所採用</td><td>全面採用</td><td>読み書き要求が大きく違う箇所だけ</td></tr><tr><td>イベントソーシング</td><td>履歴が本質の集約だけ</td><td>全CRUDに適用</td><td>再構築・監査が価値を持つかで判断</td></tr><tr><td>物理削除</td><td>再生成可能データだけ</td><td>業務データも削除</td><td>過去説明が必要なものは削除ではなく終了/取消/匿名化</td></tr></tbody></table></div>
+<div class="call tip"><div class="h">最終判断の言い方</div><div>「この設計は正しい」ではなく、「この設計では参照整合性と履歴を守る代わりにJOINを許容する」「この設計では読取を速くする代わりに調定を必要とする」のように、守るものと犠牲にするものをセットで説明する。</div></div>
+
+    </section>
+<div class="part-banner b4"><h2>第 VI 部 増補: バリエーションと判断材料 <small>― 完璧解ではなく、選ぶための材料を増やす</small></h2></div>
+
+<section id="s31" class="focus">
+  <h2 class="sec"><span class="num">31</span>状態の持ち方バリエーション総覧 ― status列だけでも、状態テーブルだけでも足りない</h2>
+  <p class="lead">状態管理には万能解がない。状態列で持つ、状態履歴を持つ、状態ごとにテーブルを分けてスライドする、イベントから導出する、読取用に現在状態だけ投影する、という複数の形がある。重要なのは「どの方式が正しいか」ではなく、<strong>どの不便を受け入れるか</strong>を明示することである。</p>
+
+  <h3>状態を保持する主な方式</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>形</th><th>強い点</th><th>弱い点</th><th>おすすめ度</th></tr></thead>
+    <tbody>
+      <tr><td>単一表 + status列</td><td><code>users(status)</code></td><td>検索・集計・JOINが簡単。小規模CRUDに強い。</td><td>状態ごとに必須列が違うとNULLだらけ。遷移履歴が消える。</td><td><span class="badge mid">単純業務なら可</span></td></tr>
+      <tr><td>単一表 + status列 + 状態履歴</td><td><code>users</code> + <code>user_status_history</code></td><td>現在値の読みやすさと監査を両立。</td><td>現在値と履歴の二重管理。更新経路統制が必要。</td><td><span class="badge ok">基幹系の第一候補</span></td></tr>
+      <tr><td>状態別テーブルへスライド</td><td><code>pending_user</code> → <code>active_user</code> → <code>withdrawn_user</code></td><td>状態ごとの必須列・制約を強く書ける。現在状態の意味が明確。</td><td>状態横断検索・FK・履歴・再入会が難しい。移動処理が重い。</td><td><span class="badge mid">状態ごとに型が大きく違うなら候補</span></td></tr>
+      <tr><td>中核エンティティ + 状態別詳細表</td><td><code>user_core</code> + <code>active_membership</code> + <code>withdrawal_case</code></td><td>同一性を保ちつつ、状態固有データを分離できる。</td><td>JOINが増える。どの詳細表が現在有効かのルールが必要。</td><td><span class="badge ok">おすすめ</span></td></tr>
+      <tr><td>イベントソース + 投影</td><td><code>user_event</code> → <code>user_current_projection</code></td><td>履歴・再構築・監査に強い。</td><td>実装・運用・イベント設計が難しい。単純CRUDには過剰。</td><td><span class="badge mid">監査重視なら候補</span></td></tr>
+      <tr><td>キュー/ワークフローエンジンが状態を持つ</td><td>DBは業務実体、状態は外部WF</td><td>複雑な承認ルート・期限・再割当をエンジンに任せられる。</td><td>DB単独で全状態を説明しづらい。外部製品依存。</td><td><span class="badge mid">大規模WFなら候補</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call mech"><div class="h">機序: 状態は「分類」ではなく「制約集合」</div><div>状態を単なる区分値として見ると <code>status</code> 列で十分に見える。しかし実務上の状態は「その状態で許される操作」「必須になる列」「参照してよい相手」「次に進める状態」「保存すべき履歴」の集合である。つまり状態をどう持つかは、列の配置ではなく、不変条件をどこに置くかの問題である。</div></div>
+
+  <h3>判断軸</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>問い</th><th>YESなら</th><th>NOなら</th></tr></thead>
+    <tbody>
+      <tr><td>状態ごとに必須項目が大きく違うか</td><td>状態別詳細表、状態別テーブルを検討</td><td>status列 + 履歴で十分な可能性</td></tr>
+      <tr><td>過去にどの状態だったかを説明する必要があるか</td><td>状態履歴またはイベントログが必須</td><td>現在値だけでも成立するが、将来監査要件に注意</td></tr>
+      <tr><td>状態横断で頻繁に検索するか</td><td>単一表または中核表を置く</td><td>状態別テーブルの分割が許容される</td></tr>
+      <tr><td>状態ごとに別の所有者・別の寿命を持つか</td><td>別集約として分ける。例: 申請、会員資格、退会ケース</td><td>同一集約内の状態として扱う</td></tr>
+      <tr><td>再入会・取消・復活があるか</td><td>状態列だけではなく期間・イベント・ケース化を検討</td><td>退会を終端状態として単純化できる</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>最小例・実務例・失敗例</h3>
+  <div class="cards">
+    <div class="card"><div class="k">Minimal</div><div class="t">小規模サービス</div><div class="d"><code>users.status</code> に <code>active/suspended/deleted</code> を持ち、退会理由は任意列。監査要件が薄く、サポートも少ないなら成立する。</div></div>
+    <div class="card"><div class="k">Practical</div><div class="t">会員制業務</div><div class="d"><code>person</code>、<code>account</code>、<code>membership</code>、<code>membership_status_event</code> を分け、ログイン状態と会員資格を混ぜない。</div></div>
+    <div class="card"><div class="k">Failure</div><div class="t">1表詰め込み</div><div class="d"><code>users</code> に申請、承認、会員、退会、再入会、BANを詰め、NULLとフラグが増殖。どの列がどの状態で有効か誰も説明できない。</div></div>
+  </div>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>迷うなら「中核表 + 状態履歴 + 状態固有詳細表」から始める。単一表の読みやすさをある程度保ちつつ、状態ごとの制約と履歴を分離できる。状態別テーブルへ完全にスライドする方式は、状態ごとに本当に別の型になる場合に限定する。</div></div>
+</section>
+
+<section id="s32" class="focus">
+  <h2 class="sec"><span class="num">32</span>ユーザー退会・停止・再入会の設計 ― 「退会済みフラグ」だけでは足りない</h2>
+  <p class="lead">ユーザーの退会管理は、見た目より難しい。退会は単なる <code>status='withdrawn'</code> ではなく、会員資格の終了、ログイン停止、個人情報削除、請求停止、利用規約上の保持、再入会可否、監査証跡、外部連携停止が絡む。これらを1つの状態に押し込むと、後で必ず矛盾が出る。</p>
+
+  <h3>まず分けるべき概念</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>概念</th><th>主語</th><th>寿命</th><th>退会時の扱い</th></tr></thead>
+    <tbody>
+      <tr><td>人物 / 法人</td><td><code>party</code>, <code>person</code></td><td>退会後も同一人物として残ることがある</td><td>法的保持・名寄せ・再入会のために残すか、匿名化する</td></tr>
+      <tr><td>ログインアカウント</td><td><code>account</code></td><td>サービス認証の寿命</td><td>無効化、認証情報削除、復旧不可化</td></tr>
+      <tr><td>会員資格</td><td><code>membership</code></td><td>入会から退会まで。再入会で別行にすることが多い</td><td><code>valid_to</code> または <code>withdrawn_at</code> を設定</td></tr>
+      <tr><td>退会申請</td><td><code>withdrawal_request</code></td><td>退会手続き1件</td><td>取消・承認・却下・処理完了を履歴化</td></tr>
+      <tr><td>利用停止・BAN</td><td><code>account_restriction</code></td><td>一時または永久の制限</td><td>退会と別概念。BAN中退会、退会後BAN履歴などがあり得る</td></tr>
+      <tr><td>個人情報削除要求</td><td><code>privacy_request</code></td><td>法務・プライバシー上の処理</td><td>退会と同時とは限らない。保持義務と衝突することがある</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>方式A: users表に退会状態を持つ</h3>
+  <pre><code>CREATE TABLE app_user (
+  user_id        NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  login_id       VARCHAR2(200) NOT NULL,
+  status         VARCHAR2(30)  NOT NULL,
+  joined_at      TIMESTAMP,
+  withdrawn_at   TIMESTAMP,
+  withdrawal_reason_code VARCHAR2(30),
+  CONSTRAINT ck_app_user_status CHECK (status IN ('APPLIED','ACTIVE','SUSPENDED','WITHDRAWN','BANNED'))
+);</code></pre>
+  <p>最も単純で、一覧検索も簡単。ただし、申請中・会員中・退会済み・BAN中で必須列が異なるほど弱くなる。退会後の再入会を「同じ <code>user_id</code> を復活させる」のか「新しい会員資格を作る」のか曖昧になりやすい。</p>
+
+  <h3>方式B: 会員資格を期間として持つ</h3>
+  <pre><code>CREATE TABLE party (
+  party_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  party_type VARCHAR2(20) NOT NULL CHECK (party_type IN ('PERSON','ORG'))
+);
+
+CREATE TABLE account (
+  account_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  party_id   NUMBER NOT NULL REFERENCES party(party_id),
+  login_id   VARCHAR2(200) NOT NULL,
+  auth_status VARCHAR2(20) NOT NULL CHECK (auth_status IN ('ENABLED','LOCKED','DISABLED'))
+);
+
+CREATE TABLE membership (
+  membership_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  party_id      NUMBER NOT NULL REFERENCES party(party_id),
+  valid_from    DATE NOT NULL,
+  valid_to      DATE NOT NULL,
+  end_reason_code VARCHAR2(30),
+  CONSTRAINT ck_membership_period CHECK (valid_from &lt; valid_to)
+);</code></pre>
+  <p>再入会を自然に表せる。退会は「会員資格の有効期間が終わる」ことであり、人物やアカウントとは別に扱える。会員番号を会員資格に紐づけるか、人物に紐づけるかは業務判断になる。</p>
+
+  <h3>方式C: 退会ケースを独立させる</h3>
+  <p>退会に承認、本人確認、未払精算、個人情報削除、返金、外部サービス停止が絡むなら、退会は状態ではなく「ケース」としてモデル化した方がよい。</p>
+  <pre><code>CREATE TABLE withdrawal_case (
+  withdrawal_case_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  membership_id NUMBER NOT NULL REFERENCES membership(membership_id),
+  requested_at TIMESTAMP NOT NULL,
+  requested_by NUMBER,
+  case_status VARCHAR2(30) NOT NULL CHECK (case_status IN ('REQUESTED','IN_REVIEW','APPROVED','REJECTED','CANCELLED','COMPLETED')),
+  desired_end_date DATE,
+  completed_at TIMESTAMP
+);
+
+CREATE TABLE withdrawal_case_event (
+  event_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  withdrawal_case_id NUMBER NOT NULL REFERENCES withdrawal_case(withdrawal_case_id),
+  event_type VARCHAR2(40) NOT NULL,
+  occurred_at TIMESTAMP NOT NULL,
+  actor_id NUMBER,
+  note VARCHAR2(1000)
+);</code></pre>
+  <div class="call tip"><div class="h">おすすめ</div><div>退会が単純なセルフサービスなら方式Bで十分。人手・承認・未払精算・返金・個人情報処理が入るなら、方式Cの退会ケースを作る。退会を <code>user.status</code> の1値として処理すると、途中状態と監査が消える。</div></div>
+
+  <h3>退会管理の追加論点</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>論点</th><th>設計上の問い</th><th>典型的な落とし穴</th></tr></thead>
+    <tbody>
+      <tr><td>再入会</td><td>同じ会員番号を再利用するか。退会前履歴と通算するか。</td><td>退会済み行を上書きして復活させ、過去の退会事実が消える</td></tr>
+      <tr><td>退会取消</td><td>退会申請の取消なのか、退会完了後の復活なのか。</td><td>取消と再入会を同じ <code>ACTIVE</code> 復帰で処理し、監査不能になる</td></tr>
+      <tr><td>個人情報削除</td><td>識別子、連絡先、請求履歴、監査ログをどこまで匿名化するか。</td><td>FK整合性を壊す物理削除。請求・監査の根拠まで消す</td></tr>
+      <tr><td>BANと退会</td><td>BANされた人が退会できるか。再登録を防ぐか。</td><td>BANを退会と同じ終端状態にして、再登録防止情報を失う</td></tr>
+      <tr><td>外部連携</td><td>外部IDを停止するだけか、削除APIを呼ぶか、再試行するか。</td><td>DBは退会済みだが外部サービスは有効のまま残る</td></tr>
+      <tr><td>課金</td><td>退会日、請求締日、返金、未払をどう扱うか。</td><td>会員状態だけで課金停止し、精算イベントを残さない</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>退会済みデータをどう残すか</h3>
+  <p>退会後のデータ保持には、少なくとも4つの選択肢がある。</p>
+  <ol>
+    <li><strong>論理削除</strong>: <code>withdrawn_at</code> や <code>deleted_at</code> を持つ。業務検索から除外しやすいが、全SQLで条件を忘れるリスクがある。</li>
+    <li><strong>アーカイブ表へ移動</strong>: 現役表を軽くできるが、FKや横断検索が複雑になる。退会者を完全に別扱いする業務に向く。</li>
+    <li><strong>匿名化</strong>: 監査・集計に必要な骨格を残し、氏名・メール等を消す。個人情報保護と履歴保持の折衷。</li>
+    <li><strong>物理削除</strong>: 本当に再現不要な一時データだけ。基幹データでは最後の選択肢。</li>
+  </ol>
+  <div class="call warn"><div class="h">警告</div><div>「退会したから物理削除」は危険。請求・問い合わせ・監査・不正検知・再登録防止の根拠が消える。削除要件がある場合でも、多くは物理削除ではなく匿名化・トークン化・保持期限切れ削除の組合せになる。</div></div>
+</section>
+
+<section id="s33" class="focus">
+  <h2 class="sec"><span class="num">33</span>状態別テーブルへスライドする設計 ― 使えるが、強い薬</h2>
+  <p class="lead">ユーザーが指摘した通り、状態ごとにテーブルを用意し、状態遷移時に行を移動させる設計も成立する。これは「1つの表に状態を持つ」の反対側の極であり、状態ごとにデータ構造が大きく違う場合には有効。ただし、同一性・参照整合・履歴・検索に強い副作用がある。</p>
+
+  <h3>状態別テーブル方式のイメージ</h3>
+  <figure>
+    <svg viewBox="0 0 900 260" role="img" aria-label="状態別テーブルへのスライド">
+      <defs><marker id="arr_s33" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5b3da8"/></marker></defs>
+      <rect x="40" y="80" width="170" height="74" rx="10" fill="#f3f0fa" stroke="#5b3da8"/><text x="125" y="108" text-anchor="middle" font-weight="700">applicant_user</text><text x="125" y="130" text-anchor="middle" font-size="12" fill="#5b6876">申請中に必要な列</text>
+      <rect x="270" y="80" width="170" height="74" rx="10" fill="#eef4ef" stroke="#1f7a5e"/><text x="355" y="108" text-anchor="middle" font-weight="700">active_user</text><text x="355" y="130" text-anchor="middle" font-size="12" fill="#5b6876">会員中に必要な列</text>
+      <rect x="500" y="80" width="170" height="74" rx="10" fill="#fff4e6" stroke="#b4541a"/><text x="585" y="108" text-anchor="middle" font-weight="700">suspended_user</text><text x="585" y="130" text-anchor="middle" font-size="12" fill="#5b6876">停止理由・期限</text>
+      <rect x="730" y="80" width="130" height="74" rx="10" fill="#fbe0e0" stroke="#9c2a2a"/><text x="795" y="108" text-anchor="middle" font-weight="700">withdrawn</text><text x="795" y="130" text-anchor="middle" font-size="12" fill="#5b6876">退会完了</text>
+      <line x1="210" y1="117" x2="266" y2="117" stroke="#5b3da8" stroke-width="2" marker-end="url(#arr_s33)"/>
+      <line x1="440" y1="117" x2="496" y2="117" stroke="#5b3da8" stroke-width="2" marker-end="url(#arr_s33)"/>
+      <line x1="670" y1="117" x2="726" y2="117" stroke="#5b3da8" stroke-width="2" marker-end="url(#arr_s33)"/>
+      <text x="450" y="205" text-anchor="middle" font-size="13" fill="#5b6876">状態遷移 = 行のINSERT/DELETEまたはINSERT/UPDATEによる「所属テーブル」の移動</text>
+    </svg>
+    <figcaption>図: 状態別テーブル方式。状態ごとの必須列と制約は強くなるが、横断参照と履歴管理は難しくなる。</figcaption>
+  </figure>
+
+  <h3>方式のバリエーション</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>バリエーション</th><th>説明</th><th>向く状況</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>物理移動方式</td><td>遷移時に旧テーブルから削除し、新テーブルへINSERTする</td><td>各状態が完全に別ライフサイクル</td><td>FKが貼りづらい。移動前後の同一性を別途保持する</td></tr>
+      <tr><td>中核ID + 状態別テーブル</td><td><code>user_core</code> は残し、状態別表が <code>user_id</code> を共有PK/FKにする</td><td>同一性を保ちたいほぼ全ケース</td><td>排他制約をどう守るかが課題</td></tr>
+      <tr><td>現在表 + アーカイブ表</td><td>現役だけ <code>active_user</code>、退会後は <code>withdrawn_user_archive</code></td><td>現役検索を軽くしたい</td><td>退会者を参照する過去取引FKをどうするか</td></tr>
+      <tr><td>ワークキュー表分離</td><td>業務処理待ちだけ別テーブルに置き、完了後は実体表へ反映</td><td>承認待ち・処理待ち・非同期処理</td><td>本体データとキューの二重管理</td></tr>
+      <tr><td>ステージング → 本番</td><td>取込・申請・検証中はステージング、本承認後に本番表へ昇格</td><td>外部取込、審査、データクレンジング</td><td>ステージングの行を本番と同じ意味にしない</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>中核ID + 状態別テーブルのDDL例</h3>
+  <pre><code>CREATE TABLE user_core (
+  user_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  party_id NUMBER NOT NULL,
+  lifecycle_status VARCHAR2(30) NOT NULL,
+  created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE user_applicant (
+  user_id NUMBER PRIMARY KEY REFERENCES user_core(user_id),
+  applied_at TIMESTAMP NOT NULL,
+  application_no VARCHAR2(50) NOT NULL UNIQUE,
+  application_payload CLOB
+);
+
+CREATE TABLE user_active_member (
+  user_id NUMBER PRIMARY KEY REFERENCES user_core(user_id),
+  member_no VARCHAR2(50) NOT NULL UNIQUE,
+  joined_at DATE NOT NULL,
+  current_plan_code VARCHAR2(30) NOT NULL
+);
+
+CREATE TABLE user_withdrawn (
+  user_id NUMBER PRIMARY KEY REFERENCES user_core(user_id),
+  withdrawn_at TIMESTAMP NOT NULL,
+  reason_code VARCHAR2(30) NOT NULL
+);</code></pre>
+  <p>この形では <code>user_core</code> が同一性を保持し、状態固有データだけを別表に置く。完全な物理移動より安全だが、「ある <code>user_id</code> が同時に複数の状態別表に存在してはいけない」という排他制約は、単純なFKだけでは守れない。Oracle 26aiでは複数表にまたがる整合性表現として assertions が導入されているが、利用可否・構文・運用制約は対象環境で検証する。従来設計では、アプリ層・トリガ・状態遷移ストアドプロシージャ・調定クエリで守る。</p>
+
+  <h3>状態別テーブル方式の設計レビュー</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>レビュー項目</th><th>確認内容</th><th>NGの兆候</th></tr></thead>
+    <tbody>
+      <tr><td>同一性</td><td>移動前後で同じユーザーをどう追跡するか</td><td>各表で別IDを発行し、関連がイベントログにしかない</td></tr>
+      <tr><td>参照</td><td>注文・問い合わせ・監査ログはどの表を参照するか</td><td>状態ごとにFK先が変わり、排他的FKが増殖する</td></tr>
+      <tr><td>横断検索</td><td>「全ユーザー」「過去含むユーザー」をどう検索するか</td><td>毎回UNION。件数が増えると遅い</td></tr>
+      <tr><td>履歴</td><td>移動した事実をどこに残すか</td><td>旧表から削除した瞬間、申請時の情報が消える</td></tr>
+      <tr><td>遷移失敗</td><td>旧表削除後、新表INSERT前に失敗したらどう復旧するか</td><td>行がどの状態にも存在しない中間事故が起きる</td></tr>
+      <tr><td>再入会</td><td>退会表から現役表へ戻すのか、新しい会員資格を作るのか</td><td>過去の退会行を削除して現役に戻し、履歴が消える</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call warn"><div class="h">強い薬として扱う</div><div>状態別テーブル方式は、状態ごとの制約を強くできる代わりに、横断参照・履歴・遷移整合性を難しくする。単に「status列が嫌だから」ではなく、「状態ごとに型が違い、同じ表に入れると制約が書けない」場合に選ぶ。</div></div>
+</section>
+
+<section id="s34" class="focus">
+  <h2 class="sec"><span class="num">34</span>承認ワークフローの難所パターン ― 承認結果だけでなく、承認作業をモデル化する</h2>
+  <p class="lead">承認は <code>approved_by</code> と <code>approved_at</code> だけでは足りないことが多い。実務には、差し戻し、再申請、代理承認、合議、条件付き承認、期限切れ、自動承認、並列承認、承認者変更、承認ルート改定がある。これらを「申請の状態」だけで持つと、承認作業の事実が消える。</p>
+
+  <h3>承認モデルの層</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>層</th><th>表の例</th><th>役割</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>対象業務</td><td><code>change_request</code>, <code>membership_application</code></td><td>承認される対象そのもの</td><td>承認のためだけの列で肥大化させない</td></tr>
+      <tr><td>承認インスタンス</td><td><code>approval_instance</code></td><td>1回の承認プロセス全体</td><td>対象業務IDを汎用参照にするか、業務別に表を分けるか判断</td></tr>
+      <tr><td>承認ステップ</td><td><code>approval_step</code></td><td>部長承認、品質承認、経理承認などの段階</td><td>順序、並列、n-of-m、スキップ条件を持つ</td></tr>
+      <tr><td>承認タスク</td><td><code>approval_task</code></td><td>誰が処理すべき作業か</td><td>代理・再割当・期限・通知と相性がよい</td></tr>
+      <tr><td>承認アクション</td><td><code>approval_action</code></td><td>承認・却下・差戻・コメントなどの事実</td><td>追記専用にする。修正は取消/訂正アクション</td></tr>
+      <tr><td>承認定義</td><td><code>approval_route_def</code>, <code>approval_rule</code></td><td>ルートの版管理</td><td>実行時には定義をスナップショット化する</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>なぜ承認定義の版が必要か</h3>
+  <p>承認ルートは運用中に変わる。今月から品質部門の承認が追加されたとしても、先月開始した申請を新ルートで扱うとは限らない。承認インスタンス開始時点で「どのルート定義のどの版を使ったか」を固定しないと、過去の申請を再表示した時に、存在しなかった承認ステップが突然現れる。</p>
+  <div class="call mech"><div class="h">機序: ワークフロー定義とワークフロー実行は別物</div><div>定義表は「これから作る承認プロセスの雛形」、インスタンス表は「実際に開始された承認プロセス」。定義変更で過去のインスタンスが変わると監査不能になる。実行時には、定義のIDだけでなく必要な承認者・条件・順序をスナップショットとして持つか、定義版を不変化する。</div></div>
+
+  <h3>並列承認とn-of-m承認</h3>
+  <p>実務でありがちな「3人中2人が承認すればよい」は、単純なステータスでは表現しづらい。ステップに <code>required_approval_count</code> を持ち、タスク単位のアクションを集計してステップ完了を判定する。</p>
+  <pre><code>CREATE TABLE approval_step (
+  approval_step_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  approval_instance_id NUMBER NOT NULL REFERENCES approval_instance(approval_instance_id),
+  step_no NUMBER NOT NULL,
+  step_type VARCHAR2(30) NOT NULL CHECK (step_type IN ('SEQUENTIAL','PARALLEL','N_OF_M')),
+  required_approval_count NUMBER,
+  status VARCHAR2(30) NOT NULL
+);
+
+CREATE TABLE approval_task (
+  approval_task_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  approval_step_id NUMBER NOT NULL REFERENCES approval_step(approval_step_id),
+  assignee_user_id NUMBER NOT NULL,
+  task_status VARCHAR2(30) NOT NULL CHECK (task_status IN ('OPEN','APPROVED','REJECTED','RETURNED','CANCELLED','EXPIRED')),
+  due_at TIMESTAMP
+);</code></pre>
+
+  <h3>差し戻しの設計</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>差し戻し方式</th><th>内容</th><th>向く状況</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>申請全体を下書きに戻す</td><td>承認インスタンスを終了し、申請を再編集状態へ</td><td>再申請時に全ルートをやり直す</td><td>旧承認アクションを残す</td></tr>
+      <tr><td>特定ステップへ戻す</td><td>品質承認まで戻す、直属上長まで戻すなど</td><td>多段承認で一部だけやり直す</td><td>再開点と無効化される後続タスクを明示</td></tr>
+      <tr><td>修正依頼としてタスクを追加</td><td>申請状態は審査中のまま、申請者へ修正タスクを発行</td><td>軽微な補足・添付差替</td><td>申請内容の版と承認時点の内容を紐づける</td></tr>
+      <tr><td>却下として終了</td><td>差戻ではなく否決扱い</td><td>再申請は新規申請として扱う</td><td>却下と差戻の意味を混同しない</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>承認対象の多態性</h3>
+  <p>承認対象が入会申請、部品改訂、価格変更、退会申請など複数ある場合、<code>approval_instance(target_type, target_id)</code> の汎用参照を作りたくなる。これは便利だがFKが効かない。代替として、業務別の承認インスタンス表、対象ごとの関連表、共通の <code>approvable_object</code> スーパータイプを置く方式がある。排他的FKの問題は第39節で詳述する。</p>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>承認が1段だけなら、対象表に承認列 + 履歴表で足りる。2段以上、代理承認、差戻、再申請、承認ルート変更があるなら、承認インスタンス・ステップ・タスク・アクションを分ける。承認定義は必ず版管理する。</div></div>
+</section>
+
+<section id="s35" class="focus">
+  <h2 class="sec"><span class="num">35</span>権限・アカウント・会員資格の分離 ― userテーブルに全部持たせない</h2>
+  <p class="lead">「ユーザー」という言葉は雑に使われやすい。ログイン主体、人物、会員資格、従業員、顧客、権限ロール、認証プロバイダのアカウントは別概念である。特に退会・停止・組織異動・外部ID連携があるシステムでは、この分離が後の保守性を決める。</p>
+
+  <h3>代表的な分離モデル</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>表</th><th>意味</th><th>主な列</th><th>変化の仕方</th></tr></thead>
+    <tbody>
+      <tr><td><code>party</code></td><td>個人・法人・組織など、契約や所有の主体</td><td>party_type, canonical_name</td><td>名寄せ・分割・承継がある</td></tr>
+      <tr><td><code>person_profile</code></td><td>個人属性</td><td>name, birth_date, contact_id</td><td>訂正・匿名化がある</td></tr>
+      <tr><td><code>account</code></td><td>認証・ログインの主体</td><td>login_id, auth_status, mfa_enabled</td><td>ロック・無効化・プロバイダ変更がある</td></tr>
+      <tr><td><code>membership</code></td><td>サービス上の会員資格</td><td>member_no, plan, valid_from, valid_to</td><td>入会・退会・再入会がある</td></tr>
+      <tr><td><code>role_assignment</code></td><td>権限付与</td><td>role_id, scope, valid_from, valid_to</td><td>期間・組織・対象スコープで変わる</td></tr>
+      <tr><td><code>external_identity</code></td><td>外部IdPや外部システム上の識別子</td><td>provider, external_subject, valid_from</td><td>連携解除・再連携・ID変更がある</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>なぜ分けるのか</h3>
+  <p>ログイン停止は、必ずしも会員資格の終了ではない。未払いで一時停止しても会員契約は残ることがある。退会しても、請求履歴や問い合わせ履歴の主体として人物または匿名化された主体は残ることがある。SSO連携を解除しても、内部会員資格は残る。これらをすべて <code>users.status</code> に押し込むと、状態数が爆発する。</p>
+
+  <h3>状態の直積爆発</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>軸</th><th>値の例</th><th>混ぜた場合の問題</th></tr></thead>
+    <tbody>
+      <tr><td>認証状態</td><td>有効、ロック、パスワード期限切れ、MFA未設定、外部IdP停止</td><td>会員状態と混ぜると「退会済みだがログインロック中」など意味不明な複合状態が出る</td></tr>
+      <tr><td>会員資格</td><td>申請中、会員中、退会予定、退会済み、再入会済み</td><td>認証・請求・権限の都合で状態値が増え続ける</td></tr>
+      <tr><td>権限</td><td>一般、管理者、承認者、代理承認者、閲覧のみ</td><td>ロール変更が会員状態変更として記録され、監査が崩れる</td></tr>
+      <tr><td>規約同意</td><td>未同意、同意済み、再同意待ち</td><td>同意待ちをログイン不可にするか会員停止にするかが曖昧</td></tr>
+      <tr><td>制裁・制限</td><td>一時停止、永久BAN、本人確認待ち、要審査</td><td>退会とは別の再登録防止・審査履歴を失う</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call mech"><div class="h">機序: 状態軸を分けないと組合せが増殖する</div><div>5つの軸がそれぞれ4状態を持つと、理論上は4^5=1024通りの状態がある。実装者はその全てを <code>user_status</code> の列挙値で表すことはできない。軸ごとに表・列・履歴を分け、最終的な利用可否はビューや判定関数で導出する方が保守しやすい。</div></div>
+
+  <h3>利用可否は状態の合成ビューにする</h3>
+  <pre><code>CREATE VIEW v_account_effective_access AS
+SELECT a.account_id,
+       m.membership_id,
+       CASE
+         WHEN a.auth_status != 'ENABLED' THEN 'DENY_AUTH'
+         WHEN CURRENT_DATE NOT BETWEEN m.valid_from AND m.valid_to THEN 'DENY_MEMBERSHIP'
+         WHEN EXISTS (SELECT 1 FROM account_restriction r
+                     WHERE r.account_id = a.account_id
+                       AND r.valid_from &lt;= SYSTIMESTAMP
+                       AND r.valid_to   &gt;  SYSTIMESTAMP) THEN 'DENY_RESTRICTION'
+         ELSE 'ALLOW'
+       END AS access_decision
+FROM account a
+LEFT JOIN membership m ON m.party_id = a.party_id;</code></pre>
+  <p>このように、元データは軸ごとに分け、画面やAPIが欲しい「使える/使えない」はビューで合成する。ビューは制約の代わりではないが、読み取り側の複雑さを局所化できる。</p>
+
+  <div class="call tip"><div class="h">おすすめ</div><div><code>user</code> という表名を使う場合でも、何のユーザーかを明確にする。認証なら <code>account</code>、会員資格なら <code>membership</code>、人物なら <code>person</code>、外部主体なら <code>external_identity</code> と分ける方が、退会・停止・再入会・権限移譲に強い。</div></div>
+</section>
+
+<section id="s36" class="focus">
+  <h2 class="sec"><span class="num">36</span>二時間軸・訂正・遡及反映 ― 「いつ起きたか」と「いつ知ったか」を分ける</h2>
+  <p class="lead">履歴設計で最も見落とされるのは、時間が1種類ではないこと。業務上の有効日、実際の発生日、システム登録日、承認日、外部システム連携日、訂正日がずれる。これを1つの <code>created_at</code> や <code>updated_at</code> で代用すると、遡及訂正や過去時点再現ができない。</p>
+
+  <h3>時間列の種類</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>時間</th><th>意味</th><th>例</th><th>設計上の注意</th></tr></thead>
+    <tbody>
+      <tr><td>発生時刻</td><td>出来事が現実に起きた時刻</td><td>入金日時、出庫日時、事故発生日</td><td>イベントに必須。後から登録されることがある</td></tr>
+      <tr><td>登録時刻</td><td>DBに記録された時刻</td><td>データ取込日時、申請入力日時</td><td>監査・遅延検知に必要</td></tr>
+      <tr><td>有効期間</td><td>業務上その値が有効な期間</td><td>価格の適用期間、所属の在籍期間</td><td>半開区間がおすすめ</td></tr>
+      <tr><td>承認時刻</td><td>業務的に有効化された時刻</td><td>価格改定が承認された日時</td><td>発生・登録・有効開始と一致しない</td></tr>
+      <tr><td>システム期間</td><td>DB上でその行がその内容だった期間</td><td>履歴表の <code>recorded_from/to</code></td><td>訂正前の誤った記録を再現できる</td></tr>
+      <tr><td>連携時刻</td><td>外部に送信・受信した時刻</td><td>ERP送信日時、会計IF取込日時</td><td>再送・重複・失敗とセットで管理</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>二時間軸（bitemporal）の考え方</h3>
+  <p>二時間軸では、業務上の有効期間（valid time）と、システムがその事実を記録していた期間（transaction/system time）を分ける。たとえば「4月1日付で所属変更だったが、入力漏れで4月10日に登録した」という場合、有効開始日は4月1日、システム登録日は4月10日になる。</p>
+  <pre><code>CREATE TABLE employee_assignment_history (
+  assignment_hist_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  employee_id NUMBER NOT NULL,
+  department_id NUMBER NOT NULL,
+  valid_from DATE NOT NULL,
+  valid_to   DATE NOT NULL,
+  recorded_from TIMESTAMP NOT NULL,
+  recorded_to   TIMESTAMP NOT NULL,
+  correction_reason VARCHAR2(200),
+  CONSTRAINT ck_emp_assign_valid CHECK (valid_from &lt; valid_to),
+  CONSTRAINT ck_emp_assign_record CHECK (recorded_from &lt; recorded_to)
+);</code></pre>
+
+  <h3>訂正の3方式</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>内容</th><th>履歴再現</th><th>複雑度</th><th>向くケース</th></tr></thead>
+    <tbody>
+      <tr><td>上書き訂正</td><td>誤った行をUPDATEする</td><td>弱い</td><td>低い</td><td>監査不要な内部メモ</td></tr>
+      <tr><td>旧行失効 + 新行追加</td><td>誤った有効期間を閉じ、訂正版を追加</td><td>中</td><td>中</td><td>価格・所属・契約などの業務履歴</td></tr>
+      <tr><td>二時間軸</td><td>「当時どう記録していたか」と「今正しいと分かっていること」を両方残す</td><td>強い</td><td>高い</td><td>会計、保険、監査、法務、製造変更管理</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>遡及訂正が絡む失敗例</h3>
+  <p>価格改定を <code>product.price</code> に上書きしていると、「5月時点で出した見積に使った価格」が再現できない。さらに6月に「4月から有効だった価格を訂正」するような遡及処理が入ると、現在値だけでは、4月当時の見積、5月当時の誤価格、6月に訂正後の正価格のどれも表現できない。</p>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>最初から全てを二時間軸にする必要はない。だが、価格、契約、所属、BOM、権限、会計、法的状態のように「過去時点でどうだったか」を問われるデータは、発生時刻・有効期間・登録時刻を分けておく。最低でも上書き前の履歴は残す。</div></div>
+</section>
+
+<section id="s37" class="focus">
+  <h2 class="sec"><span class="num">37</span>履歴方式の比較カタログ ― 監査ログ、履歴表、SCD2、Temporal、イベントストア</h2>
+  <p class="lead">履歴と一口に言っても、目的によって必要な形は違う。監査したいのか、過去時点を再現したいのか、差分同期したいのか、イベントから状態を再構築したいのかで、選ぶべき方式は変わる。</p>
+
+  <h3>履歴方式の比較</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>何を残すか</th><th>得意</th><th>苦手</th><th>おすすめ場面</th></tr></thead>
+    <tbody>
+      <tr><td>更新日時・更新者列</td><td>最後に誰がいつ更新したか</td><td>最低限の運用確認</td><td>過去値は残らない</td><td>ほぼ全表の最低装備</td></tr>
+      <tr><td>監査ログ</td><td>操作、変更前後、実行者、理由</td><td>説明責任・不正調査</td><td>業務クエリには使いにくい</td><td>管理画面、権限変更、個人情報変更</td></tr>
+      <tr><td>履歴表</td><td>変更後のスナップショットを時系列で保存</td><td>過去値参照</td><td>差分理由が弱い</td><td>マスタ変更履歴</td></tr>
+      <tr><td>SCD Type 2</td><td>有効期間付きの版</td><td>過去時点集計、DWH</td><td>重複期間排他が難しい</td><td>所属、価格、取引先属性</td></tr>
+      <tr><td>Temporal Validity</td><td>有効時間次元</td><td>有効時点の問い合わせ</td><td>業務イベントの意味までは残さない</td><td>Oracleで有効期間を使う業務</td></tr>
+      <tr><td>Flashback Time Travel</td><td>DB上の変更履歴</td><td>過去版追跡、保護、監査補助</td><td>業務イベント設計の代替ではない</td><td>重要表の保護・過去問い合わせ</td></tr>
+      <tr><td>イベントストア</td><td>業務イベントそのもの</td><td>再構築、監査、派生ビュー生成</td><td>実装・運用・イベント進化が難しい</td><td>金融、在庫、ワークフロー、状態遷移の説明責任</td></tr>
+      <tr><td>CDC/Outbox</td><td>変更を外部へ伝えるためのログ</td><td>連携・非同期処理</td><td>業務意味が薄いと再利用しにくい</td><td>検索基盤、DWH、外部サービス連携</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>監査ログとイベントソーシングを混同しない</h3>
+  <p>監査ログは「何をしたかの証跡」であり、イベントソーシングは「状態の正本」をイベント列に置く設計である。監査ログがあっても、そこから現在状態を再構築できるとは限らない。逆にイベントソーシングを採用しても、誰がどの画面から操作したか、失敗した認可試行、閲覧履歴などの監査ログが別途必要になることがある。</p>
+
+  <h3>履歴表の設計例</h3>
+  <pre><code>CREATE TABLE supplier (
+  supplier_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  supplier_code VARCHAR2(50) NOT NULL,
+  current_name VARCHAR2(200) NOT NULL,
+  current_status VARCHAR2(30) NOT NULL
+);
+
+CREATE TABLE supplier_history (
+  supplier_history_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  supplier_id NUMBER NOT NULL REFERENCES supplier(supplier_id),
+  name VARCHAR2(200) NOT NULL,
+  status VARCHAR2(30) NOT NULL,
+  valid_from DATE NOT NULL,
+  valid_to DATE NOT NULL,
+  changed_at TIMESTAMP NOT NULL,
+  changed_by NUMBER,
+  change_reason VARCHAR2(400),
+  CONSTRAINT ck_supplier_hist_period CHECK (valid_from &lt; valid_to)
+);</code></pre>
+
+  <h3>履歴方式を選ぶ問い</h3>
+  <ol>
+    <li>過去値を見るだけでよいか、過去時点の業務判断を再現したいか。</li>
+    <li>履歴は人間が読むのか、SQLで集計するのか、システムが再生するのか。</li>
+    <li>訂正前の誤った記録も残す必要があるか。</li>
+    <li>外部システムへ変更を伝える必要があるか。</li>
+    <li>履歴データの保持期限・匿名化・アーカイブはどうするか。</li>
+  </ol>
+
+  <div class="call warn"><div class="h">警告</div><div>「履歴が必要になったら後で履歴表を追加する」は危険。現在値だけを上書きしていた期間の履歴は復元できない。最低限、重要な状態変更・金額変更・所有者変更・権限変更・外部ID変更は初期から履歴化する。</div></div>
+</section>
+
+<section id="s38" class="focus">
+  <h2 class="sec"><span class="num">38</span>部品タイプ別属性の追加バリエーション ― 4種類で済む今と、40種類になる未来を分ける</h2>
+  <p class="lead">「ある部品が4種類あり、それぞれ管理データが違う」問題は、RDB設計の典型的な多態問題である。4種類で固定なら堅い設計を選べるが、将来40種類になり、属性もユーザー定義になるなら、柔軟性を残す必要がある。</p>
+
+  <h3>方式の追加比較</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>例</th><th>制約</th><th>検索</th><th>変更耐性</th><th>コメント</th></tr></thead>
+    <tbody>
+      <tr><td>単一表継承(STI)</td><td><code>part(part_type, motor_voltage, resin_grade...)</code></td><td>弱い。NULL多め</td><td>強い</td><td>低〜中</td><td>種類が少なく列差が小さいなら可</td></tr>
+      <tr><td>クラス表継承</td><td><code>part</code> + <code>motor_part</code> + <code>plastic_part</code></td><td>強い</td><td>JOIN要</td><td>中</td><td>型ごとに必須列が違うなら第一候補</td></tr>
+      <tr><td>具象表継承</td><td><code>motor_part</code>, <code>plastic_part</code> のみ</td><td>強い</td><td>横断UNION</td><td>中</td><td>共通処理が少ないなら候補</td></tr>
+      <tr><td>拡張属性テーブル</td><td><code>part_attribute_value</code></td><td>弱い</td><td>弱い〜中</td><td>高い</td><td>自由属性・PLM的特性に向くが乱用注意</td></tr>
+      <tr><td>JSON列</td><td><code>part.spec_json</code></td><td>中。JSON制約・関数索引次第</td><td>中</td><td>高い</td><td>検索しない詳細仕様・外部APIの形保持に向く</td></tr>
+      <tr><td>テンプレート/属性定義</td><td><code>part_type_attribute_def</code></td><td>アプリ制約中心</td><td>中</td><td>高い</td><td>ユーザー定義属性を管理する業務に向く</td></tr>
+      <tr><td>Oracle JSON Relational Duality</td><td>関係表をJSON文書として公開</td><td>関係表側で守れる</td><td>用途次第</td><td>中〜高</td><td>階層的APIとRDB正本を両立したい場合に検討</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>4種類固定の場合のおすすめ</h3>
+  <p>種類が4つで、各タイプの属性が明確で、画面・検索・帳票で型別属性を使うなら、共通の <code>part</code> と型別詳細表の組合せが最も説明しやすい。</p>
+  <pre><code>CREATE TABLE part (
+  part_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  part_no VARCHAR2(80) NOT NULL,
+  part_type VARCHAR2(30) NOT NULL CHECK (part_type IN ('MECHANICAL','ELECTRICAL','SOFTWARE','PURCHASED')),
+  part_name VARCHAR2(200) NOT NULL,
+  lifecycle_status VARCHAR2(30) NOT NULL,
+  CONSTRAINT uk_part_no UNIQUE (part_no)
+);
+
+CREATE TABLE electrical_part_detail (
+  part_id NUMBER PRIMARY KEY REFERENCES part(part_id),
+  rated_voltage NUMBER,
+  current_rating NUMBER,
+  insulation_class VARCHAR2(30)
+);
+
+CREATE TABLE software_part_detail (
+  part_id NUMBER PRIMARY KEY REFERENCES part(part_id),
+  repository_url VARCHAR2(500),
+  license_type VARCHAR2(80),
+  binary_hash VARCHAR2(128)
+);</code></pre>
+
+  <h3>将来タイプが増える場合の折衷</h3>
+  <p>将来タイプが増えるが、重要属性は検索・制約対象になる場合、「共通列 + 主要タイプ詳細表 + JSON自由特性」の三層にする。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>属性の種類</th><th>置き場所</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td>全部品に共通し、検索・JOINする属性</td><td><code>part</code> の通常列</td><td>型・NOT NULL・索引・FKを使う</td></tr>
+      <tr><td>タイプ固有だが重要な属性</td><td>タイプ別詳細表</td><td>必須制約・範囲制約・単位管理を効かせる</td></tr>
+      <tr><td>外部仕様、表示用、低頻度検索</td><td>JSON列</td><td>柔軟性を優先。必要なら関数索引や検索ビュー</td></tr>
+      <tr><td>ユーザー定義で分析対象になる属性</td><td>属性定義 + 値表 + 型別値列</td><td>統制されたEAVとして設計する。無秩序なEAVは避ける</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>属性定義型EAVを使うなら最低限守ること</h3>
+  <ul>
+    <li>属性定義表にデータ型、単位、必須可否、有効期間、適用部品タイプを持つ。</li>
+    <li>値表を文字列1列にしない。数値、日付、文字列、コード値を分けるか、型チェックを強制する。</li>
+    <li>頻繁に検索する属性は通常列または検索用投影表に昇格する。</li>
+    <li>属性名をユーザー入力の表示名だけにしない。安定した属性コードを持つ。</li>
+    <li>単位変換を設計する。<code>10mm</code> と <code>1cm</code> を文字列比較してはいけない。</li>
+  </ul>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>PLM/BOM系では「最初は4種類だが、後から品目分類・属性体系が増える」ことが多い。主要属性は関係表で堅く、自由特性はJSONまたは統制EAVへ逃がし、検索対象になった属性を後で昇格できる設計にする。</div></div>
+</section>
+
+<section id="s39" class="focus">
+  <h2 class="sec"><span class="num">39</span>排他的FK・多態参照の追加妙技 ― 「どれか1つを参照する」をどう守るか</h2>
+  <p class="lead">排他的外部キーは、RDBの弱点が出やすい。1つの行が、注文・申請・部品改訂・退会ケースのどれか1つだけを参照するような場合、単純なFKでは表現しづらい。実務では複数の妥協案を使い分ける。</p>
+
+  <h3>方式比較</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>形</th><th>FK整合性</th><th>拡張性</th><th>向くケース</th></tr></thead>
+    <tbody>
+      <tr><td>nullable FK複数 + CHECK</td><td><code>order_id</code>, <code>application_id</code>, <code>part_rev_id</code></td><td>強い</td><td>対象追加で列追加</td><td>対象種別が少数固定</td></tr>
+      <tr><td>型 + ID</td><td><code>target_type</code>, <code>target_id</code></td><td>弱い</td><td>高い</td><td>ログ・通知・検索など参照が緩いもの</td></tr>
+      <tr><td>スーパータイプ表</td><td><code>approvable_object</code> を作り、各対象が1:1でぶら下がる</td><td>強い</td><td>中</td><td>承認対象・添付対象など共通扱いが多い</td></tr>
+      <tr><td>関連表を対象ごとに分ける</td><td><code>order_comment</code>, <code>application_comment</code></td><td>強い</td><td>中</td><td>対象ごとに意味や制約が違う</td></tr>
+      <tr><td>共通イベント/添付テーブル + 対象別ブリッジ</td><td><code>attachment</code> + <code>order_attachment</code></td><td>強い</td><td>中</td><td>添付・コメント・タグなどを共通管理したい</td></tr>
+      <tr><td>DB assertions / トリガ</td><td>複数表を見て排他性を検査</td><td>実装次第</td><td>中</td><td>DBで複雑制約を守りたい場合</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>nullable FK複数 + CHECK</h3>
+  <pre><code>CREATE TABLE approval_instance (
+  approval_instance_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  membership_application_id NUMBER REFERENCES membership_application(application_id),
+  withdrawal_case_id        NUMBER REFERENCES withdrawal_case(withdrawal_case_id),
+  part_change_request_id    NUMBER REFERENCES part_change_request(request_id),
+  CONSTRAINT ck_approval_target_one CHECK (
+    (CASE WHEN membership_application_id IS NOT NULL THEN 1 ELSE 0 END) +
+    (CASE WHEN withdrawal_case_id        IS NOT NULL THEN 1 ELSE 0 END) +
+    (CASE WHEN part_change_request_id    IS NOT NULL THEN 1 ELSE 0 END) = 1
+  )
+);</code></pre>
+  <p>対象が少数で固定なら、最も素直で強い。欠点は列が増えること、対象ごとのSQLが少し冗長になること。ただしFKが効くため、保守性は高い。</p>
+
+  <h3>スーパータイプ表方式</h3>
+  <pre><code>CREATE TABLE approvable_object (
+  approvable_object_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  object_type VARCHAR2(40) NOT NULL CHECK (object_type IN ('MEMBERSHIP_APPLICATION','WITHDRAWAL_CASE','PART_CHANGE')),
+  created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE membership_application (
+  application_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  approvable_object_id NUMBER NOT NULL UNIQUE REFERENCES approvable_object(approvable_object_id),
+  applicant_party_id NUMBER NOT NULL
+);
+
+CREATE TABLE approval_instance (
+  approval_instance_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  approvable_object_id NUMBER NOT NULL REFERENCES approvable_object(approvable_object_id)
+);</code></pre>
+  <p>承認対象、添付対象、コメント対象のように「共通に扱う理由」が明確な場合に強い。ただし、スーパータイプを作りすぎると抽象テーブルだらけになる。共通操作がないなら無理に作らない。</p>
+
+  <h3>型 + ID方式を使ってよい条件</h3>
+  <p><code>target_type</code> + <code>target_id</code> はFKが効かないため、原則として正本データには避ける。ただし、通知ログ、操作ログ、検索インデックス、監査補助、外部リンクのように「参照先が消えてもログとして意味が残る」場合は許容されることがある。</p>
+
+  <div class="call warn"><div class="h">警告</div><div>型+ID方式を正本の関連に使うと、存在しない対象を参照する行が簡単に作れる。アプリのバグ、バッチの順序ミス、手動修正で壊れたデータが入ってもDBが止めない。使うなら調定クエリと修復手順を設計に含める。</div></div>
+
+  <h3>排他的FKの調定クエリ例</h3>
+  <pre><code>-- 型+ID方式を使った場合の調定例
+SELECT l.*
+FROM generic_link l
+WHERE (l.target_type = 'ORDER' AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.order_id = l.target_id))
+   OR (l.target_type = 'APPLICATION' AND NOT EXISTS (SELECT 1 FROM membership_application a WHERE a.application_id = l.target_id))
+   OR (l.target_type = 'PART_REVISION' AND NOT EXISTS (SELECT 1 FROM part_revision r WHERE r.part_revision_id = l.target_id));</code></pre>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>対象が3〜5種類程度で固定なら nullable FK + CHECK。共通操作が多いならスーパータイプ。対象が多く、参照がログ的・検索的なら型+IDも可。ただし正本の業務整合性が必要な関連で型+IDを使う場合は、かなり慎重に扱う。</div></div>
+</section>
+
+<section id="s40" class="focus">
+  <h2 class="sec"><span class="num">40</span>一意性がないデータの受け皿設計 ― 無理にユニーク制約を作らない</h2>
+  <p class="lead">現実には、ユニークキーが存在しないデータがある。氏名・住所・電話番号・メール・品名・外部ファイル行番号・図番の一部は、単独では一意にならない。無理に「それっぽい複合キー」を作ると、重複・誤統合・取込不能の原因になる。</p>
+
+  <h3>一意性がない理由</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>理由</th><th>例</th><th>設計上の扱い</th></tr></thead>
+    <tbody>
+      <tr><td>自然に重複する</td><td>同姓同名、同一住所の家族、同名部品</td><td>代理キーを発行し、候補重複として扱う</td></tr>
+      <tr><td>表記揺れ</td><td>株式会社ABC、ABC Co., Ltd.、ＡＢＣ</td><td>正規化値・検索キー・名寄せ候補を別管理</td></tr>
+      <tr><td>外部システムが保証しない</td><td>CSVの伝票番号が部門内でしか一意でない</td><td>source_system + batch_id + row_no で受け、業務一意性は後段で判定</td></tr>
+      <tr><td>時間で変わる</td><td>メールアドレス再利用、社員番号再発行</td><td>有効期間付き識別子として扱う</td></tr>
+      <tr><td>後から統合・分割される</td><td>取引先名寄せ、部品統合、組織再編</td><td>同一性マップ・統合履歴を持つ</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>受け皿としてのステージング表</h3>
+  <pre><code>CREATE TABLE import_batch (
+  import_batch_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  source_system_code VARCHAR2(50) NOT NULL,
+  source_file_name VARCHAR2(500),
+  imported_at TIMESTAMP NOT NULL,
+  import_status VARCHAR2(30) NOT NULL
+);
+
+CREATE TABLE import_customer_raw (
+  import_customer_raw_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  import_batch_id NUMBER NOT NULL REFERENCES import_batch(import_batch_id),
+  source_row_no NUMBER NOT NULL,
+  raw_customer_name VARCHAR2(400),
+  raw_address VARCHAR2(1000),
+  raw_phone VARCHAR2(100),
+  normalized_name VARCHAR2(400),
+  normalized_address VARCHAR2(1000),
+  match_status VARCHAR2(30) NOT NULL,
+  matched_party_id NUMBER,
+  CONSTRAINT uk_import_customer_raw UNIQUE (import_batch_id, source_row_no)
+);</code></pre>
+  <p>外部データは、いきなり本番マスタへ入れない。まず「受け取った事実」をステージングに保存し、正規化・重複候補抽出・人手確認・採番を経て本番へ昇格する。これにより、ユニークキーがないデータでも取込の再現性を保てる。</p>
+
+  <h3>疑似ユニークキーの危険</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>疑似キー</th><th>一見よさそうな理由</th><th>破綻例</th></tr></thead>
+    <tbody>
+      <tr><td>氏名 + 生年月日</td><td>人を特定できそう</td><td>双子、誤入力、改姓、法人顧客、空値</td></tr>
+      <tr><td>会社名 + 住所</td><td>法人を特定できそう</td><td>本社移転、支店、同一ビル、表記揺れ</td></tr>
+      <tr><td>品名 + メーカー</td><td>部品を特定できそう</td><td>仕様違い、型番改定、OEM、同一品名の別品</td></tr>
+      <tr><td>メールアドレス</td><td>ログインIDとして一意にできそう</td><td>再利用、家族共有、変更、外部IdP連携解除</td></tr>
+      <tr><td>外部伝票番号</td><td>外部が一意と思える</td><td>会社・拠点・年度でしか一意でない</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>マッチ候補として扱う</h3>
+  <p>一意でないデータは、キーではなく「照合特徴量」として扱う。完全一致、正規化一致、類似一致、外部ID一致、住所一致、電話一致などをスコア化し、確信度に応じて自動統合・人手確認・新規作成に分ける。</p>
+  <pre><code>CREATE TABLE party_match_candidate (
+  match_candidate_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  raw_record_id NUMBER NOT NULL,
+  candidate_party_id NUMBER NOT NULL REFERENCES party(party_id),
+  match_score NUMBER(5,2) NOT NULL,
+  match_reason VARCHAR2(1000),
+  decision_status VARCHAR2(30) NOT NULL CHECK (decision_status IN ('PENDING','ACCEPTED','REJECTED','AUTO_ACCEPTED')),
+  decided_by NUMBER,
+  decided_at TIMESTAMP
+);</code></pre>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>一意性がないなら、無理に本番表へUNIQUE制約を置かない。内部代理キーで受け、外部データの粒度・出所・取込単位・照合結果を残す。ユニーク制約を置くのは、業務が本当に保証する識別子だけにする。</div></div>
+</section>
+
+<section id="s41" class="focus">
+  <h2 class="sec"><span class="num">41</span>変更される外部キー・名寄せ・承継 ― 外部システムのIDを信じすぎない</h2>
+  <p class="lead">外部システム連携では、主キーが変更される、同じ実体に複数IDが付く、IDが再利用される、統合・分割される、ということが起こる。外部IDを内部PKにすると、外部の都合が内部DB全体を揺らす。</p>
+
+  <h3>内部同一性と外部識別子を分ける</h3>
+  <pre><code>CREATE TABLE item_identity (
+  item_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  identity_status VARCHAR2(30) NOT NULL,
+  created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE external_item_identifier (
+  external_item_identifier_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  item_id NUMBER NOT NULL REFERENCES item_identity(item_id),
+  source_system_code VARCHAR2(50) NOT NULL,
+  external_item_code VARCHAR2(120) NOT NULL,
+  valid_from TIMESTAMP NOT NULL,
+  valid_to TIMESTAMP NOT NULL,
+  identifier_status VARCHAR2(30) NOT NULL,
+  CONSTRAINT uk_external_item_identifier UNIQUE (source_system_code, external_item_code, valid_from)
+);</code></pre>
+  <p>内部の <code>item_id</code> は変えない。外部コードは有効期間付きの別表で持つ。外部コード変更は、旧行の <code>valid_to</code> を閉じ、新しい外部コード行を追加する。</p>
+
+  <h3>統合・分割・承継のパターン</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>事象</th><th>例</th><th>危険な処理</th><th>安全な処理</th></tr></thead>
+    <tbody>
+      <tr><td>名称変更</td><td>会社名変更、部品名変更</td><td>新規別エンティティにする</td><td>同一IDの属性履歴として変更</td></tr>
+      <tr><td>ID変更</td><td>外部品番変更、社員番号変更</td><td>内部PKを更新</td><td>外部ID履歴を追加</td></tr>
+      <tr><td>統合</td><td>重複顧客を1つにまとめる</td><td>片方を削除し、過去FKを付け替える</td><td>統合イベントと別名/旧IDマップを残す</td></tr>
+      <tr><td>分割</td><td>会社分割、部品の仕様分離</td><td>元IDを上書きして片方だけ残す</td><td>承継関係を持つ。過去事実は元IDに残す</td></tr>
+      <tr><td>再利用</td><td>外部コードが別実体に再利用</td><td>コードだけでJOIN</td><td>source + code + 有効期間で解決</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>同一性イベントを持つ</h3>
+  <pre><code>CREATE TABLE identity_event (
+  identity_event_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  event_type VARCHAR2(40) NOT NULL CHECK (event_type IN ('MERGED','SPLIT','RENAMED','EXTERNAL_ID_CHANGED','SUCCESSOR_ASSIGNED')),
+  occurred_at TIMESTAMP NOT NULL,
+  reason VARCHAR2(1000),
+  created_by NUMBER
+);
+
+CREATE TABLE identity_event_party (
+  identity_event_id NUMBER NOT NULL REFERENCES identity_event(identity_event_id),
+  item_id NUMBER NOT NULL REFERENCES item_identity(item_id),
+  role_code VARCHAR2(30) NOT NULL CHECK (role_code IN ('SOURCE','TARGET','PREDECESSOR','SUCCESSOR')),
+  PRIMARY KEY (identity_event_id, item_id, role_code)
+);</code></pre>
+  <p>統合や分割は単なる属性変更ではない。「AとBを統合してCにした」「AをBとCへ分割した」という事実そのものをイベントとして残す。過去の取引を新IDへ全部付け替えると、当時の事実が改竄されることがある。</p>
+
+  <h3>FKを付け替えるべきか、ビューで寄せるべきか</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>選択</th><th>内容</th><th>向くケース</th><th>リスク</th></tr></thead>
+    <tbody>
+      <tr><td>過去FKを付け替える</td><td>重複統合後、全取引を代表IDへ更新</td><td>過去も同じ主体として扱うことが明確</td><td>当時の請求先・契約主体が変わって見える</td></tr>
+      <tr><td>過去FKは残す</td><td>旧IDのまま履歴を保持し、現在表示だけ代表へ寄せる</td><td>監査・会計・契約が重要</td><td>集計時に代表ID解決が必要</td></tr>
+      <tr><td>承継ビューで解決</td><td>過去ID→現在代表IDをビューで計算</td><td>表示・検索で統合後の姿を見たい</td><td>承継ルールが複雑になる</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>外部IDは必ず別表にする。内部PKはシステムが発行する代理キーにする。統合・分割・承継は、過去FKを機械的に付け替える前に、過去事実を変えてよいかを業務・法務・会計の観点で確認する。</div></div>
+</section>
+
+<section id="s42" class="focus">
+  <h2 class="sec"><span class="num">42</span>在庫・残高・引当などホット集約 ― 可変列、イベント台帳、予約を使い分ける</h2>
+  <p class="lead">在庫数、残高、座席数、ポイント残高、予約可能数のような数値集約は、多数トランザクションが同じ行を更新するためホットスポットになりやすい。単に <code>stock_qty</code> をUPDATEする設計は簡単だが、履歴・競合・訂正・引当で苦しくなる。</p>
+
+  <h3>方式比較</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>形</th><th>強い点</th><th>弱い点</th><th>向くケース</th></tr></thead>
+    <tbody>
+      <tr><td>現在残高列</td><td><code>item_stock.onhand_qty</code></td><td>読みが速い。実装が単純</td><td>なぜその値か説明しづらい。同時更新競合</td><td>低頻度・監査軽め</td></tr>
+      <tr><td>イベント台帳</td><td><code>stock_ledger</code> を追記し、残高を集計</td><td>履歴・訂正・監査に強い</td><td>毎回集計は重い</td><td>在庫・会計・ポイント</td></tr>
+      <tr><td>台帳 + 現在残高キャッシュ</td><td>イベント追記 + <code>current_balance</code></td><td>説明責任と読み性能の両立</td><td>二重管理。調定が必要</td><td>実務上の第一候補</td></tr>
+      <tr><td>引当テーブル</td><td><code>reservation</code> で未確定分を別管理</td><td>注文前の仮押さえに強い</td><td>期限切れ・取消・二重引当管理</td><td>EC、座席、在庫引当</td></tr>
+      <tr><td>シャード/バケット残高</td><td>同じ品目残高を複数バケットへ分散</td><td>ホット行を分散</td><td>厳密残高照会が複雑</td><td>極端な高並行</td></tr>
+      <tr><td>Oracle Lock-Free Reservation系</td><td>予約可能列・補償をDB機能で扱う</td><td>ホット集約に対する専用機能</td><td>版・機能・設計制約の検証が必要</td><td>在庫・座席・金融系で検討</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>台帳 + 残高キャッシュの例</h3>
+  <pre><code>CREATE TABLE stock_ledger (
+  stock_ledger_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  item_id NUMBER NOT NULL,
+  location_id NUMBER NOT NULL,
+  event_type VARCHAR2(30) NOT NULL CHECK (event_type IN ('RECEIPT','ISSUE','ADJUSTMENT','RESERVE','RELEASE','SHIP')),
+  quantity_delta NUMBER NOT NULL,
+  occurred_at TIMESTAMP NOT NULL,
+  source_doc_type VARCHAR2(40),
+  source_doc_id NUMBER,
+  reversal_of_ledger_id NUMBER REFERENCES stock_ledger(stock_ledger_id)
+);
+
+CREATE TABLE stock_balance (
+  item_id NUMBER NOT NULL,
+  location_id NUMBER NOT NULL,
+  onhand_qty NUMBER NOT NULL,
+  reserved_qty NUMBER NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (item_id, location_id)
+);</code></pre>
+  <p>台帳は追記専用で、残高は同一トランザクションで更新する。残高は台帳から再計算できる冗長データであるため、定期的に調定する。</p>
+
+  <h3>調定クエリ例</h3>
+  <pre><code>SELECT b.item_id, b.location_id,
+       b.onhand_qty AS cached_onhand,
+       SUM(CASE WHEN l.event_type IN ('RECEIPT','ADJUSTMENT') THEN l.quantity_delta
+                WHEN l.event_type IN ('ISSUE','SHIP') THEN l.quantity_delta
+                ELSE 0 END) AS ledger_onhand
+FROM stock_balance b
+JOIN stock_ledger l
+  ON l.item_id = b.item_id
+ AND l.location_id = b.location_id
+GROUP BY b.item_id, b.location_id, b.onhand_qty
+HAVING b.onhand_qty != SUM(CASE WHEN l.event_type IN ('RECEIPT','ADJUSTMENT','ISSUE','SHIP') THEN l.quantity_delta ELSE 0 END);</code></pre>
+
+  <h3>引当の落とし穴</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>落とし穴</th><th>説明</th><th>対策</th></tr></thead>
+    <tbody>
+      <tr><td>在庫数だけ減らす</td><td>仮押さえと出荷済みが区別できない</td><td>引当、出荷、取消を別イベントにする</td></tr>
+      <tr><td>期限切れを考えない</td><td>カート放置で永遠に在庫が減る</td><td><code>reserved_until</code> と期限切れ解放ジョブ</td></tr>
+      <tr><td>残高更新をアプリで読んで計算</td><td>ロストアップデートの温床</td><td>DB内の差分UPDATE、行ロック、楽観ロック</td></tr>
+      <tr><td>負数を許すか曖昧</td><td>バックオーダー可否が不明</td><td>品目・倉庫・業務ごとのポリシーを持つ</td></tr>
+      <tr><td>補正の履歴を消す</td><td>棚卸差異の原因追跡が不能</td><td>調整イベントとして追記</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>履歴と説明責任が必要なら「台帳 + 残高キャッシュ」。高頻度でホット行になるなら、競合低減方式、予約機能、バケット化、業務単位のパーティションを検討する。残高列だけの設計は、後で必ず「なぜこの残高か」に答えられなくなる。</div></div>
+</section>
+
+<section id="s43" class="focus">
+  <h2 class="sec"><span class="num">43</span>削除・匿名化・保持期限 ― データを消す設計は、作る設計より難しい</h2>
+  <p class="lead">データ削除は単なる <code>DELETE</code> ではない。業務上の削除、画面からの非表示、ログイン不可、個人情報の匿名化、法定保持期限切れ、監査証跡の保持は別物である。削除設計を後回しにすると、データ消失か個人情報過保持のどちらかに倒れる。</p>
+
+  <h3>削除の種類</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>種類</th><th>意味</th><th>DB上の表現</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>業務終了</td><td>退会、契約終了、廃番</td><td><code>ended_at</code>, <code>valid_to</code></td><td>履歴として残す</td></tr>
+      <tr><td>論理削除</td><td>通常画面から非表示</td><td><code>deleted_at</code>, <code>is_deleted</code></td><td>全クエリ条件漏れに注意</td></tr>
+      <tr><td>アーカイブ</td><td>現役系から退避</td><td>archive schema/table</td><td>参照・復元手順を設計</td></tr>
+      <tr><td>匿名化</td><td>個人を識別できないようにする</td><td>個人情報列の消去・ハッシュ化・トークン化</td><td>再識別可能性と監査のバランス</td></tr>
+      <tr><td>物理削除</td><td>行そのものを消す</td><td><code>DELETE</code>, partition drop</td><td>復元不能。対象を限定</td></tr>
+      <tr><td>tombstone</td><td>削除済みの痕跡だけ残す</td><td><code>deleted_object</code> 表</td><td>同期・再作成防止に有効</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>削除設計のパターン</h3>
+  <pre><code>CREATE TABLE deleted_object_tombstone (
+  object_type VARCHAR2(60) NOT NULL,
+  object_id NUMBER NOT NULL,
+  deleted_at TIMESTAMP NOT NULL,
+  deleted_by NUMBER,
+  delete_reason_code VARCHAR2(60),
+  retention_until DATE,
+  PRIMARY KEY (object_type, object_id)
+);</code></pre>
+  <p>tombstoneは、外部同期で「削除されたこと」を伝える、ID再利用を防ぐ、再取込時に復活させない、といった用途に使える。実体データは消しても、削除済みである事実は残せる。</p>
+
+  <h3>匿名化と履歴保持の衝突</h3>
+  <p>監査や請求のために取引履歴は残したいが、退会者の氏名・メール・住所は消したい場合がある。このとき、取引履歴のFK先を物理削除すると壊れる。代わりに、人物IDは残し、個人特定列を匿名化する、または匿名化済みpartyへ付け替える。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>方法</th><th>利点</th><th>欠点</th></tr></thead>
+    <tbody>
+      <tr><td>個人情報列をNULL/固定値にする</td><td>FKを保てる</td><td>どこまで個人情報か棚卸が必要</td></tr>
+      <tr><td>匿名化テーブルへ分離</td><td>PIIの所在を限定できる</td><td>JOINと権限設計が必要</td></tr>
+      <tr><td>暗号化 + 鍵破棄</td><td>履歴行を残しつつ復号不能にできる</td><td>鍵管理・法的解釈・運用が難しい</td></tr>
+      <tr><td>集計値だけ残す</td><td>個人情報リスクが低い</td><td>個別問い合わせに答えられない</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>保持期限をテーブル設計に入れる</h3>
+  <pre><code>CREATE TABLE retention_policy (
+  retention_policy_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  object_type VARCHAR2(60) NOT NULL,
+  retention_basis VARCHAR2(60) NOT NULL,
+  retention_months NUMBER NOT NULL,
+  action_after_retention VARCHAR2(30) NOT NULL CHECK (action_after_retention IN ('ARCHIVE','ANONYMIZE','DELETE','REVIEW'))
+);</code></pre>
+  <p>保持期限は運用手順だけでなく、データに紐づくポリシーとして持つと管理しやすい。退会日から何年、最終取引日から何年、法定保存期間終了まで、など起算点が違うため、対象ごとに設計する。</p>
+
+  <div class="call warn"><div class="h">警告</div><div>論理削除列を足すだけでは削除設計にならない。どの画面から除外するか、どの帳票には残すか、外部連携には削除を送るか、バックアップやアーカイブからも消す必要があるか、保持期限後に何をするかまで決める。</div></div>
+</section>
+
+<section id="s44" class="focus">
+  <h2 class="sec"><span class="num">44</span>ビュー・MV・読取モデルの分離 ― 正規化した表をそのまま全画面に見せない</h2>
+  <p class="lead">正規化した書込モデルは、整合性を守るには強いが、一覧・検索・帳票には読みにくいことがある。ここでビュー、マテリアライズドビュー、検索用テーブル、CQRSの読取モデルを検討する。重要なのは、読みやすい形を作ること自体ではなく、<strong>それが正本かキャッシュか</strong>を明確にすること。</p>
+
+  <h3>読取モデルの種類</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>実体</th><th>更新</th><th>向くケース</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>通常ビュー</td><td>保存しないSQL定義</td><td>元表更新で即時反映</td><td>JOINの隠蔽、権限制御、表現統一</td><td>重いSQLは毎回実行される</td></tr>
+      <tr><td>マテリアライズドビュー</td><td>結果を保存</td><td>リフレッシュ</td><td>重い集計、DWH、サマリ</td><td>鮮度、リフレッシュ時間、依存関係</td></tr>
+      <tr><td>検索用投影テーブル</td><td>アプリが更新する読取専用表</td><td>イベント・バッチ・CDC</td><td>検索画面、横断検索、全文検索連携</td><td>正本との乖離。再構築手順が必須</td></tr>
+      <tr><td>CQRS read model</td><td>書込モデルと別のモデル</td><td>イベントや非同期処理で更新</td><td>読み書きの要件が大きく違う</td><td>結果整合性と運用複雑度</td></tr>
+      <tr><td>外部検索基盤</td><td>Elasticsearch等</td><td>連携イベント</td><td>全文検索、曖昧検索、高速フィルタ</td><td>DB正本との同期・再投入</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>正本とキャッシュの線引き</h3>
+  <p>読取モデルは原則として正本ではない。正本は制約とトランザクションで守られる書込モデルに置き、読取モデルはいつでも捨てて再構築できる形にする。これができない読取モデルは、実質的に第二の正本になり、整合性問題を生む。</p>
+
+  <h3>検索用投影テーブルの例</h3>
+  <pre><code>CREATE TABLE user_search_projection (
+  user_id NUMBER PRIMARY KEY,
+  display_name VARCHAR2(200),
+  email_for_search VARCHAR2(320),
+  membership_status VARCHAR2(30),
+  latest_application_status VARCHAR2(30),
+  latest_withdrawal_status VARCHAR2(30),
+  updated_at TIMESTAMP NOT NULL,
+  projection_version NUMBER NOT NULL
+);</code></pre>
+  <p>この表は画面検索のためのキャッシュである。直接更新せず、元表のイベントやバッチから作る。壊れたら全件再構築できることが採用条件になる。</p>
+
+  <h3>更新タイミングの選択</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>更新方式</th><th>鮮度</th><th>負荷</th><th>向くケース</th></tr></thead>
+    <tbody>
+      <tr><td>同期更新</td><td>即時</td><td>書込が重くなる</td><td>画面に即時反映が必須</td></tr>
+      <tr><td>トランザクション内Outbox</td><td>準即時</td><td>中</td><td>非同期でも取りこぼしを避けたい</td></tr>
+      <tr><td>定期バッチ</td><td>遅延あり</td><td>制御しやすい</td><td>帳票、日次集計</td></tr>
+      <tr><td>オンデマンド再構築</td><td>必要時</td><td>利用時に重い</td><td>低頻度の管理処理</td></tr>
+      <tr><td>CDC</td><td>準即時</td><td>基盤依存</td><td>DWH・検索基盤連携</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>まず正規化した書込モデルを作り、画面・検索・帳票で苦しい箇所だけビュー/MV/投影を置く。読取モデルには「正本ではない」「再構築できる」「鮮度SLAがある」「乖離検知がある」を明記する。</div></div>
+</section>
+
+<section id="s45" class="focus">
+  <h2 class="sec"><span class="num">45</span>イベントソーシング採否の細分化 ― 全面採用ではなく、部分採用もある</h2>
+  <p class="lead">イベントソーシングは強力だが重い。すべてのエンティティをイベントソースにする必要はない。実務では、純粋なCRUD、監査ログ併用、ドメインイベント、Outbox、台帳、完全イベントソーシングを使い分ける。</p>
+
+  <h3>採用レベル</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>レベル</th><th>正本</th><th>イベントの役割</th><th>向くケース</th><th>避けるケース</th></tr></thead>
+    <tbody>
+      <tr><td>CRUDのみ</td><td>現在値表</td><td>なし</td><td>単純マスタ</td><td>監査・復元が必要な領域</td></tr>
+      <tr><td>CRUD + 監査ログ</td><td>現在値表</td><td>操作証跡</td><td>管理画面、権限変更</td><td>状態再構築したい場合</td></tr>
+      <tr><td>CRUD + ドメインイベント</td><td>現在値表</td><td>外部通知・投影更新</td><td>連携、CQRS read model</td><td>イベント取りこぼしに弱い設計</td></tr>
+      <tr><td>Outbox</td><td>現在値表 + outbox</td><td>トランザクション内で発行予定を保存</td><td>DB更新とメッセージ送信の整合性</td><td>イベント自体を正本にしたい場合</td></tr>
+      <tr><td>台帳型</td><td>イベント/仕訳/入出庫明細</td><td>残高の根拠</td><td>在庫、残高、ポイント、会計</td><td>現在値だけで十分な単純設定</td></tr>
+      <tr><td>完全イベントソーシング</td><td>イベントストア</td><td>状態再構築の唯一の根拠</td><td>監査・時点再現・複雑状態遷移</td><td>単純CRUD、チーム経験不足、運用余力なし</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>イベント設計の粒度</h3>
+  <p>イベントは「状態が変わった」ではなく、できるだけ業務意図を表す。<code>StatusChanged</code> より <code>MembershipApplicationApproved</code>、<code>WithdrawalRequested</code>、<code>PartRevisionReleased</code> の方が後から意味を解釈しやすい。ただし粒度を細かくしすぎるとイベント種類が爆発する。</p>
+
+  <h3>イベントスキーマ進化</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>問題</th><th>例</th><th>対策</th></tr></thead>
+    <tbody>
+      <tr><td>イベント項目追加</td><td>承認理由を後から追加</td><td>イベントバージョン、任意項目、upcaster</td></tr>
+      <tr><td>イベント名変更</td><td><code>UserDeleted</code> を <code>MembershipWithdrawn</code> へ変更</td><td>旧イベントを残し、新イベントへ変換する層を持つ</td></tr>
+      <tr><td>意味変更</td><td><code>Cancelled</code> が取消と却下の両方を含んでいた</td><td>新イベントを追加し、旧イベントの解釈ルールを固定</td></tr>
+      <tr><td>PII含有</td><td>イベントpayloadにメールや住所がある</td><td>個人情報を参照ID化、暗号化、保持期限設計</td></tr>
+      <tr><td>再生不能</td><td>イベント処理が外部API呼び出しに依存</td><td>再生時は副作用を出さない。副作用と状態更新を分離</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>スナップショット</h3>
+  <p>完全イベントソーシングでは、毎回最初から全イベントを再生すると遅い。一定イベント数ごと、または重要状態ごとにスナップショットを保存し、そこから後続イベントだけ再生する。ただし、スナップショットは正本ではなく、イベントから再生成できるキャッシュとして扱う。</p>
+
+  <div class="call warn"><div class="h">警告</div><div>イベントソーシングは「履歴がほしい」だけで採用すると重すぎる。監査ログや履歴表で足りるならそちらがよい。イベントソーシングが向くのは、イベント自体が業務の正本であり、再構築・時点再現・複数投影が価値を持つ領域である。</div></div>
+</section>
+
+<section id="s46" class="focus">
+  <h2 class="sec"><span class="num">46</span>外部連携・取込・冪等性 ― 連携データは信用せず、再実行できるように受ける</h2>
+  <p class="lead">外部連携では、同じデータが複数回来る、順序が前後する、途中で失敗する、外部側のIDが変わる、取消が後から来る。DB設計で冪等性と取込履歴を持たないと、再実行のたびに重複・欠落・二重処理が起きる。</p>
+
+  <h3>外部連携で持つべき表</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>表</th><th>役割</th><th>持つ情報</th></tr></thead>
+    <tbody>
+      <tr><td><code>integration_message</code></td><td>受信/送信メッセージの事実</td><td>source, message_id, payload_hash, received_at, status</td></tr>
+      <tr><td><code>integration_batch</code></td><td>ファイル・APIバッチ単位</td><td>件数、ファイル名、取込開始/終了、エラー数</td></tr>
+      <tr><td><code>staging_*</code></td><td>検証前データの受け皿</td><td>生データ、正規化値、検証結果</td></tr>
+      <tr><td><code>external_identifier</code></td><td>外部IDマッピング</td><td>source_system, external_id, internal_id, valid period</td></tr>
+      <tr><td><code>outbox_event</code></td><td>DB更新後に外部へ出すイベント</td><td>event_type, payload, publish_status</td></tr>
+      <tr><td><code>inbox_dedup</code></td><td>受信重複排除</td><td>message_id, processed_at, result</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>冪等性キー</h3>
+  <p>冪等性とは、同じ処理を何度実行しても結果が同じになる性質である。外部APIやファイル取込では、<code>source_system</code>、<code>external_message_id</code>、<code>business_event_id</code>、<code>payload_hash</code> などを使って重複処理を防ぐ。</p>
+  <pre><code>CREATE TABLE inbound_message (
+  inbound_message_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  source_system_code VARCHAR2(50) NOT NULL,
+  external_message_id VARCHAR2(200) NOT NULL,
+  payload_hash VARCHAR2(128) NOT NULL,
+  received_at TIMESTAMP NOT NULL,
+  process_status VARCHAR2(30) NOT NULL,
+  processed_at TIMESTAMP,
+  CONSTRAINT uk_inbound_message UNIQUE (source_system_code, external_message_id)
+);</code></pre>
+
+  <h3>順序逆転への対処</h3>
+  <p>外部から「変更」「削除」「作成」が順番通りに来るとは限らない。削除が先に来て、後から作成が届くこともある。対策は、外部イベントの発生時刻・シーケンス番号・バージョンを持ち、古いイベントを無視または保留できるようにすること。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>対策</th><th>内容</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>外部バージョン</td><td>外部エンティティの版番号を比較し、新しいものだけ反映</td><td>外部が単調増加を保証する必要</td></tr>
+      <tr><td>発生時刻</td><td>新旧を時刻で判断</td><td>時計ずれ・遅延登録に注意</td></tr>
+      <tr><td>保留キュー</td><td>親が来ていない子イベントを保留</td><td>期限切れ・手動修復が必要</td></tr>
+      <tr><td>再同期</td><td>差分ではなくスナップショットで整合を取り直す</td><td>全件負荷と整合窓</td></tr>
+      <tr><td>調定</td><td>外部と内部の件数・ハッシュ・重要項目を突合</td><td>日次・週次など運用設計が必要</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Outboxパターン</h3>
+  <p>DB更新とメッセージ送信を別トランザクションにすると、「DBは更新されたがメッセージ送信に失敗」「メッセージだけ送られたがDBがロールバック」という事故が起きる。Outboxでは、DB更新と同じトランザクションで送信予定イベントを保存し、別プロセスが送信する。</p>
+  <pre><code>CREATE TABLE outbox_event (
+  outbox_event_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  aggregate_type VARCHAR2(60) NOT NULL,
+  aggregate_id NUMBER NOT NULL,
+  event_type VARCHAR2(100) NOT NULL,
+  payload CLOB NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  publish_status VARCHAR2(30) NOT NULL CHECK (publish_status IN ('PENDING','PUBLISHED','FAILED','DEAD_LETTER')),
+  published_at TIMESTAMP,
+  retry_count NUMBER DEFAULT 0 NOT NULL
+);</code></pre>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>外部連携は「成功する前提」で設計しない。メッセージID、取込バッチ、ステージング、外部ID履歴、冪等性キー、再実行可能な処理、調定クエリを最初から置く。連携の失敗を業務データの不整合にしない。</div></div>
+</section>
+
+<section id="s47" class="focus">
+  <h2 class="sec"><span class="num">47</span>マルチテナント・所有権・公開範囲 ― tenant_idを足すだけではない</h2>
+  <p class="lead">複数会社・複数顧客・複数部門で同じシステムを使う場合、データの所有権と公開範囲をテーブル設計に入れる必要がある。単に全表に <code>tenant_id</code> を足すだけでは、共有マスタ、グローバルコード、横断管理、委託運用、データ移管に耐えられない。</p>
+
+  <h3>テナント分離方式</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>分離度</th><th>運用</th><th>向くケース</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>共有DB・共有スキーマ</td><td>低〜中</td><td>楽</td><td>小〜中規模SaaS、テナント数多数</td><td>全表のtenant_id漏れが致命的</td></tr>
+      <tr><td>共有DB・テナント別スキーマ</td><td>中</td><td>中</td><td>顧客ごとのカスタマイズがある</td><td>DDL適用・集計が大変</td></tr>
+      <tr><td>テナント別DB</td><td>高</td><td>重い</td><td>強い分離、規制、巨大顧客</td><td>横断分析・運用コスト</td></tr>
+      <tr><td>ハイブリッド</td><td>顧客規模で分ける</td><td>重い</td><td>大口だけ専用DB</td><td>コードと運用が複雑</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>共有マスタの扱い</h3>
+  <p>部品分類、国コード、単位、標準工程などは全テナント共通のこともあれば、テナントごとに上書きしたいこともある。グローバルマスタとテナント上書きを分けると柔軟性が出る。</p>
+  <pre><code>CREATE TABLE global_unit (
+  unit_code VARCHAR2(30) PRIMARY KEY,
+  unit_name VARCHAR2(100) NOT NULL
+);
+
+CREATE TABLE tenant_unit_override (
+  tenant_id NUMBER NOT NULL,
+  unit_code VARCHAR2(30) NOT NULL REFERENCES global_unit(unit_code),
+  display_name VARCHAR2(100) NOT NULL,
+  is_enabled CHAR(1) NOT NULL CHECK (is_enabled IN ('Y','N')),
+  PRIMARY KEY (tenant_id, unit_code)
+);</code></pre>
+
+  <h3>所有権と閲覧権限</h3>
+  <p>データの所有者と閲覧可能者は違う。製造委託、共同開発、親会社・子会社、販売代理店のように、所有テナントと参照テナントが分かれる場合がある。この場合、全表に <code>tenant_id</code> を置くだけでは足りず、共有範囲・公開設定・アクセス制御表が必要になる。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>設計要素</th><th>役割</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td><code>owner_tenant_id</code></td><td>データを所有する主体</td><td>部品を登録した会社</td></tr>
+      <tr><td><code>visibility_scope</code></td><td>公開範囲</td><td>private, group, public, supplier_shared</td></tr>
+      <tr><td>共有ACL</td><td>個別に参照・編集を許す</td><td>特定取引先にBOM閲覧を許可</td></tr>
+      <tr><td>データ移管履歴</td><td>所有者変更を記録</td><td>子会社から親会社へ部品管理を移管</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>tenant_id漏れ対策</h3>
+  <ul>
+    <li>テナント配下の全表で、PKを <code>(tenant_id, local_id)</code> にするか、少なくとも一意制約に <code>tenant_id</code> を含める。</li>
+    <li>FKにも <code>tenant_id</code> を含め、他テナント行を参照できないようにする。</li>
+    <li>横断管理者用ビューと通常利用者用ビューを分ける。</li>
+    <li>テナント境界のないグローバル表を明示的に分類する。</li>
+    <li>テストデータで「同じlocal_idが別テナントに存在する」ケースを必ず作る。</li>
+  </ul>
+
+  <div class="call warn"><div class="h">警告</div><div>マルチテナントで最も危険なのは、JOIN条件の <code>tenant_id</code> 漏れで他社データが見えること。これは性能問題ではなく重大なセキュリティ事故である。設計段階で複合FK、ビュー、RLS/VPD、テスト観点を入れる。</div></div>
+</section>
+
+<section id="s48" class="focus">
+  <h2 class="sec"><span class="num">48</span>追加アンチパターンと推奨度 ― 迷ったときの比較材料</h2>
+  <p class="lead">最後に、上級者が設計レビューで気にする追加論点をカタログ化する。ここにある全てを採用する必要はない。むしろ、どのリスクを無視してよいかを判断するための材料として使う。</p>
+
+  <h3>追加アンチパターン集</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>アンチパターン</th><th>症状</th><th>後で起きること</th><th>代替</th></tr></thead>
+    <tbody>
+      <tr><td>意味の違う日付を <code>date1/date2</code> で持つ</td><td>列名から意味が分からない</td><td>発生日・登録日・有効日が混ざる</td><td><code>occurred_at</code>, <code>recorded_at</code>, <code>valid_from</code></td></tr>
+      <tr><td>状態と理由を同じ列にする</td><td><code>status='REJECTED_BY_MANAGER'</code></td><td>状態値が爆発する</td><td>状態コードと理由コードを分ける</td></tr>
+      <tr><td>メモ列に業務判断を書く</td><td>検索不能な自由文に重要情報</td><td>帳票・監査・移行で拾えない</td><td>構造化列 + コメント履歴</td></tr>
+      <tr><td>最新フラグだけで履歴管理</td><td><code>is_current='Y'</code></td><td>複数最新・最新なしが発生</td><td>有効期間 + 排他制約/調定</td></tr>
+      <tr><td>外部コードをPKにする</td><td>品番・社員番号・取引先コードをPK</td><td>変更・再利用・統合でFK更新地獄</td><td>内部代理キー + 外部ID履歴</td></tr>
+      <tr><td>汎用コードマスタ1表主義</td><td>全コードを <code>code_master</code> に入れる</td><td>桁・意味・有効期間・階層が混ざる</td><td>安定したコードだけ共通化。業務コードは専用表</td></tr>
+      <tr><td>履歴の物理削除</td><td>古い履歴を消して現役だけ残す</td><td>監査・時点再現が不能</td><td>保持期限、匿名化、アーカイブ</td></tr>
+      <tr><td>NULLを業務状態として使う</td><td><code>approved_at IS NULL</code> = 未承認</td><td>未処理・不要・不明が区別できない</td><td>明示状態 + 日時列</td></tr>
+      <tr><td>1対1表を無条件に結合</td><td>全て同じ主キーの表が大量</td><td>JOIN地獄。どれが必須か不明</td><td>分離理由を明確化。任意/機密/型別なら分ける</td></tr>
+      <tr><td>ENUMをアプリだけで管理</td><td>DBにはVARCHAR2だけ</td><td>不正コードが入る。集計不能</td><td>CHECK制約またはコード表</td></tr>
+      <tr><td>集計列の調定なし</td><td>残高と明細があるが突合しない</td><td>乖離に気づかない</td><td>定期調定クエリと差分修復</td></tr>
+      <tr><td>移行不能なNOT NULL追加</td><td>大表にいきなり必須列</td><td>DDL失敗・長時間ロック</td><td>NULL許容追加→バックフィル→制約追加</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>推奨度つき設計選択表</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>対象</th><th>まず検討</th><th>条件付きで検討</th><th>避けたい</th></tr></thead>
+    <tbody>
+      <tr><td>ユーザー状態</td><td>中核表 + 状態履歴 + 状態固有表</td><td>状態別テーブルスライド、イベント投影</td><td>巨大な <code>user_status</code> 列挙値</td></tr>
+      <tr><td>退会</td><td>会員資格期間 + 退会ケース</td><td>論理削除、アーカイブ、匿名化</td><td>即物理削除</td></tr>
+      <tr><td>承認</td><td>インスタンス/ステップ/タスク/アクション</td><td>対象別承認表、WFエンジン</td><td>対象表に承認列だけ追加</td></tr>
+      <tr><td>部品タイプ</td><td>共通表 + 型別詳細表</td><td>JSON自由特性、統制EAV</td><td>無秩序EAV、NULLだらけSTI</td></tr>
+      <tr><td>排他的参照</td><td>nullable FK + CHECK、スーパータイプ</td><td>型+ID + 調定</td><td>正本関連でFKなし型+ID</td></tr>
+      <tr><td>外部ID</td><td>内部代理キー + 外部ID履歴</td><td>同一性マップ、承継関係</td><td>外部IDをPK/FKに直使用</td></tr>
+      <tr><td>履歴</td><td>状態履歴、履歴表、期間モデル</td><td>Temporal/Flashback、イベントストア</td><td>updated_atだけ</td></tr>
+      <tr><td>読み性能</td><td>索引、ビュー、MV、投影</td><td>CQRS、検索基盤</td><td>正規化表を毎画面で重JOIN</td></tr>
+      <tr><td>在庫/残高</td><td>台帳 + 残高キャッシュ + 調定</td><td>予約、バケット化、専用DB機能</td><td>履歴なし残高上書き</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>参考資料追補</h3>
+  <p>本増補で特に参照した公式・一次寄り資料を以下に示す。本文では読みやすさを優先してURLを脚注化していないため、仕様・版差・実装制約は必ず対象環境で確認する。</p>
+  <ul>
+    <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/data-integrity.html">Oracle AI Database 26ai Concepts — Data Integrity</a>：整合性制約、assertions、制約の利点。</li>
+    <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/adfns/design_basics.html">Oracle AI Database 26ai Development Guide — Design Basics</a>：Temporal Validityの位置づけ。</li>
+    <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/adfns/flashback.html">Oracle AI Database 26ai Development Guide — Flashback Technology</a>：Flashback Time Travel。</li>
+    <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/create-json-relational-duality-view.html">Oracle AI Database 26ai SQL Language Reference — JSON Relational Duality View</a>：関係表とJSON文書の二面性。</li>
+    <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/adfns/using-lock-free-reservation.html">Oracle AI Database 26ai Development Guide — Lock-Free Reservation</a>：在庫・残高・座席などホットな数値集約。</li>
+    <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/dwhsg/basic-materialized-views.html">Oracle AI Database 26ai Data Warehousing Guide — Materialized Views</a>：MVとQuery Rewrite。</li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs">Microsoft Azure Architecture Center — CQRS pattern</a>：読み書きモデルの分離。</li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing">Microsoft Azure Architecture Center — Event Sourcing pattern</a>：イベントストアと投影。</li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/materialized-view">Microsoft Azure Architecture Center — Materialized View pattern</a>：読取向け投影の扱い。</li>
+  </ul>
+
+  <div class="call tip"><div class="h">この増補版の使い方</div><div>設計レビュー時に、対象テーブルを1つ選び、「状態」「同一性」「時間」「履歴」「削除」「外部連携」「読取モデル」「移行」の各節を順に当てる。全てを重装備にするのではなく、どのリスクは受け入れ、どのリスクはDB設計で潰すかを明文化する。</div></div>
+</section>
+
+
+<div class="part-banner b2"><h2>第 VII 部 増補: 周辺だが設計で効く領域 <small>― 申請内容、添付、分類、物理配置、レビュー質問</small></h2></div>
+
+<section id="s48a" class="focus">
+  <h2 class="sec"><span class="num">48A</span>申請・ドラフト・提出スナップショット ― 「今のマスタ」と「申請時の内容」を混ぜない</h2>
+  <p class="lead">入会申請、部品改訂申請、価格改定申請、退会申請のような申請系データでは、申請者が入力した時点の内容と、現在のマスタ値がずれる。申請が承認された時に、どの内容を承認したのかを再現できない設計は危険である。</p>
+
+  <h3>申請系でよくある状態</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>状態</th><th>意味</th><th>編集可否</th><th>DB設計上の扱い</th></tr></thead>
+    <tbody>
+      <tr><td>ドラフト</td><td>本人または担当者が編集中</td><td>可</td><td>上書き可。ただし下書き保存履歴が必要なら別途版管理</td></tr>
+      <tr><td>提出済み</td><td>承認プロセスへ渡した</td><td>原則不可</td><td>提出時スナップショットを固定</td></tr>
+      <tr><td>差戻中</td><td>承認者から修正依頼</td><td>可</td><td>再提出で申請版を増やす</td></tr>
+      <tr><td>承認済み</td><td>業務的に採用された</td><td>不可</td><td>承認対象内容を不変として保存</td></tr>
+      <tr><td>却下</td><td>採用されなかった</td><td>不可または再申請へコピー</td><td>却下理由と却下時点内容を残す</td></tr>
+      <tr><td>取消</td><td>申請者または管理者が取り下げた</td><td>不可</td><td>取消理由・取消者・取消時刻を残す</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>申請内容の3つの持ち方</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>形</th><th>強い点</th><th>弱い点</th><th>向くケース</th></tr></thead>
+    <tbody>
+      <tr><td>申請表に正規化して持つ</td><td><code>application</code> + <code>application_line</code></td><td>検索・制約・差分比較に強い</td><td>本番表と似た構造が二重化</td><td>申請内容を画面検索・承認条件に使う</td></tr>
+      <tr><td>JSONスナップショット</td><td><code>submitted_payload_json</code></td><td>提出時の形を丸ごと保存できる</td><td>検索・制約が弱い</td><td>外部フォーム、項目変動、証跡重視</td></tr>
+      <tr><td>本番候補表</td><td><code>part_revision_candidate</code> など</td><td>承認後の昇格が明確</td><td>候補と本番の差分管理が必要</td><td>PLM、価格改定、マスタ改訂</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>提出スナップショットを持つ例</h3>
+  <pre><code>CREATE TABLE membership_application_version (
+  application_version_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  application_id NUMBER NOT NULL REFERENCES membership_application(application_id),
+  version_no NUMBER NOT NULL,
+  version_status VARCHAR2(30) NOT NULL CHECK (version_status IN ('DRAFT','SUBMITTED','SUPERSEDED')),
+  applicant_name VARCHAR2(200) NOT NULL,
+  applicant_email VARCHAR2(320) NOT NULL,
+  submitted_payload_json CLOB,
+  created_at TIMESTAMP NOT NULL,
+  submitted_at TIMESTAMP,
+  CONSTRAINT uk_application_version UNIQUE (application_id, version_no)
+);</code></pre>
+  <p>差し戻し後に再提出する場合、同じ申請IDで版を増やす。承認アクションは、どの <code>application_version_id</code> を見て承認したかを参照する。これにより、申請者が後から氏名や住所を変更しても、承認者が見た内容は変わらない。</p>
+
+  <h3>本番マスタへの昇格</h3>
+  <p>承認後に申請内容を本番表へ反映する場合、以下のどれかを選ぶ。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>昇格方式</th><th>内容</th><th>メリット</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>コピー昇格</td><td>申請版から本番表へINSERT/UPDATE</td><td>本番表がシンプル</td><td>申請版と本番版の対応を残す</td></tr>
+      <tr><td>参照昇格</td><td>本番表が承認済み申請版を参照</td><td>二重コピーが少ない</td><td>申請表が長期正本になるため設計を堅くする</td></tr>
+      <tr><td>イベント昇格</td><td>承認イベントから本番投影を作る</td><td>監査と再構築に強い</td><td>イベント設計・投影再構築が必要</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>差分表示のための設計</h3>
+  <p>承認者は「前回から何が変わったか」を見たい。差分表示を後から作るなら、申請版を比較可能な構造で持つ必要がある。JSONだけで保存すると柔軟だが、項目単位の差分が難しくなる。重要項目は正規列で持ち、自由項目はJSONにする折衷が扱いやすい。</p>
+
+  <div class="call warn"><div class="h">警告</div><div>承認済み申請が現在のユーザープロフィールや現在の部品マスタをJOINして表示されると、当時承認された内容が変わって見える。承認対象はスナップショットまたは不変版を参照する。</div></div>
+</section>
+
+<section id="s48b" class="focus">
+  <h2 class="sec"><span class="num">48B</span>添付・コメント・通知・タスク ― 周辺データにも正本と寿命がある</h2>
+  <p class="lead">設計資料では主テーブルに注目しがちだが、実務で問題を起こすのは添付ファイル、コメント、通知、タスク、既読、メンション、メモのような周辺データである。これらは「おまけ」ではなく、承認や監査では重要な証跡になる。</p>
+
+  <h3>周辺データの分類</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>データ</th><th>正本性</th><th>寿命</th><th>設計上の注意</th></tr></thead>
+    <tbody>
+      <tr><td>添付ファイル</td><td>申請・承認の根拠になる場合は正本</td><td>対象業務の保持期間に従う</td><td>DBにはメタデータ、実体はオブジェクトストレージでも可</td></tr>
+      <tr><td>コメント</td><td>判断理由なら正本、雑談なら補助</td><td>監査要件次第</td><td>編集履歴・削除可否を決める</td></tr>
+      <tr><td>通知</td><td>業務事実ではなく配信事実</td><td>短〜中期</td><td>再送・失敗・既読を分ける</td></tr>
+      <tr><td>タスク</td><td>作業割当の正本</td><td>完了後も監査保持</td><td>再割当・代理・期限切れを持つ</td></tr>
+      <tr><td>既読</td><td>UX補助または法的通知証跡</td><td>用途次第</td><td>法的通知なら既読時刻・通知内容の版が必要</td></tr>
+      <tr><td>メンション</td><td>通知派生データ</td><td>コメント寿命に依存</td><td>コメント編集時の再計算・履歴</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>添付ファイル設計</h3>
+  <pre><code>CREATE TABLE file_object (
+  file_object_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  storage_provider VARCHAR2(40) NOT NULL,
+  storage_key VARCHAR2(1000) NOT NULL,
+  file_name VARCHAR2(500) NOT NULL,
+  content_type VARCHAR2(200),
+  byte_size NUMBER NOT NULL,
+  sha256_hash VARCHAR2(64) NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  created_by NUMBER
+);
+
+CREATE TABLE business_attachment (
+  attachment_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  file_object_id NUMBER NOT NULL REFERENCES file_object(file_object_id),
+  target_type VARCHAR2(60) NOT NULL,
+  target_id NUMBER NOT NULL,
+  attachment_role VARCHAR2(60) NOT NULL,
+  attached_at TIMESTAMP NOT NULL,
+  attached_by NUMBER,
+  is_deleted CHAR(1) DEFAULT 'N' NOT NULL CHECK (is_deleted IN ('Y','N'))
+);</code></pre>
+  <p>添付はファイル実体と業務関連を分ける。ファイルは同じものを複数対象で参照する可能性がある。ハッシュを持つと改ざん検知・重複排除に使える。業務関連の排他的FK問題は第39節と同じで、重要な正本添付では対象別関連表を検討する。</p>
+
+  <h3>コメントの編集・削除</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>内容</th><th>向くケース</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>編集不可</td><td>誤記は訂正コメントを追加</td><td>承認理由・監査証跡</td><td>UXはやや硬い</td></tr>
+      <tr><td>編集可 + 履歴</td><td>現在コメントと編集履歴を持つ</td><td>一般コメント</td><td>承認時にどの版を見たかが必要</td></tr>
+      <tr><td>論理削除</td><td>削除済み表示だけ残す</td><td>会話履歴</td><td>監査者には見えるかを決める</td></tr>
+      <tr><td>物理削除</td><td>完全に消す</td><td>誤投稿・法務対応</td><td>証跡喪失に注意</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>通知は業務状態ではない</h3>
+  <p>「承認依頼通知を送った」ことと「承認タスクが存在する」ことは別である。通知は届かないことがあるが、タスクは残らなければならない。通知失敗で承認タスクまで消える設計は危険である。</p>
+  <pre><code>CREATE TABLE notification_delivery (
+  notification_delivery_id NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  notification_type VARCHAR2(80) NOT NULL,
+  recipient_user_id NUMBER NOT NULL,
+  channel VARCHAR2(30) NOT NULL CHECK (channel IN ('MAIL','WEB','SLACK','TEAMS')),
+  subject_snapshot VARCHAR2(500),
+  body_snapshot CLOB,
+  delivery_status VARCHAR2(30) NOT NULL CHECK (delivery_status IN ('PENDING','SENT','FAILED','CANCELLED')),
+  created_at TIMESTAMP NOT NULL,
+  sent_at TIMESTAMP,
+  retry_count NUMBER DEFAULT 0 NOT NULL
+);</code></pre>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>添付・コメント・通知を「汎用テーブル」で済ませる場合でも、正本性が高い対象だけは対象別関連表やスナップショットを持つ。承認判断に使った添付やコメントは、後から差し替わって見えないように版・ハッシュ・添付時刻を保存する。</div></div>
+</section>
+
+<section id="s48c" class="focus">
+  <h2 class="sec"><span class="num">48C</span>コード体系・分類階層・有効期間 ― コードマスタは小さく見えて深い</h2>
+  <p class="lead">コードマスタは簡単に見えるが、実務では分類階層、表示順、廃止、統合、言語、テナント別上書き、有効期間、外部コード対応が絡む。雑な共通コードマスタは、後で最も壊しにくい負債になる。</p>
+
+  <h3>コードの種類を分ける</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>種類</th><th>例</th><th>設計</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td>固定列挙</td><td>性別区分、承認状態</td><td>CHECK制約または小さなコード表</td><td>頻繁に変わらない前提</td></tr>
+      <tr><td>業務コード</td><td>退会理由、部品分類、工程区分</td><td>専用コード表</td><td>有効期間・表示順・廃止が必要</td></tr>
+      <tr><td>階層分類</td><td>品目分類、勘定科目、組織</td><td>隣接リスト/閉包表/経路列挙</td><td>移動・版管理・循環防止</td></tr>
+      <tr><td>外部対応コード</td><td>ERPコード、会計コード</td><td>外部コードマップ</td><td>外部側の変更・有効期間</td></tr>
+      <tr><td>テナント別コード</td><td>顧客ごとの分類</td><td>tenant_id付きコード表</td><td>グローバルコードとの対応</td></tr>
+      <tr><td>ユーザー定義タグ</td><td>任意タグ</td><td>タグ表 + 関連表</td><td>コードマスタと混ぜない</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>汎用コードマスタが壊れる理由</h3>
+  <pre><code>-- ありがちだが肥大化しやすい例
+CREATE TABLE code_master (
+  code_type VARCHAR2(50) NOT NULL,
+  code_value VARCHAR2(50) NOT NULL,
+  code_name VARCHAR2(200) NOT NULL,
+  sort_order NUMBER,
+  PRIMARY KEY (code_type, code_value)
+);</code></pre>
+  <p>この形は小規模では便利だが、コードごとに必要な属性が違うと破綻する。退会理由には再入会可否が必要、部品分類には親分類が必要、承認状態には終端状態フラグが必要、会計科目には貸借区分が必要、というように、汎用列だけでは表現できない。</p>
+
+  <h3>専用コード表の例</h3>
+  <pre><code>CREATE TABLE withdrawal_reason_code (
+  reason_code VARCHAR2(40) PRIMARY KEY,
+  reason_name VARCHAR2(200) NOT NULL,
+  is_user_selectable CHAR(1) NOT NULL CHECK (is_user_selectable IN ('Y','N')),
+  allows_rejoin CHAR(1) NOT NULL CHECK (allows_rejoin IN ('Y','N')),
+  requires_manual_review CHAR(1) NOT NULL CHECK (requires_manual_review IN ('Y','N')),
+  valid_from DATE NOT NULL,
+  valid_to DATE NOT NULL,
+  sort_order NUMBER NOT NULL
+);</code></pre>
+  <p>業務固有の意味があるコードは、専用表にした方が制約と説明力が上がる。共通コード表は「本当に属性が共通な小さな列挙」に限定する。</p>
+
+  <h3>分類階層の方式</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方式</th><th>形</th><th>強い点</th><th>弱い点</th><th>向くケース</th></tr></thead>
+    <tbody>
+      <tr><td>隣接リスト</td><td><code>parent_category_id</code></td><td>更新が簡単</td><td>祖先・子孫検索が再帰</td><td>浅い階層</td></tr>
+      <tr><td>閉包表</td><td>祖先-子孫を全行で持つ</td><td>子孫検索が速い</td><td>更新が重い</td><td>参照が多い分類</td></tr>
+      <tr><td>経路列挙</td><td><code>/A/B/C/</code></td><td>LIKE検索が簡単</td><td>移動で更新多数</td><td>階層移動が少ない</td></tr>
+      <tr><td>ネスト集合</td><td>left/right値</td><td>範囲検索が速い</td><td>更新が非常に重い</td><td>静的分類</td></tr>
+      <tr><td>分類版</td><td>分類体系自体に版を持つ</td><td>過去分類を再現</td><td>設計が複雑</td><td>会計科目、品目分類改定</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>廃止コードの扱い</h3>
+  <p>コードは削除しない方がよい。過去データが参照しているコードを削除すると、帳票や履歴が表示できなくなる。廃止は <code>valid_to</code>、<code>is_selectable</code>、<code>is_active</code> で表現し、「新規入力では選べないが過去表示には使える」状態を作る。</p>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>コードマスタを作る前に、そのコードが単なる列挙か、業務属性を持つ分類か、外部対応表か、階層かを分ける。業務属性を持つなら専用表にする。コード削除ではなく廃止期間で扱う。</div></div>
+</section>
+
+<section id="s48d" class="focus">
+  <h2 class="sec"><span class="num">48D</span>パーティション・アーカイブ・IOT ― 物理設計もモデリング段階で少し考える</h2>
+  <p class="lead">論理設計だけで完結するように見えるテーブルも、データ量・保持期間・アクセスパターンによっては物理設計を早めに考える必要がある。特に履歴表、イベント表、ログ表、明細表は、後からパーティション化しようとすると移行が重い。</p>
+
+  <h3>物理設計を早めに考える表</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>表の種類</th><th>増え方</th><th>主な検索</th><th>検討する物理設計</th></tr></thead>
+    <tbody>
+      <tr><td>イベント/台帳</td><td>追記で増え続ける</td><td>期間、対象ID、イベント種別</td><td>日付パーティション、対象ID索引、アーカイブ</td></tr>
+      <tr><td>状態履歴</td><td>状態変更ごと</td><td>対象IDの最新、期間</td><td>対象ID+時刻索引、古い履歴の圧縮</td></tr>
+      <tr><td>監査ログ</td><td>全操作で大量</td><td>期間、ユーザー、対象</td><td>期間パーティション、検索基盤連携</td></tr>
+      <tr><td>添付メタデータ</td><td>業務に比例</td><td>対象ID、ハッシュ、作成日</td><td>対象別関連表、実体ストレージ分離</td></tr>
+      <tr><td>外部取込raw</td><td>バッチごと大量</td><td>バッチID、エラー、照合状態</td><td>バッチ単位パーティション/削除</td></tr>
+      <tr><td>検索投影</td><td>再構築可能</td><td>画面検索条件</td><td>用途特化索引、再作成手順</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>パーティションキーの考え方</h3>
+  <p>パーティションは「大きい表を小分けにする」だけではない。削除・アーカイブ・ロード・集計・バックアップの単位を設計する手段である。期間で捨てる表は日付パーティションが自然だが、テナントごとに運用するならテナントパーティションやサブパーティションも候補になる。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>キー</th><th>利点</th><th>欠点</th><th>向くケース</th></tr></thead>
+    <tbody>
+      <tr><td>日付</td><td>期間検索、古いデータ削除、アーカイブに強い</td><td>特定対象の全履歴検索は複数パーティション</td><td>ログ、イベント、台帳</td></tr>
+      <tr><td>テナント</td><td>テナント単位の移管・削除に強い</td><td>巨大テナントに偏る</td><td>マルチテナント</td></tr>
+      <tr><td>ハッシュ</td><td>負荷分散</td><td>運用単位としては意味が薄い</td><td>高並行・偏り対策</td></tr>
+      <tr><td>リスト</td><td>状態・地域・組織などで分ける</td><td>値追加・偏りに注意</td><td>少数カテゴリの運用分離</td></tr>
+      <tr><td>複合</td><td>日付×テナントなど</td><td>設計・運用が複雑</td><td>大規模履歴表</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>アーカイブ設計</h3>
+  <p>古い履歴をどう扱うかは、テーブル設計時に方針だけでも決める。アーカイブ先は、同一表の古いパーティション、別表、別スキーマ、別DB、オブジェクトストレージ、DWHなどがある。どれを選んでも、復元手順と参照要件を決める必要がある。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>アーカイブ方式</th><th>利点</th><th>欠点</th></tr></thead>
+    <tbody>
+      <tr><td>同一表に残す</td><td>クエリが簡単</td><td>表・索引が肥大</td></tr>
+      <tr><td>パーティション退避</td><td>期間単位の管理が容易</td><td>パーティション設計が必要</td></tr>
+      <tr><td>履歴別表</td><td>現役表を軽くできる</td><td>UNIONや復元処理が必要</td></tr>
+      <tr><td>DWHへ移す</td><td>分析に強い</td><td>OLTPから即時参照しづらい</td></tr>
+      <tr><td>オブジェクトストレージ</td><td>低コスト長期保持</td><td>SQL参照・復元が重い</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>IOTを検討するケース</h3>
+  <p>OracleのIndex Organized Tableは、主キー順で行を格納するため、主キーまたは主キーprefixでの範囲アクセスが多い表に向くことがある。たとえば、<code>(aggregate_id, sequence_no)</code> でイベントを読むイベントストリーム、<code>(tenant_id, code)</code> の小さな参照表など。ただし、非キー列が大きい表、二次索引が多い表、更新が多い表では慎重に検討する。</p>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>最初から詳細なストレージ設計を固める必要はないが、履歴・イベント・ログ・取込rawのように増え続ける表では、日付列、テナント列、取込バッチIDなど、将来のパーティションキー候補を設計に入れておく。後から列を足すより安全である。</div></div>
+</section>
+
+<section id="s48e" class="focus">
+  <h2 class="sec"><span class="num">48E</span>追加レビュー質問100 ― 答えられない箇所が設計リスク</h2>
+  <p class="lead">最後に、DB設計レビューで使える質問を100個に近い粒度で並べる。全質問に厳密な答えを用意する必要はないが、重要テーブルについて答えられない項目が多い場合、そのテーブルはまだ設計が浅い。</p>
+
+  <h3>意味・境界</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>質問</th><th>見たいリスク</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>この表の1行は何を表すか、名詞1つで言えるか。</td><td>ゴッドテーブル化</td></tr>
+      <tr><td>2</td><td>同じ業務用語が別部門で違う意味を持っていないか。</td><td>同名異義</td></tr>
+      <tr><td>3</td><td>似た名前の表が別々に存在する理由を説明できるか。</td><td>異名同義</td></tr>
+      <tr><td>4</td><td>この表はリソース、イベント、状態、履歴、投影のどれか。</td><td>責務混在</td></tr>
+      <tr><td>5</td><td>この表の行はいつ生まれ、いつ終わるか。</td><td>寿命不明</td></tr>
+      <tr><td>6</td><td>行を削除してよい条件は何か。</td><td>データ消失</td></tr>
+      <tr><td>7</td><td>この表は業務正本か、キャッシュか、ログか。</td><td>二重正本</td></tr>
+      <tr><td>8</td><td>この表を再構築できるか。できるなら何からか。</td><td>復旧不能</td></tr>
+      <tr><td>9</td><td>画面項目に引きずられていないか。</td><td>UI依存設計</td></tr>
+      <tr><td>10</td><td>将来増えそうな状態・種別をどこへ逃がすか。</td><td>拡張不能</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>キー・同一性</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>質問</th><th>見たいリスク</th></tr></thead>
+    <tbody>
+      <tr><td>11</td><td>PKは内部で発行しているか、外部から来ているか。</td><td>外部都合でPK変更</td></tr>
+      <tr><td>12</td><td>業務キーは本当に一意か。誰が保証するか。</td><td>疑似一意性</td></tr>
+      <tr><td>13</td><td>外部IDが変わった場合、履歴を残せるか。</td><td>連携破綻</td></tr>
+      <tr><td>14</td><td>同じ実体に複数外部IDが付くか。</td><td>名寄せ不能</td></tr>
+      <tr><td>15</td><td>IDが再利用される可能性はあるか。</td><td>過去JOIN誤り</td></tr>
+      <tr><td>16</td><td>統合・分割・承継をどう表すか。</td><td>過去改竄</td></tr>
+      <tr><td>17</td><td>表示番号とPKを混ぜていないか。</td><td>採番変更地獄</td></tr>
+      <tr><td>18</td><td>採番はトランザクションとどの関係にあるか。</td><td>欠番・重複</td></tr>
+      <tr><td>19</td><td>一意制約を置かない理由を説明できるか。</td><td>重複混入</td></tr>
+      <tr><td>20</td><td>一意制約を置くならNULLの扱いを理解しているか。</td><td>想定外重複</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>状態・承認・履歴</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>質問</th><th>見たいリスク</th></tr></thead>
+    <tbody>
+      <tr><td>21</td><td>現在状態だけでなく状態遷移履歴が必要か。</td><td>監査不能</td></tr>
+      <tr><td>22</td><td>状態ごとに必須列が違うか。</td><td>NULL増殖</td></tr>
+      <tr><td>23</td><td>状態遷移の許可条件はどこで守るか。</td><td>不正遷移</td></tr>
+      <tr><td>24</td><td>差戻と却下は区別されているか。</td><td>ワークフロー混乱</td></tr>
+      <tr><td>25</td><td>承認者変更・代理承認・期限切れを扱えるか。</td><td>運用不能</td></tr>
+      <tr><td>26</td><td>承認定義の版と承認インスタンスを分けているか。</td><td>過去WF改変</td></tr>
+      <tr><td>27</td><td>承認時に見た申請内容を再現できるか。</td><td>証跡欠落</td></tr>
+      <tr><td>28</td><td>取消、訂正、再申請を別の概念として扱っているか。</td><td>状態値混濁</td></tr>
+      <tr><td>29</td><td>履歴は人間用か、システム再構築用か。</td><td>履歴方式ミスマッチ</td></tr>
+      <tr><td>30</td><td>履歴データの保持期限は決まっているか。</td><td>肥大化/過保持</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>時間・削除・個人情報</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>質問</th><th>見たいリスク</th></tr></thead>
+    <tbody>
+      <tr><td>31</td><td>発生時刻、登録時刻、有効開始日を分けているか。</td><td>遡及不能</td></tr>
+      <tr><td>32</td><td>有効期間は半開区間か。</td><td>境界重複</td></tr>
+      <tr><td>33</td><td>期間重複をどこで防ぐか。</td><td>二重有効</td></tr>
+      <tr><td>34</td><td>訂正前の誤記録も残す必要があるか。</td><td>監査不足</td></tr>
+      <tr><td>35</td><td>退会と個人情報削除は分離されているか。</td><td>過削除/過保持</td></tr>
+      <tr><td>36</td><td>匿名化後もFKを保てるか。</td><td>参照破壊</td></tr>
+      <tr><td>37</td><td>削除済みを外部システムへどう伝えるか。</td><td>外部残存</td></tr>
+      <tr><td>38</td><td>バックアップやアーカイブの個人情報はどう扱うか。</td><td>削除漏れ</td></tr>
+      <tr><td>39</td><td>論理削除条件が全SQLに入る仕組みはあるか。</td><td>削除済み露出</td></tr>
+      <tr><td>40</td><td>tombstoneが必要な連携はあるか。</td><td>削除再発生</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>外部連携・性能・運用</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>質問</th><th>見たいリスク</th></tr></thead>
+    <tbody>
+      <tr><td>41</td><td>外部メッセージを重複受信したらどうなるか。</td><td>二重処理</td></tr>
+      <tr><td>42</td><td>取込途中で失敗しても再実行できるか。</td><td>半端データ</td></tr>
+      <tr><td>43</td><td>外部イベントの順序逆転を扱えるか。</td><td>古い状態への巻戻り</td></tr>
+      <tr><td>44</td><td>DB更新と外部通知の整合性をどう取るか。</td><td>送信漏れ/二重送信</td></tr>
+      <tr><td>45</td><td>検索画面のための投影は再構築できるか。</td><td>第二正本化</td></tr>
+      <tr><td>46</td><td>MVや投影の鮮度要件は明記されているか。</td><td>古い表示</td></tr>
+      <tr><td>47</td><td>履歴・ログ表はどの列でパーティション化できるか。</td><td>肥大化</td></tr>
+      <tr><td>48</td><td>索引は読みのために足すが、書込負荷を見ているか。</td><td>更新性能劣化</td></tr>
+      <tr><td>49</td><td>ホット行になる集約はあるか。</td><td>ロック競合</td></tr>
+      <tr><td>50</td><td>調定クエリと修復手順はあるか。</td><td>乖離放置</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>追加50問（短縮リスト）</h3>
+  <ol>
+    <li>この表の全FKに <code>ON DELETE</code> 方針はあるか。</li>
+    <li>循環参照がある場合、登録順序と削除順序を説明できるか。</li>
+    <li>遅延制約が必要な登録シナリオはあるか。</li>
+    <li>バルクロード時に制約を一時的に無効化するか。</li>
+    <li>制約を無効化した後の再検証手順はあるか。</li>
+    <li>コード値追加でアプリのデプロイが必要になるか。</li>
+    <li>コード廃止後も過去データを表示できるか。</li>
+    <li>多言語表示名はどこに持つか。</li>
+    <li>テナント別にコードを上書きできるか。</li>
+    <li>ユーザー定義属性を検索対象にする基準はあるか。</li>
+    <li>JSON列の中の重要属性をどう索引化するか。</li>
+    <li>JSON列に入れてはいけない属性の基準はあるか。</li>
+    <li>同じ概念をRDBと検索基盤のどちらが正本として持つか。</li>
+    <li>検索基盤が遅延したとき、画面はどう表示するか。</li>
+    <li>イベントの再送で投影が二重加算されないか。</li>
+    <li>イベントpayloadに個人情報を入れてよいか。</li>
+    <li>イベントスキーマ変更時に旧イベントを読めるか。</li>
+    <li>スナップショットはイベントから再生成できるか。</li>
+    <li>承認済みデータを後から訂正するプロセスはあるか。</li>
+    <li>訂正は上書きか、訂正イベントか、旧版失効か。</li>
+    <li>現在値列と履歴表の乖離を検知できるか。</li>
+    <li>集計キャッシュと明細の乖離を検知できるか。</li>
+    <li>採番の欠番を許容するか。</li>
+    <li>表示番号は年度や組織でリセットされるか。</li>
+    <li>自然キーに空白・大小文字・全半角の正規化が必要か。</li>
+    <li>メールアドレスの大文字小文字をどう扱うか。</li>
+    <li>電話番号や住所の正規化はどこで行うか。</li>
+    <li>名寄せ候補と確定統合を別管理しているか。</li>
+    <li>統合を取り消せるか。</li>
+    <li>分割後の過去取引はどちらに属するか。</li>
+    <li>権限付与に有効期間があるか。</li>
+    <li>代理承認の権限範囲を履歴化しているか。</li>
+    <li>退職者・退会者が過去承認者として表示できるか。</li>
+    <li>削除済みユーザー名を監査ログにどう表示するか。</li>
+    <li>添付ファイルのハッシュを保存しているか。</li>
+    <li>添付実体が消えたときにメタデータで検知できるか。</li>
+    <li>コメント編集履歴が必要か。</li>
+    <li>通知本文は送信時点のスナップショットを残すか。</li>
+    <li>既読はUX用か法的通知証跡か。</li>
+    <li>バッチ処理の実行履歴・対象件数・エラー件数を残すか。</li>
+    <li>手動修正をどの表に記録するか。</li>
+    <li>運用者が直接DB修正した場合の証跡はあるか。</li>
+    <li>データ移行時に旧IDと新IDのマップを残すか。</li>
+    <li>移行後に旧システムと件数調定するか。</li>
+    <li>大表への列追加・型変更を無停止で行えるか。</li>
+    <li>バックフィルは冪等か。</li>
+    <li>二重書き期間の差分検証はあるか。</li>
+    <li>ロールバック時に新旧どちらを正とするか。</li>
+    <li>テーブルコメント・列コメントで業務意味を説明しているか。</li>
+    <li>この設計を半年後の別メンバーが見て判断理由を追えるか。</li>
+  </ol>
+
+  <div class="call tip"><div class="h">レビューの使い方</div><div>全テーブルに100問を適用するのではなく、重要な正本テーブル、履歴表、外部連携表、ユーザー・権限・会員資格、部品・BOM・承認に絞って使う。答えに詰まった箇所は、設計が悪いというより「まだ判断が明文化されていない」箇所である。</div></div>
+</section>
+
+
+<section id="s48f" class="focus">
+  <h2 class="sec"><span class="num">48F</span>ケース別の設計選択シナリオ ― 似た要件でも選ぶ形は変わる</h2>
+  <p class="lead">ここでは、実務でありがちな状況ごとに「まず選ぶ形」「避けたい形」「判断が変わる条件」をまとめる。設計に完璧解はないため、同じ“ユーザー管理”“部品管理”でも、監査・性能・外部連携・変更頻度で選択が変わる。</p>
+
+  <h3>シナリオ1: 小規模な会員サイト</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>観点</th><th>推奨</th><th>理由</th><th>将来の分岐</th></tr></thead>
+    <tbody>
+      <tr><td>ユーザー状態</td><td><code>account</code> + <code>membership</code> に簡易status</td><td>業務が軽ければ過剰設計を避ける</td><td>承認・退会審査が入ったら申請/退会ケースを追加</td></tr>
+      <tr><td>履歴</td><td>状態履歴だけ</td><td>問い合わせ対応に必要な最小限</td><td>法務・監査要件が出たら二時間軸や監査ログ</td></tr>
+      <tr><td>退会</td><td>論理退会 + 個人情報匿名化ポリシー</td><td>再入会・問い合わせに対応</td><td>完全削除要求が強いなら保持期限ワークフロー</td></tr>
+      <tr><td>読取モデル</td><td>通常ビュー</td><td>データ量が少なければ十分</td><td>検索が遅くなったら投影表</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>シナリオ2: 製造業PLM/BOM</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>観点</th><th>推奨</th><th>理由</th><th>避けたいこと</th></tr></thead>
+    <tbody>
+      <tr><td>部品同一性</td><td><code>part</code> と <code>part_revision</code> を分離</td><td>部品番号と改訂版の寿命が違う</td><td>部品表にRev属性だけを上書き</td></tr>
+      <tr><td>部品タイプ</td><td>共通表 + 型別詳細表 + 自由特性</td><td>型ごとの制約と将来拡張の両立</td><td>全部EAV、またはNULLだらけ単一表</td></tr>
+      <tr><td>BOM</td><td>版・有効期間・構成イベントを持つ</td><td>過去構成と設計変更を再現</td><td>現在BOMだけを上書き</td></tr>
+      <tr><td>承認</td><td>ECR/ECO/ECNなど変更プロセスをケース化</td><td>変更理由・影響範囲・承認を残す</td><td>部品マスタに承認状態だけ追加</td></tr>
+      <tr><td>外部連携</td><td>ERP品番・CAD IDを外部ID履歴に分離</td><td>外部ID変更に耐える</td><td>CADファイル名やERP品番をPKにする</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>シナリオ3: 承認が複雑な社内申請</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>観点</th><th>推奨</th><th>理由</th><th>判断が変わる条件</th></tr></thead>
+    <tbody>
+      <tr><td>承認対象</td><td>対象業務表 + 承認インスタンス</td><td>承認作業を業務本体から分ける</td><td>承認対象が1種類だけなら対象表に近づけてもよい</td></tr>
+      <tr><td>承認ルート</td><td>定義版 + 実行スナップショット</td><td>ルート改定で過去申請を変えない</td><td>ルートが完全固定なら簡略化可</td></tr>
+      <tr><td>差戻</td><td>申請版を増やす</td><td>承認者が見た内容を保存</td><td>軽微修正だけなら修正タスクでも可</td></tr>
+      <tr><td>通知</td><td>タスク正本 + 通知配信ログ</td><td>通知失敗とタスク存在を分ける</td><td>通知不要なら配信ログは簡略化</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>シナリオ4: 外部データ取込中心のシステム</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>観点</th><th>推奨</th><th>理由</th><th>失敗例</th></tr></thead>
+    <tbody>
+      <tr><td>取込</td><td>rawステージング + 正規化 + 昇格</td><td>外部データを信用しない</td><td>CSVを直接本番マスタへMERGE</td></tr>
+      <tr><td>重複</td><td>冪等性キー + message_id</td><td>再送・再実行に耐える</td><td>同じファイルを2回取り込んで重複</td></tr>
+      <tr><td>一意性</td><td>候補照合・人手確認</td><td>外部データに真のキーがない</td><td>氏名+住所でUNIQUE</td></tr>
+      <tr><td>調定</td><td>件数・金額・ハッシュ・エラーの突合</td><td>取りこぼしを検知</td><td>成功ログだけ見て安心する</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>シナリオ5: 高頻度の在庫・座席・ポイント</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>観点</th><th>推奨</th><th>理由</th><th>追加検討</th></tr></thead>
+    <tbody>
+      <tr><td>正本</td><td>台帳イベント</td><td>残高理由を説明できる</td><td>イベント量が多ければパーティション</td></tr>
+      <tr><td>現在値</td><td>残高キャッシュ</td><td>読み性能</td><td>明細との調定</td></tr>
+      <tr><td>引当</td><td>予約表 + 期限</td><td>仮押さえを明示</td><td>期限切れジョブ、補償</td></tr>
+      <tr><td>競合</td><td>差分UPDATE、ロック設計、バケット化</td><td>ホット行を避ける</td><td>DB機能やキューの利用</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>シナリオ6: 監査・法務・個人情報が強いシステム</h3>
+  <p>この場合は、単純なCRUDよりも、履歴・削除・匿名化・証跡・アクセス制御を優先する。重要な設計判断は、誰がいつ何を見たか、誰が何を承認したか、どの内容を根拠に処理したか、削除要求に対して何を消し何を残したかを説明できること。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>領域</th><th>設計</th><th>補足</th></tr></thead>
+    <tbody>
+      <tr><td>監査</td><td>監査ログ + 重要イベント</td><td>監査ログだけで業務状態を再構築しようとしない</td></tr>
+      <tr><td>個人情報</td><td>PII分離、暗号化、匿名化履歴</td><td>PII列の棚卸が必要</td></tr>
+      <tr><td>保持期限</td><td>保持ポリシー表 + 削除/匿名化ジョブ</td><td>対象ごとに起算点が違う</td></tr>
+      <tr><td>アクセス制御</td><td>権限履歴、スコープ、行レベル制御</td><td>過去権限で見えたかを問われる場合がある</td></tr>
+      <tr><td>証跡固定</td><td>提出スナップショット、添付ハッシュ</td><td>承認後に内容が変わって見える事故を防ぐ</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call tip"><div class="h">判断の型</div><div>ケースごとに「正本」「履歴」「現在値キャッシュ」「読取投影」「外部連携」「削除方針」を1行ずつ書く。これだけで、設計の抜けが見える。特に正本とキャッシュを混ぜている箇所は、後で整合性事故になりやすい。</div></div>
+</section>
+
+<section id="s48g" class="focus">
+  <h2 class="sec"><span class="num">48G</span>コメント・命名・ADRで判断を残す ― 設計意図が消えると、正しい表も負債になる</h2>
+  <p class="lead">良いテーブル設計でも、なぜその形にしたのかが残っていなければ、半年後に壊される。状態別テーブル、外部ID履歴、履歴表、投影表、JSON列、非正規化列などの妥協は、必ず設計意図と代償を残す。</p>
+
+  <h3>残すべき設計意図</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>対象</th><th>残すこと</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>表コメント</td><td>1行が表す業務事実、正本/キャッシュの区分</td><td>「会員資格の有効期間を表す。人物や認証アカウントではない。」</td></tr>
+      <tr><td>列コメント</td><td>時刻列・状態列・外部IDの意味</td><td>「valid_fromは業務上の有効開始日。登録日時ではない。」</td></tr>
+      <tr><td>制約名</td><td>何を守る制約か</td><td><code>ck_membership_period_valid</code></td></tr>
+      <tr><td>ADR</td><td>なぜその方式を選んだか、捨てた選択肢</td><td>「ユーザー状態は状態別テーブルではなく中核表+詳細表にする」</td></tr>
+      <tr><td>ER図注記</td><td>排他的関連、履歴、投影、アーカイブ方針</td><td>「search_projectionは再構築可能。正本ではない。」</td></tr>
+      <tr><td>運用Runbook</td><td>調定・再構築・バックフィル・匿名化手順</td><td>「残高差分が出た場合の調査順序」</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>命名の方針</h3>
+  <p>命名は美学ではなく、誤用防止である。<code>user</code>、<code>status</code>、<code>date</code>、<code>type</code>、<code>history</code> のような広すぎる名前は、意味が伝わらない。表名・列名で、主語・時間・正本性・状態軸が伝わるようにする。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>曖昧な名前</th><th>改善例</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td><code>user</code></td><td><code>account</code>, <code>membership</code>, <code>person_profile</code></td><td>ログイン主体・会員資格・人物を分ける</td></tr>
+      <tr><td><code>status</code></td><td><code>auth_status</code>, <code>membership_status</code>, <code>approval_status</code></td><td>状態軸を明確にする</td></tr>
+      <tr><td><code>date</code></td><td><code>occurred_at</code>, <code>submitted_at</code>, <code>valid_from</code></td><td>時間の種類を区別する</td></tr>
+      <tr><td><code>history</code></td><td><code>status_event</code>, <code>price_validity</code>, <code>audit_log</code></td><td>履歴の目的を示す</td></tr>
+      <tr><td><code>data_json</code></td><td><code>submitted_payload_json</code>, <code>external_raw_payload</code></td><td>JSONの役割を示す</td></tr>
+      <tr><td><code>flag</code></td><td><code>is_user_selectable</code>, <code>requires_manual_review</code></td><td>真偽値の意味を明確にする</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ADRテンプレート</h3>
+  <pre><code># ADR: 会員状態の保持方式
+
+## Status
+Accepted / 2026-06-02
+
+## Context
+会員には申請中、会員中、一時停止、退会済み、再入会がある。
+退会時には請求・個人情報削除・外部連携停止が絡む。
+状態ごとに必要な列が異なるが、全ユーザー横断検索も必要。
+
+## Decision
+単一の users 表に全状態を詰め込まず、party / account / membership / withdrawal_case を分ける。
+membership には現在状態を持ち、membership_status_event に状態遷移を追記する。
+退会手続きは withdrawal_case として独立させる。
+
+## Alternatives considered
+1. users.status のみ
+   - 読みは簡単だが、退会ケース・再入会・監査が弱い。
+2. 状態別テーブルへ完全スライド
+   - 状態固有制約は強いが、横断検索とFKが難しい。
+3. 完全イベントソーシング
+   - 監査は強いが、現時点のチーム・要件では過剰。
+
+## Consequences
+- JOINは増える。
+- 状態遷移時は現在値と履歴を同一トランザクションで更新する。
+- 将来、承認ルートが複雑化したら approval_instance を追加する。
+</code></pre>
+
+  <h3>COMMENT文例</h3>
+  <pre><code>COMMENT ON TABLE membership IS
+'会員資格を表す。人物(person/party)や認証アカウント(account)ではない。再入会時は原則として別membership行を作る。';
+
+COMMENT ON COLUMN membership.valid_from IS
+'会員資格の業務上の有効開始日。DB登録日時ではない。';
+
+COMMENT ON COLUMN membership.valid_to IS
+'会員資格の業務上の有効終了日時。半開区間 [valid_from, valid_to) として扱う。';
+
+COMMENT ON TABLE user_search_projection IS
+'ユーザー検索画面用の再構築可能な投影表。正本ではない。更新はprojection jobのみが行う。';</code></pre>
+
+  <h3>設計意図が消えたときの事故</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>元の意図</th><th>意図が消えた後の変更</th><th>事故</th></tr></thead>
+    <tbody>
+      <tr><td>外部IDは履歴管理する</td><td>開発者が最新外部IDだけを本体表に追加</td><td>コード変更時に過去連携が壊れる</td></tr>
+      <tr><td>投影表は再構築可能</td><td>手動入力列を投影表に追加</td><td>再構築で手動入力が消える</td></tr>
+      <tr><td>状態履歴は監査証跡</td><td>古い履歴を削除して軽量化</td><td>問い合わせ・監査に答えられない</td></tr>
+      <tr><td>JSON列は自由特性のみ</td><td>検索必須項目をJSONに追加</td><td>検索性能と制約が崩れる</td></tr>
+      <tr><td>退会は会員資格の終了</td><td>accountを物理削除</td><td>過去承認・請求の参照先が消える</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call tip"><div class="h">おすすめ</div><div>複雑な設計ほど、DDLだけでなく「なぜそうしたか」を短いADRで残す。特に、非正規化、JSON、型+ID、状態別テーブル、履歴表、投影表、外部ID履歴、論理削除は、意図が失われると誤用されやすい。</div></div>
+</section>
+
+<section id="s49" class="">
+      <h2 class="sec"><span class="num">49</span>まとめと参考資料</h2>
+      <p class="lead">テーブル設計の上級者が見ているのは、列の型だけではない。意味、同一性、時間、制約、履歴、削除、読取、移行、運用を同時に見ている。</p>
+      
+<h3>要点</h3>
+<ul>
+  <li>リソース、イベント、状態、履歴、射影を分ける。混ぜると過去と理由が消える。</li>
+  <li>変更される可能性のある外部IDや業務番号をPKにしない。内部代理キーと対応表で守る。</li>
+  <li>状態管理は現在値だけでなく、状態遷移履歴・承認イベント・承認タスクを分ける。</li>
+  <li>ユニークキーがないデータは、rawを保持し、名寄せ候補と確信度を管理する。取り込み時に捨てない。</li>
+  <li>排他的外部キーや多態参照は、柔軟性と参照整合性のトレードオフを明示する。</li>
+  <li>型別データは、共通表 + 型別1:1表 + JSON自由属性の三層で考える。</li>
+  <li>履歴・時系列は、発生時刻、登録時刻、有効期間を分ける。半開区間を基本にする。</li>
+  <li>非正規化、MV、CQRS、イベントソーシングは、書込モデルの真実を守った上で読取を最適化するために使う。</li>
+  <li>削除、訂正、取消、終了、匿名化を混同しない。物理削除は再生成可能なデータに限定する。</li>
+  <li>スキーマは必ず変わる。expand/contract、NOVALIDATE、EBR、オンライン再定義などを前提に、互換期間を設計する。</li>
+</ul>
+<h3>参考資料</h3>
+<ul>
+  <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/data-integrity.html">Oracle AI Database 26ai Concepts — Data Integrity</a> — 外部キー、参照整合性、制約の基本確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/constraint.html">Oracle AI Database 26ai SQL Language Reference — constraint</a> — PK/FK/UNIQUE/CHECK、DEFERRABLE、ビュー制約、RELY/NOVALIDATEの確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/SET-CONSTRAINTS.html">Oracle AI Database 26ai SQL Language Reference — SET CONSTRAINTS</a> — 遅延制約のトランザクション内制御の確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/arpls/DBMS_FLASHBACK_ARCHIVE.html">Oracle AI Database 26ai PL/SQL Packages — DBMS_FLASHBACK_ARCHIVE</a> — Valid Time / temporal visibility の確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/create-json-relational-duality-view.html">Oracle AI Database 26ai SQL Language Reference — CREATE JSON RELATIONAL DUALITY VIEW</a> — リレーショナル表とJSON階層の両立に関する確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/arpls/DBMS_REDEFINITION.html">Oracle AI Database 26ai PL/SQL Packages — DBMS_REDEFINITION</a> — オンライン再定義の確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/adfns/editions.html">Oracle AI Database 26ai Development Guide — Edition-Based Redefinition</a> — 稼働中アップグレードとeditioning viewの確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/dwhsg/basic-query-rewrite-materialized-views.html">Oracle AI Database 26ai Data Warehousing Guide — Materialized Views / Query Rewrite</a> — MVの鮮度・同期・クエリリライトの確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/vldbg/partition-availability.html">Oracle AI Database 26ai VLDB and Partitioning Guide — Partitioning</a> — パーティションの管理性・性能・可用性の確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/data-concurrency-and-consistency.html">Oracle AI Database 26ai Concepts — Data Concurrency and Consistency</a> — MVCC、UNDO、読み取り一貫性の確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/adfns/sql-processing-for-application-developers.html">Oracle AI Database 26ai Development Guide — SQL Processing for Application Developers</a> — SELECT FOR UPDATEやロックの扱いの確認に使用。</li><li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/admin/managing-indexes.html">Oracle AI Database 26ai Administrator’s Guide — Managing Indexes</a> — Invisible Index、Function-Based Index、オンライン索引構築の確認に使用。</li><li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs">Microsoft Azure Architecture Center — CQRS pattern</a> — CQRSとイベントソーシング併用時のread model / materialized viewの整理に使用。</li><li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing">Microsoft Azure Architecture Center — Event Sourcing pattern</a> — イベントストア、射影、再生、読取モデルの整理に使用。</li><li><a href="https://martinfowler.com/eaaDev/EventSourcing.html">Martin Fowler — Event Sourcing</a> — イベントソーシングの基本概念の補助資料。</li><li><a href="https://martinfowler.com/bliki/CQRS.html">Martin Fowler — CQRS</a> — CQRSの価値と複雑性の注意点の補助資料。</li>
+</ul>
+<hr class="soft">
+<p class="axis-note">本資料は、既存の「RDB / Oracle DB設計 応用編 — モデリングの難所・進化・最適化」を土台に、モデリングとテーブル設計に関する別冊として再構成・増補した。300KB増補版では、状態別テーブルへのスライド、退会ケース化、二時間軸履歴、外部連携の冪等性、ホット集約、マルチテナント境界など、判断材料となる設計バリエーションを追加した。厳密なSQL構文や利用可能機能はOracleの版・エディション・構成・権限に依存するため、実案件では対象環境で検証すること。DDL例は設計パターンを示すための最小例であり、監査列、コメント、権限、ストレージ、パーティション、命名規約、テスト、移行手順はプロジェクト標準に合わせて補う。</p>
+
+    </section>
+</main>
+</div>
+</body>
+</html>
