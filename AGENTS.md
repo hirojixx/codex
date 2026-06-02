@@ -23,7 +23,9 @@
 
 ## HTML生成ワークフロー
 
-/spec-to-readable-docs の skills を確認してHTML作成のワークフローで利用すること
+/spark の skills を利用して調査及び資料作成作業を行うこと
+
+/spec-to-readable-docs の skills を利用してHTML作成のワークフローで利用すること
 
 ## レビュー前確認
 
